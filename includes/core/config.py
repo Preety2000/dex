@@ -1,18 +1,9 @@
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Dict, Optional
+from contextlib import contextmanager
+
 from pydantic import BaseModel
-from sqlalchemy import create_engine
-from contextlib import contextmanager
-from sqlalchemy.orm import sessionmaker, scoped_session
-
-from includes.core.globals.entry import app_context
-from includes.db.models.db_exam import ExamDb
-from includes.db.models.owner import BaseOwner
-from includes.db.models.secondary import BaseSecondary
-
-
-from typing import Dict
-from contextlib import contextmanager
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -22,50 +13,37 @@ from includes.db.models.db_exam import ExamDb
 from includes.db.models.owner import BaseOwner
 from includes.db.models.secondary import BaseSecondary
 
-# Configuration
 
-# PostgreSQL connection format:
-# postgresql+psycopg://username:password@host:port/database
-
-# MAIN_DB_URL = "postgresql+psycopg://postgres:rajkamal@localhost:5432/db_vidya"
-
-# EXAM_DB_URL = "postgresql+psycopg://postgres:rajkamal@localhost:5432/db_exam"
-
-# SECONDARY_DB_URLS = {
-#     "hindi": "postgresql+psycopg://postgres:rajkamal@localhost:5432/db_hindi"
-# }
-
+# ============================================================
+# DATABASE CONFIGURATION
+# ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent
-DB_DIR = BASE_DIR / "sqlite"
 
-# Folder automatically create
+# SQLite files will be created here:
+# includes/core/sqlite/
+DB_DIR = BASE_DIR / "sqlite"
 DB_DIR.mkdir(parents=True, exist_ok=True)
+
 
 MAIN_DB_URL = f"sqlite:///{DB_DIR / 'db_vidya.db'}"
 
 EXAM_DB_URL = f"sqlite:///{DB_DIR / 'db_exam.db'}"
 
-SECONDARY_DB_URLS = {"hindi": f"sqlite:///{DB_DIR / 'db_hindi.db'}"}
+SECONDARY_DB_URLS: Dict[str, str] = {
+    "hindi": f"sqlite:///{DB_DIR / 'db_hindi.db'}"
+}
 
 
-# --- Session Factories ---
+# ============================================================
+# SQLAlchemy SESSION FACTORY
+# ============================================================
+
 def create_session_factory(db_url: str, base):
-    """Creates SQLAlchemy engine + scoped session factory."""
-
-    # engine = create_engine(
-    #     db_url,
-    #     pool_size=50,
-    #     max_overflow=100,
-    #     pool_timeout=30,
-    #     pool_recycle=1800,
-    #     pool_pre_ping=True,
-    # )
-
-    # base.metadata.create_all(bind=engine)
-    # Session = scoped_session(
-    #     sessionmaker(bind=engine, autocommit=False, autoflush=False)
-    # )
+    """
+    Create SQLAlchemy engine and scoped session factory.
+    Supports both SQLite and PostgreSQL.
+    """
 
     is_sqlite = db_url.startswith("sqlite")
 
@@ -79,7 +57,6 @@ def create_session_factory(db_url: str, base):
         )
 
     else:
-
         engine = create_engine(
             db_url,
             pool_size=50,
@@ -89,49 +66,74 @@ def create_session_factory(db_url: str, base):
             pool_pre_ping=True,
         )
 
-    # Create tables if they don't exist
+    # Create tables automatically
     base.metadata.create_all(bind=engine)
 
     Session = scoped_session(
         sessionmaker(
             bind=engine,
-            autocommit=False,
             autoflush=False,
+            expire_on_commit=False,
         )
     )
 
     return engine, Session
 
 
-# Main DB Engine + Session
-# Factories for your databases (assume these are properly defined)
-main_engine, MainSession = create_session_factory(MAIN_DB_URL, BaseOwner)
+# ============================================================
+# MAIN DATABASE
+# ============================================================
 
-# Exam DB Engine + Session
-# Factories for your databases (assume these are properly defined)
-exam_engine, ExamSession = create_session_factory(EXAM_DB_URL, ExamDb)
+main_engine, MainSession = create_session_factory(
+    MAIN_DB_URL,
+    BaseOwner,
+)
 
 
-SecondarySessionList: Dict[str, sessionmaker] = {}
+# ============================================================
+# EXAM DATABASE
+# ============================================================
+
+exam_engine, ExamSession = create_session_factory(
+    EXAM_DB_URL,
+    ExamDb,
+)
+
+
+# ============================================================
+# SECONDARY DATABASES
+# ============================================================
+
+SecondarySessionList: Dict[str, scoped_session] = {}
+
 for db_key, db_url in SECONDARY_DB_URLS.items():
 
-    # Factories for your databases (assume these are properly defined)
-    engine, Session = create_session_factory(db_url, BaseSecondary)
+    engine, Session = create_session_factory(
+        db_url,
+        BaseSecondary,
+    )
+
     SecondarySessionList[db_key] = Session
 
 
-# --- Utility Functions ---
+# ============================================================
+# DATABASE CONTEXT MANAGERS
+# ============================================================
+
 @contextmanager
 def main_database():
-    """Context manager for main DB session."""
+    """Main database session."""
 
     session = MainSession()
+
     try:
         yield session
+        session.commit()
 
     except Exception as e:
-        print(f"[Main DB Error] {e}")
         session.rollback()
+        print(f"[Main DB Error] {e}")
+        raise
 
     finally:
         session.close()
@@ -139,48 +141,61 @@ def main_database():
 
 @contextmanager
 def exam_database():
-    """Context manager for main DB session."""
+    """Exam database session."""
+
     session = ExamSession()
 
     try:
         yield session
+        session.commit()
+
     except Exception as e:
-        print(f"[Exam DB Error] {e}")
         session.rollback()
+        print(f"[Exam DB Error] {e}")
+        raise
+
     finally:
         session.close()
 
 
 @contextmanager
 def secondary_database(db_key: str = app_context.db_key):
-    """Context manager for secondary DB sessions."""
+    """Secondary database session."""
 
     factory = SecondarySessionList.get(db_key)
+
     if not factory:
-        print(f"[Secondary DB Error] No session factory for '{db_key}'")
-        yield None
-        return
+        raise ValueError(
+            f"[Secondary DB Error] "
+            f"No session factory for '{db_key}'"
+        )
 
     session = factory()
+
     try:
         yield session
+        session.commit()
+
     except Exception as e:
-        print(f"[{db_key.upper()} DB Error] {e}")
         session.rollback()
+        print(f"[{db_key.upper()} DB Error] {e}")
+        raise
+
     finally:
         session.close()
 
 
-from pydantic import BaseModel
-from typing import Optional
-
+# ============================================================
+# LOCATION MODEL
+# ============================================================
 
 class Location(BaseModel):
-    # Core GPS coordinates
+
+    # GPS
     latitude: float
     longitude: float
 
-    # Optional GPS metadata
+    # GPS metadata
     altitude: Optional[float] = None
     accuracy: Optional[float] = None
     altitudeAccuracy: Optional[float] = None
@@ -188,7 +203,7 @@ class Location(BaseModel):
     speed: Optional[float] = None
     timestamp: Optional[int] = None
 
-    # IP-based location info (optional)
+    # IP location
     ip: Optional[str] = None
     city: Optional[str] = None
     region: Optional[str] = None
@@ -198,37 +213,64 @@ class Location(BaseModel):
     org: Optional[str] = None
 
     # Misc
-    source: Optional[str] = None  # "gps", "ip", "wifi", "manual", etc.
-    device: Optional[str] = None  # Device type or name (optional)
+    source: Optional[str] = None
+    device: Optional[str] = None
 
 
 async def receive_location(location: Location):
-    return {"message": "Location data received successfully!", "data": location}
+    return {
+        "message": "Location data received successfully!",
+        "data": location,
+    }
 
 
-MASTER_KEY = "qh5DB6lIEAkPk48e7KwVEJOkcQVAngkuy8_5O8y2tGu0tPyo2fulAbhaRGjyIMWzxY"
+# ============================================================
+# SECURITY / COOKIE
+# ============================================================
+
+MASTER_KEY = (
+    "qh5DB6lIEAkPk48e7KwVEJOkcQVAngkuy8_5O8y2tGu0tPyo2fulAbhaRGjyIMWzxY"
+)
+
 DEFAULT_COOKIE = (
-    "Em4FYvhv.0.0.qh5DB6lIEAkPk48e7KwVEJOkcQVAngkuy8_5O8y2tGu0tPyo2fulAbhaRGjyIMWzxY"
+    "Em4FYvhv.0.0."
+    "qh5DB6lIEAkPk48e7KwVEJOkcQVAngkuy8_5O8y2tGu0tPyo2fulAbhaRGjyIMWzxY"
 )
 
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
+# ============================================================
+# APPLICATION SETTINGS
+# ============================================================
 
 class Settings(BaseSettings):
 
     APP_NAME: str = "PhonePe FastAPI Payment"
 
-    DATABASE_URL: str
+    # --------------------------------------------------------
+    # Database
+    # --------------------------------------------------------
+
+    # Optional because application is currently using SQLite
+    # above. If DATABASE_URL is provided in Railway/.env,
+    # it will still be available.
+    DATABASE_URL: Optional[str] = None
+
+    # --------------------------------------------------------
+    # PhonePe
+    # --------------------------------------------------------
 
     PHONEPE_ENV: str = "SANDBOX"
 
-    PHONEPE_CLIENT_ID: str
-    PHONEPE_CLIENT_SECRET: str
-    PHONEPE_CLIENT_VERSION: str
+    PHONEPE_CLIENT_ID: Optional[str] = None
+    PHONEPE_CLIENT_SECRET: Optional[str] = None
+    PHONEPE_CLIENT_VERSION: Optional[str] = None
 
-    FRONTEND_URL: str
-    BACKEND_URL: str
+    # --------------------------------------------------------
+    # URLs
+    # --------------------------------------------------------
+
+    FRONTEND_URL: Optional[str] = None
+    BACKEND_URL: Optional[str] = None
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -236,13 +278,27 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # --------------------------------------------------------
+    # PhonePe Auth URL
+    # --------------------------------------------------------
+
     @property
     def phonepe_auth_url(self) -> str:
 
         if self.PHONEPE_ENV.upper() == "PRODUCTION":
-            return "https://api.phonepe.com/" "apis/identity-manager/v1/oauth/token"
+            return (
+                "https://api.phonepe.com/"
+                "apis/identity-manager/v1/oauth/token"
+            )
 
-        return "https://api-preprod.phonepe.com/" "apis/pg-sandbox/v1/oauth/token"
+        return (
+            "https://api-preprod.phonepe.com/"
+            "apis/pg-sandbox/v1/oauth/token"
+        )
+
+    # --------------------------------------------------------
+    # PhonePe Base URL
+    # --------------------------------------------------------
 
     @property
     def phonepe_base_url(self) -> str:
@@ -252,5 +308,9 @@ class Settings(BaseSettings):
 
         return "https://api-preprod.phonepe.com/apis/pg-sandbox"
 
+
+# ============================================================
+# GLOBAL SETTINGS INSTANCE
+# ============================================================
 
 settings = Settings()
