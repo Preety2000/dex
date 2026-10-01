@@ -2,7 +2,7 @@ import json
 from sqlalchemy.ext.declarative import declarative_base
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import format_view_count
-from includes.core.globals.coreutils import format_TimeStamp
+from includes.core.globals.coreutils import format_datetime
 from includes.db.models.utils import TimeStamp, JsonList
 from sqlalchemy.orm import column_property, relationship
 from sqlalchemy import (
@@ -273,7 +273,7 @@ class Article(BaseSecondary):
 
     async def to_dataclass(self, *, category=None, like=None) -> _Article:
         article = _Article(**serialize(self))
-        article.date = format_TimeStamp(self.timestamp)
+        article.date = format_datetime(self.timestamp)
 
         if like is True:
             article.likes = (
