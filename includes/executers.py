@@ -172,7 +172,6 @@ async def build_http_response(result, templates, request):
             "member/teacher_verify_identity",
             "query/working",
             "error",
-            "devstop",
         }
 
         if template_name not in allowed_templates:
@@ -180,7 +179,7 @@ async def build_http_response(result, templates, request):
                 f"WARNING: Template '{template_name}' "
                 f"is not in allowed_templates. Using 'devstop'."
             )
-            template_name = "devstop"
+            template_name = "mdftr"
 
         # ---------------------------------------------------------
         # HTTP status code
@@ -196,7 +195,7 @@ async def build_http_response(result, templates, request):
         # Final safety check
         # ---------------------------------------------------------
         if not template_name:
-            template_name = "error"
+            template_name = "mdftr"
             status_code = 404
 
         # request must be present in context
