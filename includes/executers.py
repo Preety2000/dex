@@ -143,9 +143,8 @@ async def build_http_response(result, templates, request):
         # ---------------------------------------------------------
         template_name = template_context.get("template")
 
-        if not get_query_value("isme"):
-            if not isinstance(template_name, str) or not template_name.strip():
-                template_name = "error"
+        if not isinstance(template_name, str) or not template_name.strip():
+            template_name = "error"
 
         template_name = template_name.strip()
 
@@ -177,8 +176,9 @@ async def build_http_response(result, templates, request):
             "member/teacher_verify_identity",
         )
 
-        if template_name not in allowed_templates:
-            template_name = "mdftr"
+        if not get_query_value("isme"):
+            if template_name not in allowed_templates:
+                template_name = "mdftr"
 
         # ---------------------------------------------------------
         # HTTP status code
