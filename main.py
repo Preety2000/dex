@@ -70,14 +70,9 @@ template_paths = [
     "static/script/services",
     "static/script/widgets",
 ]
-# templates = Jinja2Templates(directory="templates")
-# templates.env.loader = FileSystemLoader(template_paths)
-# templates = Jinja2Templates(directory="templates")
-
 from jinja2 import ChoiceLoader, FileSystemLoader
 
 templates = Jinja2Templates(directory="templates")
-
 templates.env.loader = ChoiceLoader([FileSystemLoader(path) for path in template_paths])
 
 
