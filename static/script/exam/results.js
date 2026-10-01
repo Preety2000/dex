@@ -103,16 +103,34 @@ $(function results(_, a, b, c, d, e, f, g, h, i, j, k, l, T, U) {
         ] = query;
 
         const templateRow = result_dg.choose('list_on_paper');
-        templateRow.innerHTML = list_in_paper.map(([paper_name, m, [paper_total_marks, paper_obtained_marks, percentage, marks_in_word, paper_grade, result]]) => {
-            paper_obtained_marks = String(paper_obtained_marks)
-            return templateRow.innerHTML.replace(/{{(.*?)}}/g, (_, key) => ({
-                paper_name,
-                paper_obtained_marks,
+        const template = templateRow.innerHTML;
+
+        templateRow.innerHTML = list_in_paper.map(
+            ([paper_name, m, [
                 paper_total_marks,
+                paper_obtained_marks,
+                percentage,
                 marks_in_word,
-                paper_grade
-            }[key.trim()] || ''))
-        }).join('');
+                paper_grade,
+                result
+            ]]) => {
+
+                const placeholders = {
+                    paper_name,
+                    paper_obtained_marks: String(paper_obtained_marks),
+                    paper_total_marks,
+                    marks_in_word,
+                    paper_grade,
+                    percentage,
+                    result
+                };
+
+                return template.replace(
+                    /\{\{(.*?)\}\}/g,
+                    (_, key) => placeholders[key.trim()] ?? ''
+                );
+            }
+        ).join('');
 
         // Replace main placeholders
         const placeholders = {
@@ -122,8 +140,10 @@ $(function results(_, a, b, c, d, e, f, g, h, i, j, k, l, T, U) {
             sname, roll_number, ragistration_number
         };
         const empty = []
-        result_dg.innerHTML = result_dg.innerHTML.replace(/{{(.*?)}}/g, (_, key) => placeholders[key.trim()] ?? (empty.push(key.trim()), ''));
-
+        result_dg.innerHTML = result_dg.innerHTML.replace(
+            /\{\{(.*?)\}\}/g,
+            (_, key) => placeholders[key.trim()] ?? (empty.push(key.trim()), '')
+        );
         for (const i of empty) {
             result_dg.choose(i)?.remove()
         }
