@@ -1,5 +1,6 @@
 from sqlalchemy import inspect
 
+from includes.core.metadata import MetaData
 from includes.db.models.utils import TimeStamp
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
