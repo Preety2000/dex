@@ -17,7 +17,6 @@ from fastapi.responses import (
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from jinja2 import FileSystemLoader
 
 from includes.executers import (
     execute_home_page,
@@ -71,8 +70,16 @@ template_paths = [
     "static/script/services",
     "static/script/widgets",
 ]
+# templates = Jinja2Templates(directory="templates")
+# templates.env.loader = FileSystemLoader(template_paths)
+# templates = Jinja2Templates(directory="templates")
+
+from jinja2 import ChoiceLoader, FileSystemLoader
+
 templates = Jinja2Templates(directory="templates")
-templates.env.loader = FileSystemLoader(template_paths)
+
+templates.env.loader = ChoiceLoader([FileSystemLoader(path) for path in template_paths])
+
 
 # Allow CORS for specific origins
 app.add_middleware(
