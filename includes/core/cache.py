@@ -51,7 +51,7 @@ class AppCache:
         """
 
         created_at = datetime.now()
-        # cls.db[key] = (value, created_at)
+        cls.db[key] = (value, created_at)
 
         return value
 
