@@ -68,7 +68,9 @@ async def execute_home_page(roots: Any = None) -> dict[str, Any]:
 
 async def build_http_response(result, templates, request):
     try:
+        # ---------------------------------------------------------
         # Track response timing safely
+        # ---------------------------------------------------------
         end_time = dt.datetime.now()
         app_context.response["end_time"] = end_time
 
@@ -76,18 +78,24 @@ async def build_http_response(result, templates, request):
         if start_time:
             app_context.response["fetch_time"] = (end_time - start_time).total_seconds()
 
+        # ---------------------------------------------------------
         # Direct responses
+        # ---------------------------------------------------------
         if isinstance(result, str):
             return result
 
         if isinstance(result, (StreamingResponse, HTMLResponse)):
             return result
 
+        # ---------------------------------------------------------
         # Non-dict response
+        # ---------------------------------------------------------
         if not isinstance(result, dict):
             return result
 
+        # ---------------------------------------------------------
         # Build template context
+        # ---------------------------------------------------------
         template_context = dict(result)
 
         template_context.update(
@@ -102,13 +110,20 @@ async def build_http_response(result, templates, request):
             }
         )
 
+        # ---------------------------------------------------------
         # Add metadata
+        # ---------------------------------------------------------
         metadata = MetaData.to_dict()
 
         if isinstance(metadata, dict):
             template_context.update(metadata)
 
+        # request must always remain the actual Request object
+        template_context["request"] = request
+
+        # ---------------------------------------------------------
         # Handle redirect
+        # ---------------------------------------------------------
         redirect_url = MetaData.redirect_url
 
         if redirect_url:
@@ -116,17 +131,27 @@ async def build_http_response(result, templates, request):
                 request=request,
                 name="redirect.html",
                 context={
-                    "redirect": redirect_url,
                     "request": request,
+                    "redirect": redirect_url,
                     "response": None,
                 },
             )
 
+        # ---------------------------------------------------------
         # Select template
-        template_name = template_context.get("template") or "error"
+        # ---------------------------------------------------------
+        template_name = template_context.get("template")
+
+        if not isinstance(template_name, str) or not template_name.strip():
+            template_name = "error"
+
+        template_name = template_name.strip()
 
         print("template_name:", template_name)
 
+        # ---------------------------------------------------------
+        # Allowed templates
+        # ---------------------------------------------------------
         allowed_templates = {
             "index",
             "index.mobile",
@@ -151,9 +176,15 @@ async def build_http_response(result, templates, request):
         }
 
         if template_name not in allowed_templates:
+            print(
+                f"WARNING: Template '{template_name}' "
+                f"is not in allowed_templates. Using 'devstop'."
+            )
             template_name = "devstop"
 
+        # ---------------------------------------------------------
         # HTTP status code
+        # ---------------------------------------------------------
         status_code_map = {
             "query/working": 503,
             "error": 404,
@@ -161,18 +192,19 @@ async def build_http_response(result, templates, request):
 
         status_code = status_code_map.get(template_name, 200)
 
-        # Fallback
+        # ---------------------------------------------------------
+        # Final safety check
+        # ---------------------------------------------------------
         if not template_name:
-            return templates.TemplateResponse(
-                request=request,
-                name="redirect.html",
-                context={
-                    "redirect": "/",
-                    "request": request,
-                },
-            )
+            template_name = "error"
+            status_code = 404
 
+        # request must be present in context
+        template_context["request"] = request
+
+        # ---------------------------------------------------------
         # Render template
+        # ---------------------------------------------------------
         return templates.TemplateResponse(
             request=request,
             name=f"{template_name}.html",
@@ -185,7 +217,9 @@ async def build_http_response(result, templates, request):
         raise
 
     finally:
+        # ---------------------------------------------------------
         # Clean session teardown
+        # ---------------------------------------------------------
         if hasattr(app_context, "main_session"):
             try:
                 app_context.main_session.close()
