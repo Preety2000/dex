@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    .container{
+        max-width: 400px;
+        height: auto;
+        margin: 11vh  auto;
+        text-align: center;
+    }
+    .container h1{
+        font-size: 86px;
+    }
+</style>
+{% endblock %}
+
+
+{% block body %}
+<div class="adscontainer">
+    <div class="ads_container"><ins class="adsbywseditor" style="display:inline-block;width: 728px;height:90px;"></ins></div>
+</div>
+<div class="container">
+    <h2> Oops!</h2>
+    <p style="text-transform: capitalize;">{{response.error_message}}</p>
+</div>
+{% endblock %}

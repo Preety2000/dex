@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="hi">
+{% if svg %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{{ title or 'Error '~(response.status_code or 404)~' - Page not found.' }}</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+    <!-- Lenk Session  -->
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+    <link rel="image_src" href="/img/{{response.hasTitle if response.hasTitle else security.short_encode(title)}}">
+    <link rel="search" type="application/opensearchdescription+xml" title="{{response.site_name  | safe}}"
+        href="/opensearch.xml">
+    <link rel="canonical" href="{{request.url}}">
+    <!-- Meta data session  -->
+    <meta name="title" property="title" itemprop="name" content="{{title}}">
+    <meta name="description" property="description" itemprop="description" content='{{ response.excerpt | safe }}'>
+    <meta name="keywords" content="{{ response.keywords|join(',') }}">
+    <meta name="index:query" content="{{response.id}}/{{response.slug}}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{request.url}}">
+    <meta property="og:site_name " content="{{response.site_name  | safe}}">
+    <meta property="og:image" itemprop="image primaryImageOfPage" content="/static/apple-touch-icon@2.png">{%if
+    response.keywords %} {% for item in response.keywords %}
+    <meta property="og:tag" content="{{item}}">{% endfor %}{% endif %}
+
+    <!-- Twitter meta session  -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:domain" content="{{response.site_domain}}">
+    <meta name="twitter:title" property="og:title" itemprop="name" content="{{title}}">
+    <meta name="twitter:description" property="og:description" itemprop="description"
+        content='{{ response.excerpt |safe }}'>
+    <meta content='#1e1e1e' name='theme-color' />
+    <style>
+        body {
+            overflow: hidden;
+        }
+
+        .IN010 {
+            position: fixed;
+            width: -webkit-fill-available;
+            height: 100%;
+            margin: 0;
+            left: 0;
+            top: 0;
+            background: #FFF;
+            z-index: 9999;
+        }
+
+        .__dom {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            height: max-content;
+            width: -webkit-fill-available;
+        }
+    </style>
+    {%if response.data_querys and response.parameter%}
+    <script type="application/ld+json">{
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "publisher": {
+            "@type": "{{response.site_name  | safe}}",
+            "name": "{{response.site_domain}}",
+            "url": "{{request.base_url}}",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "/static/logo.png",
+                "width": 40,
+                "height": 100
+            }
+        },
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://gp.png",
+            "width": 1600,
+            "height": 900
+        },
+        "url": "{{request.url}}",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{request.base_url}}{{response.parameter.slug}}"
+        },
+        "datePublished": "{{response.timestamp}}",
+        "keywords": "{{ response.keywords|join(',') }}",
+        "description": "{%if response.excerpt %}{{response.excerpt | safe}}{% else %} {{response.site_name  | safe}} | The World’s Largest Online Community for Developers{% endif %}",
+        "headline": "{{response.title}}"
+    }</script>{% endif %}
+    <link rel="stylesheet" id="main_style" href="/static/css/index.css?m={{device_info.device_type}}">{% block head %}{%
+    endblock %}{%if device_info.device_type == "mobile"%}
+    <link rel="stylesheet" id="main_style" href="/static/css/mobile.css?m={{device_info.device_type}}">{%endif%}
+    <script type="application/json" data-sjs data-content-len="4">
+        {"require":["bess", null, null, ["7512725961844105", "splash_load"]]}
+    </script>
+    <script type="application/json" data-sjs data-content-len="4">
+        {"require":["option", null, null, ["7512725961844105", "splash_load"]]}
+    </script>
+
+    <script type="text/javascript">
+        function ExtentJs(a, b, c, d, f, m = e => typeof e === "function") {
+            const g = a[b], h = m(g) ? g.call(a, d) : c;
+            return m(f) && a.DOMContentLoaded(e => f.call(a, h));
+        }
+    </script>
+    <script type="text/javascript">// Main Script     {% include 'index.js' %}</script>
+    <script type="text/javascript"> $.module.list ??= $.getFunction().FlEXMAP();</script>
+</head>
+
+<body theme="{{app_context.preferences.theme}}" class="{{device_info.device_type}} {{response.page_type}}">
+    <div class="IN010"></div>
+    <!-- start_time: {{app_context.start_time}}</br>end_time: {{app_context.end_time}}</br>fetch_timing: {{response.fetch_time}}</br> -->
+    <div
+        style="position: absolute;top: 0;left: 50%;transform: translateX(-50%);height: 30px;width: 80px;z-index: 99999;text-wrap-mode: nowrap;">
+        RT : {{response.fetch_time}}</div>
+    <div class="__dom">
+        <div class="IN001">
+            <div class="progress"><span class="IN002"></span></div>
+        </div>
+        <!-- Header Session  -->
+        <div class='IN038'>
+            <header class='header DIS01 clear'>
+                <button class='IN040 button icon' style='position: relative;' title="Menu">
+                    {{svg.ic_menu | safe}}
+                </button>
+                <div class='IN041'>
+                    <div class='logo site-logo'>
+                        {{svg.logo_main | safe}}
+                        <span class="IN042" style="display: none;">request.ipinfo()['country']</span>
+                    </div>
+                </div>
+
+                <div class='IN043'>{% if device_info.device_type == "desktop" %}
+                    <ul class='IN0104 DIS01'>
+                        <li class='list nort'><a class='list-item' href='/'
+                                title='{{function.utc("Home")}}'>{{function.utc("Home")}}</a>
+                        </li>
+                        <li class='list nort'><a class='list-item' href='{{request.base_url}}trending'
+                                title='{{function.utc("Trending")}}'>{{function.utc("Trending")}}</a>
+                        </li>
+                        <li class='list nort'><a class='list-item' href='{{request.base_url}}topic'
+                                title='{{function.utc("Topic")}}'>{{function.utc("Topic")}}</a>
+                        </li>
+                        <li class='list nort'><a class='list-item' href='{{request.base_url}}questions'
+                                title='{{function.utc("Questions")}}'>{{function.utc("Questions")}}</a>
+                        </li>
+                        <li class='list nort'><a class='list-item' href='{{request.base_url}}books'
+                                title='{{function.utc("Books")}}'>{{function.utc("Books")}}</a>
+                        </li>
+                    </ul>{%endif%}
+                </div>
+                <div class='IN020 DIS01'>
+                    {%if search_hide != True %}
+                    <form action='/search' class='search' method='get'>
+                        <div class="IN046">
+                            <input name='q' placeholder='{{function.utc("Search")}}…' type='search'
+                                value='{{request.query_params.get("q", "")}}' />
+                        </div>
+                        <div class="IN047">
+                            <button class="IN049" title="Search button">{{svg.ic_search | safe}}</button>
+                        </div>
+                    </form>
+                    {% endif %}
+                    <a href="#subMenu" class='button icon' js-name="button" title='Sub Menu'
+                        jsname="subMenu">{{svg.menu_nine | safe}}</a>{%if auth_session %}
+                    <a href="#accountWindow" js-name="button" role='button' class='member button icon'
+                        jsname="accountWindow"
+                        aria-label="{{response.site_name  | safe}} खाता: {{auth_session.name}}  {{auth_session.email}}">
+                        <img loading='eager' height="34" width="34"
+                            src="{{auth_session.img or 'icon/member.png'}}?size=50x50" alt="User Profile Image">
+                    </a>{% else %}
+                    <a class="button login"
+                        href="/ut/accounts/login{% if request.path and request.path != '/ut/accounts/login' %}?redirect={{ request.url }}{% endif %}"
+                        target="_self" title="Login">
+                        {{ function.utc('Login') }}
+                    </a>
+                    {%endif%}
+                </div>
+                <div class='setting-container'></div>
+            </header>
+        </div>
+        <!-- Main Session  -->
+        <div class="IN016 clear">{% block body %}{% endblock %}</div>
+        <!-- Footer Session  -->
+        {%if device_info.device_type == "mobile"%}
+        <div class="navigation-session button-navigation">
+            <div class="IN0104 width DIS01">
+                <a href="/?action=mobile_navigation"
+                    class="button {{function.active_class(response.resource, 'widget')}}">
+                    <div class="squer">
+                        <icon class="IN065">{{svg.ib_home | safe}}</icon>
+                        <span class="IN040-title">{{function.utc("Home")}}</span>
+                    </div>
+                </a>
+                <a href="/questions?action=mobile_navigation"
+                    class="button {{function.active_class(response.resource, 'questions')}}">
+                    <div class="squer">
+                        <icon class="IN065">{{svg.ib_question | safe}}</icon>
+                        <span class="IN040-title">{{function.utc("Questions")}}</span>
+                    </div>
+                </a>
+                <a href="/practice?action=mobile_navigation"
+                    class="button {{function.active_class(response.resource, 'practice')}}">
+                    <div class="squer">
+                        <icon class="IN065">{{svg.ib_bulb | safe}}</icon>
+                        <span class="IN040-title">{{function.utc("MCQ")}}</span>
+                    </div>
+                </a>
+                <a href="/exam?action=mobile_navigation"
+                    class="button {{function.active_class(response.resource, 'exam')}}">
+                    <div class="squer">
+                        <icon class="IN065">{{svg.ib_evaluation | safe}}</icon>
+                        <span class="IN040-title">{{function.utc("Exam")}}</span>
+                    </div>
+                </a>
+                <!-- <a href="/inbox?action=mobile_navigation" class="button {{function.active_class(response.resource, 'inbox')}}">
+                    <div class="squer">
+                        <icon class="IN065">{{svg.inbox | safe}}</icon>
+                        <span class="IN040-title">{{function.utc("Inbox")}}</span>
+                    </div>
+                </a> -->
+            </div>
+        </div>
+        <script src="/script/ismobile"></script>
+        {%else%}
+
+        {%if footer_hide != True %}
+        <div class="IN052">
+            <div class="IN054" style="background-image:url(/media/img/footer_background.png);"></div>
+            <footer class="clear mx">
+                <div class="IN0104">
+                    <div class="logo">
+                        {{svg.logo_main | safe}}
+                    </div>
+                    <div class="IN055">
+                        <a class="tw" href="https://{{config.follow_link.twitter.uri}}" title="Twitter"
+                            target="_blank">{{svg.ic_twitter | safe}}</a>
+                        <a class="fb" href="https://{{config.follow_link.facebook.uri}}" title="Facebook"
+                            target="_blank">{{svg.ic_facebook | safe}}</a>
+                        <a class="ig" href="https://{{config.follow_link.instagram.uri}}" title="Instagram"
+                            target="_blank">{{svg.ic_instagram | safe}}</a>
+                        <a class="yt" href="https://{{config.follow_link.youtube.uri}}" title="Youtube"
+                            target="_blank">{{svg.ic_youtube | safe}}</a>
+                    </div>
+                </div>
+                <div class="IN0104">
+                    <h3 class="title">{{function.utc('Support')}}</h3>
+                    <a class="link" href="#" title="Online {{function.utc('Support')}}">{{function.utc('Online
+                        Support')}}</a>
+                    <a class="link" href="/help" title="{{function.utc('Help Center')}}">{{function.utc("Help
+                        Center")}}</a>
+                    <a class="link" href="/help/contact" target="_blank"
+                        title="{{function.utc('Contact Us')}}">{{function.utc('Contact
+                        Us')}}</a>
+                </div>
+                <div class="IN0104">
+                    <h3 class="title" aria-label="{{function.utc('Link')}}">
+                        {{function.utc('Link')}}</h3>
+                    <a class="link" href="/privacy-policy"
+                        title="{{function.utc('Privacy Policy')}}">{{function.utc('Privacy
+                        Policy')}}</a>
+                    <a class="link" href="/disclaimer"
+                        title="{{function.utc('Disclaimer')}}">{{function.utc('Disclaimer')}}</a>
+                    <a class="link" href="/terms-and-conditions"
+                        title="{{function.utc('Terms and Conditions')}}">{{function.utc('Terms
+                        and Conditions')}}</a>
+                    <a class="link" href="/sitemap.xml" target="_blank"
+                        title="{{function.utc('Sitemap')}}">{{function.utc('Sitemap')}}</a>
+                </div>
+                <div class="IN0104">
+                    <h3 class="title" aria-label="{{function.utc('Link')}}">Tools</h3>
+                    <a class="link" href="/editor" target="_blank" title="Code Editor">Code Editor</a>{%for item in
+                    response.tools or {} %}
+                    <a class="link" href="/tools/{{item.slug}}" target="_blank"
+                        title="{{item.title}}">{{item.title}}</a>{%endfor%}
+                </div>
+            </footer>
+        </div>{%endif%}
+        <div class="IN053">{% set site_link = '<a href="/" title="' ~ response.site_name ~ '">' ~ response.site_name ~
+                '</a>' %}
+            <p class="copyright">{{function.utc("Copyright © 2021-2025 | {0} | All Rights
+                Reserved").format(site_link) | safe}}</p>
+        </div>
+        {%endif%}
+    </div>
+    <div class="IN056" style="display: none !important;">{{svg.errow_top | safe}}</div>
+
+    {% set lsc = security.short_encode(response.languageCode) %}
+    {% set lt = security.short_encode(response.language) %}
+
+    <script type="text/javascript">// All PageWorker  {% include 'page_worker.js' %}</script>
+    <script type="text/javascript">// Nagivation      {% include 'navigation.js' %}</script>
+    <script type="text/javascript">// Main Script     {% include 'script.main.js' %}</script>
+
+    <script
+        src="/script/services/ads.js?lsc=RSd1w6fwS9MSQtyBnShv0PxN40A2ic_EPkFDpHA3d0PQkKbWcIiS27&lt=0PQkKbWcIiS27"></script>
+
+    {%if response.message %}
+    <script>$.message("{{response.message | safe}}")</script>{%endif%}
+    {%if redirect_url %}
+    <script>(function (request) { setTimeout(e => window.location = decodeURIComponent("{{response.redirect_url}}").replace(/&amp;/g, '&'), 4000) }(new $.request()))</script>
+    {%endif%}
+    {% block script %}{% endblock %}
+    <div class="print-ariya"></div>
+
+    {%if not app_context.cookie.get("_cf_bQ") %}
+    <script type="text/javascript">//{% include 'components/cookie-consent.js' %}</script>
+    {%endif%}
+    <script>const N = { "search": ["action_form", $] }</script>
+
+
+</body>
+{% else %}
+
+<head>
+    <!-- <script>window.location.reload()</script> -->
+</head>
+
+<body>
+    <p>error : {{app_context}} : </p>
+    <hr>
+    <p>response : {{response}}</p>
+</body>
+{%endif%}
+
+</html>

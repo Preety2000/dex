@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/login.css?m={{device_info.device_type}}">
+<style>
+    .IN094 {
+        margin: 30px 0;
+    }
+
+    .IN094 .button {
+        margin-bottom: 10px;
+    }
+
+    .other .button {}
+
+    .other .button span {
+        margin: 0 5px;
+        color: var(--border);
+    }
+
+    .lx01 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>{% endblock %}{% block body %}
+<div class="IN003 clear">{%if auth_session%}
+    <main class="aside" style="margin: 23% 6%;">
+        <h1 class="title">Welcome Back !</h1>
+        <p>Hi {{auth_session.name}}, You are already logged in.</p>
+        <a href="/liked-questions" class="IN087"> <i>Liked Question</i><svg viewBox="0 0 24 24" focusable="false"
+                width="24px" height="24px">
+                <g>
+                    <path
+                        d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z">
+                    </path>
+                </g>
+            </svg></a>
+        <div class="IN094">
+            <a href="/" class="button manage">Go home page</a>
+            <a href="/settings/edit" class="button manage">Edit Account</a>
+        </div>
+    </main>{% else %}
+    {%if response.message %}<p class="b_message">{{response.message | safe}}</p>{%endif%}
+    <div class="b_tween lx01">
+        <div class="box-value-prop">
+            <img width="400" height="400" src="/media/img/lolo.png" alt="Image">
+        </div>
+    </div>
+    <main class="loginForm aside">
+        <h1 class="hidden">Login your learner account</h1>
+        <div class="welcome-to">
+            <h2 class="hdr-better-way IN014">Welcome back 👋</h2>
+            <p> Enter your details below and get back to your account.</p>
+        </div>
+        <p></p>
+        <div class="other" style="padding: 0 20px;">
+            <div class="google-login button" style="width: -webkit-fill-available;margin-bottom: 23px;">
+                <div class="DIS01" style="justify-content: center;">
+                    {{svg.ib_google |safe}}<span>|</span>Log in with Google
+                </div>
+            </div>
+        </div>
+        <div class="_ab38 DIS01" style="padding: 0 20px;gap: 10px; font-size: 80%;">
+            <span style="height: 1px; background: var(--border);flex: 1;"></span>
+            <span style="color: var(--border);">OR</span>
+            <span style="height: 1px;background: var(--border);flex: 1;"></span>
+        </div>
+        <!-- {{data}} -->
+        <form class="form" method="post">
+            <input name="username" type="text" class="username {{username_class}}"
+                placeholder="Phone number, username, or email" value="{{email}}" autocomplete="username"
+                autocapitalize="none" />{%if message_username %}<p class="b_message">{{message_username}}</p>{%endif%}
+
+            <input name="password" type="password" class="password {{password_class}}" placeholder="Password"
+                value="{{password}}" autocomplete="current-password" />{%if message_password %}<p class="b_message">
+                {{message_password}}</p>{%endif%}
+
+            <div class="show-password"><span class="show"></span> {{function.utc("Show Password")}}</div>
+            <button class="submit">{{function.utc("Login")}}</button>
+            <div class="link"><a href="/ut/accounts/password/reset"> {{ function.utc("Forgot password?")}}
+                </a></div>
+        </form>
+    </main>{%endif%}
+</div>
+<script>
+    $.event("show", (a, b, c = function (d, e = $("password")) {
+        this.get('array') == 'true'
+            ? (this.add('array', false), e.add('type', 'password'))
+            : (this.add('array', true), e.add('type', 'text'));
+    }) => a.event.on(c))
+</script>{% endblock %}

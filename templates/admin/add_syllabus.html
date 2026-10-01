@@ -1,0 +1,156 @@
+{% extends "admin/base.html" %}{% block body %}{% if data_querys %}
+<form class="form as-action-form" id="form" action="" method="post">
+    <div id="post-body" class="metabox-holder columns-2">
+        <div id="post-body-content">
+            <div id="titlediv">
+                <div id="titlewrap">
+                    <label class="screen-F0019" id="title-prompt-text" for="title">Add title</label>
+                    <input type="text" name="title" size="30" value="{{data_querys.title}}" id="title"
+                        spellcheck="true" autocomplete="off">
+                </div>
+                <div class="inside">
+                    <div id="edit-slug-box"></div>
+                </div>
+            </div>
+            <!-- /titlediv -->
+            <div id="postdivrich" class="postarea editor-expand">
+
+                <div id="content-wrap" class="core-ui editor-wrap tmce-active has-dfw">
+                    <link rel="stylesheet" id="editor-buttons-css" href="/static/css/admin/editor.min.css" media="all">
+                    <div id="content-editor-tools" class="editor-tools hide-if-no-js">
+                        <div id="content-media-buttons" class="media-buttons"><button type="button"
+                                id="insert-media-button" class="button insert-media add_media"
+                                data-editor="content"><span class="media-buttons-icon"></span> Add Media</button>
+                        </div>
+                        <div class="editor-tabs">
+                            <button type="button" id="content-tmce" class="switch-editor switch-tmce">Visual</button>
+                            <button type="button" id="content-html" class="switch-editor switch-html">Text</button>
+                        </div>
+                    </div>
+                    <div id="content-editor-container" class="editor-container">
+                        <div id="ed_toolbar" class="quicktags-toolbar hide-if-no-js"></div>
+                        <textarea class="editor-area" style="height: 300px" autocomplete="off" cols="40" name="content"
+                            id="content">{{data_querys.content}}</textarea>
+
+                    </div>
+                </div>
+
+                <div id="post-status-info">
+                    <div id="word-count">Word count: <span class="word-count">0</span></div>
+                    <div id="character-count">Character count: <span class="character-count">0</span> </div>
+                    <div class="autosave-info">
+                        <span class="autosave-message">&nbsp;</span>
+                    </div>
+                </div>
+
+            </div>
+        </div><!-- /post-body-content -->
+
+        <div id="postbox-container-1" class="postbox-container">
+            <div id="side-sortables" class="meta-box-sortables">
+                <div id="submitdiv" class="postbox ">
+                    <div class="F0006">
+                        <h2 class="hndle">Publish</h2>
+                        <div class="handle-actions hide-if-no-js"></div>
+                    </div>
+
+                    <div class="inside">
+
+                        <div class="misc-pub-section misc-pub-subject" id="visibility">
+                            Subject: <b><span id="subject-display">{{data_querys.subject_name or 'Select'}} </span></b>
+
+                            <a href="javascript:void(0)" class="edit-subject edit" aria-label="subject-select"
+                                role="button">
+                                <span class="span" aria-hidden="true">Edit</span><span class="screen-F0019">Edit
+                                    subject </span>
+                            </a>
+                            <div id="subject-select" class="subject-select hidden hide-if-js">
+                                <div class="grid insides border-bottom">
+                                    {% for subject in subjects %}
+                                    <label class="subject" for="subject-{{subject.id}}">
+                                        <input onclick="title_set(this)" type="radio" {{subject.checked}} title="{{subject.name}}" name="subject" id="subject-{{subject.id}}" value="{{subject.id}}">
+                                        {{subject.name}}
+                                    </label>
+                                    {%endfor%}
+                                    <a href="javascript:void(0)" jsname="ACANS" class="add-new-subject" role="button">
+                                        <span aria-hidden="true">Add a New Subject</span>
+                                        <span class="screen-F0019">Add a new Subject List</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="misc-pub-section misc-pub-university" id="visibility">
+                            University: <b><span id="university-display">{{data_querys.university_name or 'Select'}}</span></b>
+
+                            <a href="javascript:void(0)" class="edit-university edit" aria-label="university-select" role="button">
+                                <span class="span" aria-hidden="true">Edit</span>
+                                <span class="screen-F0019">Edit University </span>
+                            </a>
+                            <div id="university-select" class="university-select hidden hide-if-js">
+                                <div class="grid insides border-bottom">{% for university in universitys %}
+                                    <label class="university" for="university-{{university.id}}">
+                                        <input title="{{university.name}}" onclick="title_set(this)" type="radio" {{university.checked}} name="university" id="university-{{university.id}}" value="{{university.id}}">
+                                        {{university.name}}
+                                    </label>{%endfor%}
+                                    <a href="javascript:void(0)" jsname="addNewUniversity" class="add-new-university" role="button">
+                                        <span aria-hidden="true">Add New University</span>
+                                        <span class="screen-F0019">Add New University List</span>
+                                    </a>
+                                </div>
+                                <script>
+                                    function title_set(input, display) {
+                                        display = $(input.name + "-display", true);
+                                        display.in(input.title);
+                                    }
+                                </script>
+                            </div>
+                        </div>
+
+
+                        <div class="misc-pub-section">
+                            <p><b>Image URL</b></p>
+                            <label class="screen-F0019" for="slug">Image Uri</label>
+                            <input name="image_src" type="text" class="large-text width" id="image_src"
+                                value="{{data_querys.image_src}}">
+                        </div>
+                    </div>
+                    <div class="insides">
+                        <div class="submitbox" id="submitpost">
+                            <div id="major-publishing-actions">
+                                <div id="publishing-action">
+                                    <input type="submit" name="action" id="publish"
+                                        class="button button-primary button-large" value="Publish">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="slugdiv" class="postbox  hide-if-js">
+                    <div class="F0006">
+                        <h2 class="hndle">Slug</h2>
+                        <div class="handle-actions hide-if-no-js"></div>
+                    </div>
+                    <div class="inside">
+                        <label class="screen-F0019" for="slug">Slug</label>
+                        <input name="slug" type="text" class="large-text width" id="slug"
+                            value="{{data_querys.slug}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="postbox-container-2" class="postbox-container">
+            <div id="normal-sortables" class="meta-box-sortables">
+
+            </div>
+            <div id="advanced-sortables" class="meta-box-sortables"></div>
+        </div>
+    </div>
+</form>
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+<script src="/script/dm/article.js"></script>
+{% endblock %}

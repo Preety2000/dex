@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block body %}
+<style>
+    .IN038 {
+        background: transparent;
+        border-bottom: none
+    }
+</style>
+
+<div class="IN0103-container">
+    <div class="IN0103" id="IN0103">
+        <div class="slide"><img src="/static/banner/card1.jpeg" alt="Image 1"></div>
+        <div class="slide"><img src="/static/banner/card2.jpeg" alt="Image 1"></div>
+        <div class="slide"><img src="/static/banner/card3.jpeg" alt="Image 1"></div>
+        <div class="slide"><img src="/static/banner/card1.jpeg" alt="Image 1"></div>
+        <!-- Add more slides as needed -->
+    </div>
+    <div class="dots" id="dots"></div>
+</div>
+<div class='IN077'>
+    <div class="IN0104 IN075">
+        <a href="/exam" class="list button" role="button">
+            <div class="IN091">
+                <span class="IN065">{{svg.ib_evaluation | safe}}</span>
+                <span class="IN040-title">{{function.utc('Exam')}}</span>
+            </div>
+        </a>
+        <a href="/practice" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.ib_bulb | safe}}</span>
+                <span class="IN040-title">{{function.utc('MCQ')}}</span>
+            </div>
+        </a>
+        <a href="courses" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.ib_elearning | safe}}</span>
+                <span class="IN040-title">{{function.utc("Courses")}}</span>
+            </div>
+        </a>
+        <a href="/syllabus" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.ib_syllabus | safe}}</span>
+                <span class="IN040-title">{{function.utc('Syllabus')}}</span>
+            </div>
+        </a>
+        <a href="/questions" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.ib_question | safe}}</span>
+                <span class="IN040-title">{{function.utc("Questions")}}</span>
+            </div>
+        </a>
+        <a href="/topic" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.ib_trending | safe}}</span>
+                <span class="IN040-title">{{function.utc('Topic')}}</span>
+            </div>
+        </a>
+        <a href="/shopping" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.ib_trolley | safe}}</span>
+                <span class="IN040-title">{{function.utc("Shopping")}}</span>
+            </div>
+        </a>
+        <a href="/trending" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.ib_analysis | safe}}</span>
+                <span class="IN040-title">{{function.utc('Trending')}}</span>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class='session'>
+    <div class='clear IN022'>
+        <h2 class='title center IN014'>{{function.utc("Topics")}}</h2>
+        <div class='IN0104'>{%for insex in response.category %}
+            <div class='list boc button' onclick="$.onlink(this,'learning-link')">
+                <div class='IN0105'>
+                    <div class='logo'>
+                        <img width="60" height="60" alt='{{insex.name}}' src='{{insex.img}}' loading="lazy" />
+                    </div>
+                    <div class='meta'>
+                        <div class='title'>{{insex.name}}</div>
+                        <a class='learning-link' href='{{insex.url}}'>{{function.utc('Start
+                            Learning')}}!</a>
+                    </div>
+                </div>
+            </div>{% endfor %}
+        </div>
+        <a href="/topic" class="button right">{{function.utc("All Topics")}}</a>
+    </div>
+</div>
+<!--ADS-->
+<div class='adscontainer clear'>
+    <div class='ads_container'><ins class='adsbywseditor' style='display:inline-block;width: auto;height:auto'></ins>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,226 @@
+{% extends "admin/base.html" %}
+{% block head %}
+<style>
+    .charts {
+        padding: 10px;
+        table-layout: fixed;
+        border: 1px solid var(--border);
+        box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+        border-spacing: 0;
+        width: 50%;
+        clear: both;
+        background: var(--bg-muted);
+        margin: 5px auto;
+    }
+</style>
+{% endblock %}
+{% block body %}
+<div class="chart-container">
+    <div class="tooltip"></div>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th class="manage-column check-column">No.</th>
+            <th class="manage-column column-name">Article Title</th>
+            <th class="manage-column column-views">Views</th>
+            <th class="manage-column column-views">Likes</th>
+            <th class="manage-column column-date">Article Publish Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {%for item in trending%}
+        <tr>
+            <th class="manage-column check-column">{{item.rank}}</th>
+            <th class="manage-column column-name">{{item.title}}</th>
+            <th class="manage-column column-views">{{item.views}}</th>
+            <th class="manage-column column-views">{{item.likes}}</th>
+            <th class="manage-column column-date">{{item.timestamp}}</th>
+        </tr>
+        {%endfor%}
+    </tbody>
+</table>
+<script src="/script/cdn/chart.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
+
+<script>
+    //     // type: 'scatter',
+    //     // type: 'bubble',
+    //     // type: 'polarArea',
+    //     // type: 'radar',
+    //     // type: 'doughnut',
+    //     // type: 'pie',
+    //     // type: 'line',
+    //     // type: 'bar',
+    // Create chart
+   
+    const canvas1 = document.createElement('canvas');
+    const chart_container = $('chart-container');
+    canvas1.width = 600; // Set width dynamically
+    canvas1.height = 250; // Set height dynamically
+    chart_container.create("charts").create.span("title","Trending Article").p.in(canvas1);
+    var ctx1 = canvas1.getContext('2d');
+
+    const labelss = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+
+    var data_ = [
+        {
+            label: 'Views',
+            data: [12, 19, 3, 5, 2, 3, 7],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        },
+        {
+            label: 'Date',
+            data: [12, 29, 13, 15, 2, 32, 7],
+            backgroundColor: '#f0f5',
+            borderColor: '#f0f',
+            borderWidth: 1
+        },
+        {
+            label: 'Content',
+            data: [12, 19, 9, 25, 24, 12, 17],
+            backgroundColor: '#ff05',
+            borderColor: '#ff0',
+            borderWidth: 1
+        },
+    ]
+    // Chart configuration
+    const myBarChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: labelss,
+            datasets:data_
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    display: true,// Hide default legend
+                    labels: {
+                        font: {
+                            size: 14
+                        },
+                        color: '#121212'
+                    }
+                },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+
+    var data = {{ trending | safe}};
+    var data2 = {{ trending | safe}};
+
+    // Process data for chart
+    const labels = response.map(item => item.title);
+    const views = response.map(item => item.views);
+    const dates = response.map(item => item.trending_timestamp.length);
+    const likes = response.map(item => item.likes);
+
+    
+    // Create chart
+    const canvas2 = document.createElement('canvas');
+    canvas2.width = 600; // Set width dynamically
+    canvas2.height = 250; // Set height dynamically
+    const charts = chart_container.create("charts")
+    charts.create.span("title","Trending Article");
+    charts.create("_charts").in(canvas2);
+    var ctx2 = canvas2.getContext('2d');
+
+    var myPieChart = new Chart(ctx2, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Views',
+                data: dates,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)', // Red
+                    'rgba(54, 162, 235, 0.2)', // Blue
+                    'rgba(255, 206, 86, 0.2)', // Yellow
+                    'rgba(75, 192, 192, 0.2)', // Green
+                    'rgba(153, 102, 255, 0.2)', // Purple
+                    'rgba(255, 159, 64, 0.2)', // Orange
+                    'rgba(255, 105, 180, 0.2)', // Pink
+                    'rgba(0, 255, 255, 0.2)', // Cyan
+                    'rgba(50, 205, 50, 0.2)', // Lime
+                    'rgba(0, 128, 128, 0.2)'  // Teal
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)', // Red
+                    'rgba(54, 162, 235, 1)', // Blue
+                    'rgba(255, 206, 86, 1)', // Yellow
+                    'rgba(75, 192, 192, 1)', // Green
+                    'rgba(153, 102, 255, 1)', // Purple
+                    'rgba(255, 159, 64, 1)', // Orange
+                    'rgba(255, 105, 180, 1)', // Pink
+                    'rgba(0, 255, 255, 1)', // Cyan
+                    'rgba(50, 205, 50, 1)', // Lime
+                    'rgba(0, 128, 128, 1)'  // Teal
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'left',
+                    display: true, // Display legend
+                    labels: {
+                        font: {
+                            size: 14
+                        },
+                        color: '#121212'
+                    }
+                },
+                tooltip: {
+                    enabled: false, // Disable default tooltips
+                },
+                datalabels: {
+                    display: true, // Enable data labels
+                    // color: '#000', // Text color
+                    color: (context) => {
+                        return context.dataset.borderColor[context.dataIndex]; // Background color based on slice
+                    },
+                    formatter: (value, context) => {
+                        // Customize the label text
+                        return value
+                        return context.chart.response.labels[context.dataIndex] + ': ' + value;
+                    },
+                    anchor: 'center', // Position of the label
+                    align: 'center', // Align the label text
+                    font: {
+                        weight: 'bold' // Font weight
+                    },
+                    backgroundColor: (context) => {
+                        return "#0000"
+                        return context.dataset.backgroundColor[context.dataIndex]; // Background color based on slice
+                    },
+                    padding: 6 // Padding around the text
+                }
+            },
+            interaction: {
+                mode: 'nearest', // Change interaction mode
+                intersect: false // Allow interaction even when not directly hovering
+            },
+        },
+        plugins: [ChartDataLabels] // Make sure to include this plugin
+    });
+
+
+
+</script>
+{{params}}
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "admin/base.html" %}
+
+{% block head %}
+
+
+{% endblock %}
+
+
+{% block leftSide %}
+<a href="/admin/content/insert?key=AIzaSyAc0d8_11vdQOfoSbU5PDXYuSkoIk9FOy8" class="button">Add New</a>
+{% endblock %}
+
+{% block body %}
+
+{{index_header | safe}}
+
+
+<div id="article" class="content-query striped">
+    <table>
+        <thead>
+            <tr>
+                <th class="manage-column check-column">
+                    <label class="screen-F0019" for="cb-select-all">Select all</label>
+                    <input id="cb-select-all" type="checkbox">
+                </th>
+                <th class="manage-column column-title"><a href="" class="query-title">Title</a></th>
+                <th class="manage-column column-category">Parameter</th>
+                <th class="manage-column column-category">Subject</th>
+                <th class="manage-column column-category">Categories</th>
+                <th class="manage-column column-tags">Tags Count</th>
+                <th class="manage-column column-comment">Comment</th>
+                <th class="manage-column column-views">Views</th>
+                <th class="manage-column column-date">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for content in params.data_querys %}
+            <tr class="{{'_isfalse' if content.status == 'Draft' else '_istrue' }}">
+                <th class="manage-column check-column">
+                    <div class="hidden query-{{content.id}}" style="display: none;">
+                        <div id="{{content.id}}" class="quick-editesDIS00width">
+                            <div class="input-box">
+                                <input type="text" name="title" value="{{content.title}}">
+                                <label for="title">Article Title</label>
+                            </div>
+                            <div class="input-box">
+                                <input type="text" name="slug" value="{{content.slug}}">
+                                <label for="slug">Article Slug</label>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea style="display: none;" class="query-data hidden">{{content}} </textarea>
+                    <label class="screen-F0019" for="cb-select">Select all</label>
+                    <input id="cb-select" type="checkbox">
+                </th>
+                <th class="manage-column column-title">
+                    <strong><a href="/admin/content/update?item={{content.id}}&action=edit&qas={{content.slug}}"
+                            class="query-title">{{content.title}}</a></strong>
+                    <div class="row-actions">
+                        <span class="edit"><a
+                                href="/admin/content/update?item={{content.id}}&action=edit&qas={{content.slug}}">Edit</a>
+                            | </span>
+                        <span class="inline"><a type="button" class="button-link editinline" aria_data="{{content.id}}"
+                                aria-expanded="false" href="javascript:void(0)">Quick Edit</a> | </span>
+                        {%if content.status == 'Draft' %}<span class="publish"><a
+                                href="/admin/content/action?item={{content.id}}&action=publish&qas={{content.slug}}"
+                                class="submitdelete">Publish</a> | </span>{%endif%}
+                        <span class="trash"><a
+                                href="/admin/content/action?item={{content.id}}&action={{'delete' if content.status == 'Draft' else 'trash' }}&qas={{content.slug}}"
+                                class="submitdelete">{{'Delete' if content.status == 'Draft' else 'Bin' }}</a> | </span>
+                        <span class="view"><a href="{{content.url}}" rel="bookmark" target="_blank">View</a></span>
+                    </div>
+                </th>
+                <th class="manage-column column-parameter"> {%if content.parameter %}{{content.parameter.name}}{%endif
+                    %}</th>
+                <th class="manage-column column-subject"> {{content.subjects.name or "Default"}}</th>
+                <th class="manage-column column-category">
+                    {% set category = [] %}
+                    {% for item in content.category %}
+                    {% set _ = category.append(item.name) %}
+                    {%endfor%}
+                    <a href="javascript:void(0)" class="sowing-data" title="{{category}}"
+                        aria-label="{{category}}">{{content.category | length}}</a>
+                </th>
+                <th class="manage-column column-tags">
+                    {% set tags = [] %}
+                    {% for item in content.tags %}
+                    {% set _ = tags.append(item.tag) %}
+                    {%endfor%}
+                    <a href="javascript:void(0)" class="sowing-data" title="{{tags}}"
+                        aria-label="{{tags}}">{{content.tags | length}}</a>
+                </th>
+                <th class="manage-column column-comment"></th>
+                <th class="manage-column column-views">{{content.views}}</th>
+                <th class="manage-column column-date">{{content.date}}</th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- <div class='paginator' id='paginator'>{%for insex in params.paginator%}
+        <a class='button {{insex.clas}}' href='{{insex.slug}}' title='Page {{insex.name}}'>{{insex.name}}</a>{%endfor%}
+    </div> -->
+    <input class="query" type="hidden" name="query" value="{{params.data_querys}}">
+</div>
+{% endblock %}

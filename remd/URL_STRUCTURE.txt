@@ -1,0 +1,83 @@
+# ===================================================================
+SEO-OPTIMIZED URL ROUTING STRUCTURE (EXPANDED)
+
+1. MCQ / QUIZ QUESTIONS
+-------------------------------------------------------------------
+Content Type         : MCQ / Quiz
+All Items            : /practice
+Category Filter      : /practice/tagged/jharkhand-gk
+Single MCQ View      : /practice/what-is-article-370
+Note                 : Excludes category from single view to prevent
+                       duplicate content issues in SEO.
+
+2. NORMAL ARTICLE QUESTIONS
+-------------------------------------------------------------------
+Content Type         : Normal Article
+All Items            : /questions
+Category Filter      : /questions/tagged/
+Single Article View  : /questions/education/education-of-tribal-women-of-jharkhand
+
+3. RESEARCH QUESTIONS
+-------------------------------------------------------------------
+Content Type         : Research
+All Items            : /research
+Category Filter      : /research/sociology
+Single Research View : /research/sociology/tribal-women-literacy-study
+
+4. TOPICS & CATEGORIES (GLOBAL DISCOVERY)
+-------------------------------------------------------------------
+All Topics List      : /topics
+Single Topic Overview: /topics/jharkhand-gk
+Topic-wise MCQs      : /topics/jharkhand-gk/practice
+Topic-wise Articles  : /topics/jharkhand-gk/questions
+Topic-wise Research  : /topics/jharkhand-gk/research
+
+5. TRENDING & USER SAVED CONTENT
+-------------------------------------------------------------------
+Trending Items       : /trending
+Liked Questions      : /saved/liked-questions (or /me/liked-questions)
+Saved / Bookmarked   : /saved/bookmarks
+
+6. COURSES & BOOKS (COMMERCIAL / PRODUCTS)
+-------------------------------------------------------------------
+All Courses          : /courses
+Course Category      : /courses/upsc-prep
+Single Course View   : /courses/upsc-prep/jharkhand-gk-masterclass
+
+All Books            : /books
+Book Category        : /books/history
+Single Book View     : /books/history/jharkhand-tribal-history-book
+
+7. USER PROFILES & PUBLIC ACCOUNTS
+-------------------------------------------------------------------
+Public Profile       : /profile/username (or /@username)
+User Contributions   : /profile/username/questions
+User Stats/Badges    : /profile/username/achievements
+
+8. SETTINGS & PREFERENCES (AUTHENTICATED USER)
+-------------------------------------------------------------------
+Main Settings        : /settings
+Account Info         : /settings/account
+Profile Edit         : /settings/profile
+Appearance (Theme)   : /settings/appearance
+Notifications        : /settings/notifications
+Security & Password  : /settings/security
+
+9. APP DOWNLOAD & SYSTEM PAGES
+-------------------------------------------------------------------
+App Download Page    : /download/app (or /app)
+About Us             : /about
+Contact Us           : /contact
+Privacy Policy       : /privacy-policy
+Terms of Service     : /terms
+
+# ===================================================================
+KEY ROUTING & SEO RULES FOLLOWED
+
+1. Hyphens (-) used instead of underscores (_).
+2. All slugs strictly in lowercase.
+3. Clean separation between content types (questions, practice, research).
+4. '/topics' gives a centralized hub for SEO siloing.
+5. User specific data (/settings, /saved) is kept distinct from public SEO pages.
+6. Unique canonical URL for each single item to avoid duplicate content.
+===================================================================

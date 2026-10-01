@@ -1,0 +1,63 @@
+{% extends "base.html" %}{% block head %}
+<style>
+    .container {
+        padding: 20px;
+    }
+
+    .syllabus .link {
+        display: block;
+    }
+
+    .b_results._syllabus_group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-gap: 10px;
+        width: -webkit-fill-available;
+        padding: 10px;
+    }
+
+    .syllabus {
+        list-style: none;
+        overflow: hidden;
+    }
+
+    .syllabus .button {
+        background: var(--bg-muted);
+        width: -webkit-fill-available;
+        height: 100%;
+        color: var(--text-primary);
+        padding: 8px 16px;
+        border: none;
+        box-shadow: 1px 1px 4px #0003;
+        font-family: sans-serif;
+    }
+
+    * {
+        member-select: none;
+    }
+</style>
+{% endblock %}
+{% block body %}
+<div class="adscontainer">
+    <div class="ads_container"><ins class="adsbywseditor" style="display:inline-block;width: 728px;height:90px;"></ins>
+    </div>
+</div>
+<div class="IN003 clear">
+    <div class="b_tween bocs m#40">
+        <h1 class="title center IN014">{{function.utc('Syllabus')}}</h1>
+    </div>
+    <main class="container">
+        {%for item in response.data_querys%}
+        <h2 class="center" style="border-bottom: solid 3px var(--border-light);padding-bottom: 20px;">{{item.name}}</h2>
+        <ul class="b_results _syllabus_group">
+            {%for syllabus in item.syllabus %}
+            <li class="syllabus boc">
+                <a class="link button" href="{{syllabus.url}}" title="{{syllabus.title}}">{{syllabus.title}}</a>
+            </li>
+            {%endfor%}
+        </ul>
+        {%endfor%}
+    </main>
+</div>
+
+{% endblock %}

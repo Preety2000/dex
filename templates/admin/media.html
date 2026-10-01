@@ -1,0 +1,46 @@
+{% extends "admin/base.html" %}
+
+{% block head %}
+
+
+{% endblock %}
+
+
+{% block leftSide %}{% endblock %}
+
+{% block rightSide %}
+
+{% endblock %}
+
+{% block body %}
+
+<iframe id="myFrame" src="/container/media" frameborder="0" height="700px" width="880px"></iframe>
+
+<script>
+
+    // const main_body = $.choose('main-body');
+    // const iframe = main_body.create('iframe');
+    // iframe.src = "/container/media"
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const iframe = document.getElementById('myFrame');
+
+        // आईफ्रेम के अंदर के लिंक या बटन को चुनें और click इवेंट को हैंडल करें
+        console.log(iframe.contentWindow.document);
+        iframe.contentWindow.document.addEventListener('click', function (event) {
+            console.log("ओक ");
+            event.preventDefault(); // इवेंट की डिफ़ॉल्ट बहाली को रोकें
+
+            console.log("ओक ");
+            // यदि आपका उद्देश्य एक कॉन्क्रीट बटन या लिंक है, तो यहाँ उसे पहचानें
+            const targetElement = event.target;
+
+            // उसे चेक करें कि यह आपका बटन या लिंक है और फिर externalFunction() को चलाएं
+            // if (targetElement.id === 'myButton') {
+            //     externalFunction(); // बाहरी फ़ंक्शन को चलाएं
+            // }
+        });
+    });
+</script>
+
+{% endblock %}

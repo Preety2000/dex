@@ -1,0 +1,66 @@
+{
+profiles: {
+501: 4922, 502: "b_container_group", 503: "attribut", 504: "function", 505: [
+{
+501: 4922, 502: "b_container_list", 503: "attribut", 504: "function", 505: [
+{ 501: 81, 502: "title", 503: "attribut", 504: "function", 505: "Your profile" },
+{
+501: 4922, 502: "box-container", 503: "attribut", 504: "function", 505: [
+{
+501: 4922, 502: ["padding-twenty", "width", "DIS01"], 503: "attribut", 504: "function", 505: [
+{ 501: 4922, 502: "member-image", 503: "attribut", 504: "function", 505: [{ 501: 9137, 502: "img", 503:
+["src={{response.auth_session.img}}", "alt=User Image"], 504: "function" }] },
+{
+501: 4922, 502: "member-info", 503: "attribut", 504: "function", 505: [
+{ 501: 4922, 502: "name", 505: "{{response.auth_session.name}}" },
+{ 501: 4922, 502: "email", 505: "{{response.auth_session.email}}" },
+]
+},
+{ 501: 4922, 502: ["button", " logout"], 504: "function", 505: "{{function.utc('Logout')}}" }
+]
+},
+{ 501: 832, 502: "hr-boder", 503: ['aria-hidden=true'] },
+{
+501: 4922, 502: ["padding-ten-twenty", "space-between", "width"], 505: [
+{
+501: 4922, 502: "DIS01", 505: [
+{ 501: 4922, 502: "icon", 505: 5004 },
+{ 501: 4922, 502: "s-tital", 505: "Manage account" }
+]
+},
+{ 501: 4922, 502: "icon", 505: 5008 }
+]
+}
+]
+}]
+},
+{ 501: 4922, 502: "b_container_list", 505: [
+{ 501: 4922, 502: "box-container", 505: [
+{ 501: 4922, 502: ["padding-ten-twenty", "space-between", " width"], 505: [
+{ 501: 4922, 502: "DIS01",504: "function", 505: [
+{ 501: 4922, 502: "icon",504: "function", 505: 5005 },
+{ 501: 4922, 502: "s-tital",504: "function", 505: "Personal info" }
+] },
+{ 501: 4922, 502: ["icon","button"],504: "function", 505: 5009 },
+] },
+{ 501: 832, 502:"hr-boder" },
+{ 501: 4922, 502: ["padding-ten-twenty", "space-between", " width"], 505: [
+{ 501: 4922, 502: "DIS01",504: "function", 505: [
+{ 501: 4922, 502: "icon",504: "function", 505: 5006 },
+{ 501: 4922, 502: "s-tital",504: "function", 505: "Passwords" }
+] },
+{ 501: 4922, 502: ["icon","button"],504: "function", 505: 5009 },
+] },
+{ 501: 832, 502:"hr-boder" },
+{ 501: 4922, 502: ["padding-ten-twenty", "space-between", " width"], 505: [
+{ 501: 4922, 502: "DIS01",504: "function", 505: [
+{ 501: 4922, 502: "icon",504: "function", 505: 5007 },
+{ 501: 4922, 502: "s-tital",504: "function", 505: "Sync" }
+] },
+{ 501: 4922, 502: ["icon","button"],504: "function", 505: 5009 },
+] }
+] }
+] }
+]
+}
+}

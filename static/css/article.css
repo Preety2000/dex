@@ -1,0 +1,374 @@
+/* Artical Session */
+body {
+    background: var(--bg-muted);
+}
+
+.IN038 {
+    background: var(--bg-muted) !important;
+    box-shadow: 0px 4px 9px 0 #0003;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    /* font-family: Arya; */
+}
+
+table {
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    width: -webkit-fill-available;
+    border: solid 1px var(--border);
+    margin-bottom: 20px;
+}
+
+thead {
+    background: var(--border);
+}
+
+th {
+    text-align: left;
+}
+
+th,
+td {
+    padding: 4px 12px;
+    border: solid 0.5px var(--border);
+}
+
+.IN016 {
+    margin: 0 auto;
+}
+
+.menu-item .DIS01 {
+    height: 35px;
+    padding: 0 10px 0 0;
+    background: var(--btn-primary-bg);
+}
+
+.menu-item .IN0104 {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.menu-item span.list {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background: #00adb4;
+    color: var(--bg-muted);
+    flex: none;
+    padding: 6px 16px;
+    font-weight: 500;
+    clip-path: polygon(0 0, 90% 0, 100% 100%, 0 100%);
+}
+
+.menu-item p {
+    color: var(--bg-soft);
+    margin-left: 10px;
+}
+
+.IN016 .container {
+    display: flex;
+    padding: 0px 10px
+}
+
+.container .IN097,
+.IN077 {
+    overflow: hidden;
+    width: -webkit-fill-available;
+    ;
+}
+
+.container .sidebar {
+    position: relative;
+    display: block;
+    max-width: 336px;
+    flex: none;
+    margin-left: 30px;
+    min-width: 240px;
+    padding-top: 16px;
+}
+
+.container .sidebar div:last-child {
+    position: sticky;
+    top: 70px;
+}
+
+.IN026 {
+    padding-bottom: 8px;
+}
+
+.article-content {
+    font-size: 100%;
+    margin-top: 10px;
+    font-family: Vesper Libre;
+}
+
+.article-content img {
+    max-width: 437px;
+    margin: 15px auto;
+    width: -webkit-fill-available;
+    ;
+    display: block;
+}
+
+.container .index {
+    display: block;
+    width: auto;
+    overflow: hidden;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content p,
+.article-content img,
+.breadcrumb,
+.IN026,
+.sidebar .section,
+.post-footer,
+.comment-header,
+.comment-list,
+.IN072 {
+    padding: 5px 10px;
+    overflow: hidden;
+}
+
+.IN073,
+.article-content h4 {
+    margin: 0;
+    border-radius: 4px 4px 0 0;
+    border-bottom: none;
+    color: var(--text-title);
+}
+
+/* .article-content ol,.article-content ul{padding-left: 30px; padding-top: 12px; padding-bottom: 12px;} */
+.article-content ol p,
+.article-content ul p {
+    border: none;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.breadcrumb {
+    font-family: Vesper Libre;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.article-title,
+.post-snippet {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    margin-top: 0;
+}
+
+.post-snippet {
+    -webkit-line-clamp: 3;
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
+.IN025 .image {
+    position: relative;
+    min-height: 170px;
+    display: inline-block;
+    height: auto
+}
+
+.IN025 .meta {
+    margin-top: 10px;
+}
+
+.article-view {
+    margin-right: 4px;
+}
+
+.article-like {
+    padding: 2px 6px;
+    font-size: 90%;
+}
+
+.article-like.feedback {
+    color: var(--btn-primary-bg);
+    background: var(--bg-soft);
+    border-color: var(--border);
+}
+
+.article-like.feedback:hover {
+    color: #0074cc;
+    background: var(--bg-soft);
+    border-color: #0074cc;
+}
+
+.image .absolute {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: -webkit-fill-available;
+    ;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background: transparent linear-gradient(80deg, #61aad9 0%, #0102b7 100%);
+    color: var(--bg-muted);
+}
+
+.image .absolute span {
+    width: 60%;
+    margin: 0 auto;
+    text-align: center
+}
+
+.article-info {
+    font-family: 'Karla';
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.article-info .left-side {
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.article-IN069 a {
+    overflow: hidden;
+    display: inline-flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-footer,
+.IN077 {
+    margin: 20px auto;
+}
+
+.tag-group {
+    padding: 10px 0;
+}
+
+a.tag {
+    display: inline-block;
+    padding: 0.4em 0.5em;
+    line-height: normal;
+    white-space: nowrap;
+    text-decoration: none;
+    text-align: center;
+    border-width: 1px;
+    border-style: solid;
+    font-size: 80%;
+    border-color: #00000022;
+    margin: 5px 0
+}
+
+.writer.DIS01 {
+    display: none
+}
+
+.next_perv {
+    justify-content: space-between;
+    padding: 10px;
+    border: solid 1px var(--border);
+    border-radius: 8px;
+}
+
+.sidebar .section {
+    padding-bottom: 11px;
+    margin-bottom: 20px;
+}
+
+.sidebar .list {
+    line-height: 140%;
+    list-style: none;
+    padding: 0 10px;
+    display: flex;
+    margin: 10px 0;
+    gap: 5px;
+    align-items: flex-start;
+    font-size: 90%;
+    color: var(--link);
+}
+
+.sidebar .list::before {
+    content: "";
+    position: relative;
+    width: 8px;
+    height: 8px;
+    margin: 5px;
+    background: var(--link);
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+.sidebar .title {
+    font-family: Vesper Libre;
+    font-size: 120%;
+    font-weight: 600;
+    margin: 0;
+    padding: 7px 0 7px 10px;
+    margin-bottom: 10px;
+    text-transform: capitalize;
+}
+
+.sidebar a:hover {
+    color: var(--link-hover);
+    text-decoration: underline
+}
+
+.article-content p {
+    overflow: unset !important;
+    text-align: justify;
+}
+
+.article-content li p {
+    display: contents;
+}
+
+.atech {
+    display: inline-block;
+    float: left;
+    margin: 0 !important;
+    margin-right: 5px !important;
+    padding: 5px 0 0 10px !important;
+    border: none !important;
+    background: none !important;
+}
+
+.article-content .atech {
+    font-size: 100%;
+    background: none !important;
+    line-height: inherit;
+    white-space: nowrap;
+}
+
+.atech::after {
+    content: " :";
+}
+
+@media screen and (max-width: 1080px) {
+    .container .sidebar {
+        width: 260px;
+    }
+}
+
+@media screen and (max-width: 780px) {
+    .IN016 .container {
+        display: block;
+    }
+}

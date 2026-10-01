@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block body %}
+<style>
+    .IN038 {
+        background: transparent;
+        border-bottom: none
+    }
+</style>
+{%if device_info.device_type == "mobile"%}
+<div class="IN0103-container">
+    <div class="IN0103" id="IN0103">
+        <div class="slide"><img src="/static/banner/card1.jpeg" alt="Image 1"></div>
+        <div class="slide"><img src="/static/banner/card2.jpeg" alt="Image 1"></div>
+        <div class="slide"><img src="/static/banner/card3.jpeg" alt="Image 1"></div>
+        <div class="slide"><img src="/static/banner/card1.jpeg" alt="Image 1"></div>
+        <!-- Add more slides as needed -->
+    </div>
+    <div class="dots" id="dots"></div>
+</div>
+<div class='IN077'>
+    <div class="IN0104 IN075">
+        <a href="/exam" class="list button" role="button">
+            <div class="IN091">
+                <span class="IN065">{{svg.evaluation | safe}}</span>
+                <span class="IN040-title">{{function.utc('Exam')}}</span>
+            </div>
+        </a>
+        <a href="/practice" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.bulb | safe}}</span>
+                <span class="IN040-title">{{function.utc('MCQ')}}</span>
+            </div>
+        </a>
+        <a href="courses" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.elearning | safe}}</span>
+                <span class="IN040-title">{{function.utc("Courses")}}</span>
+            </div>
+        </a>
+        <a href="/syllabus" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.syllabus | safe}}</span>
+                <span class="IN040-title">{{function.utc('Syllabus')}}</span>
+            </div>
+        </a>
+        <a href="/questions" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.question_mark1 | safe}}</span>
+                <span class="IN040-title">{{function.utc("Questions")}}</span>
+            </div>
+        </a>
+        <a href="/topic" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.trending_topic | safe}}</span>
+                <span class="IN040-title">{{function.utc('Topic')}}</span>
+            </div>
+        </a>
+        <a href="/shopping" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.online_shopping | safe}}</span>
+                <span class="IN040-title">{{function.utc("Shopping")}}</span>
+            </div>
+        </a>
+        <a href="/trending" class="list button">
+            <div class="IN091">
+                <span class="IN065">{{svg.market_analysis | safe}}</span>
+                <span class="IN040-title">{{function.utc('Trending')}}</span>
+            </div>
+        </a>
+    </div>
+</div>
+{%else%}
+<div class='IN016 IN017'>
+    <div class='IN018 clear'>
+        <div class='IN019'>
+            <h1 class='hidden'>Learn to online - The MyApplication</h1>
+            <h2 class='title'>{{function.utc('Welcome to MyApplication')}}</h2>
+            <p class='desc'>{{function.utc('MyApplication 2023 was launched by Ws team with a dream to present
+                every answer related to social, historical, education and religious in Hindi language. The main goal of
+                starting this blog is to create an active community of students so that they can study every aspect of
+                education in a better way.')}}</p>
+            <div class='buttons'>
+                <a class='button' href='#' onclick='$.coming_soon(this)'>{{function.utc("Free
+                    Courses")}}</a>
+                <a class='button button-secondary' href='#' onclick='$.coming_soon(this)'>{{function.utc('Explore
+                    Blog')}}</a>
+            </div>
+        </div>
+        <div class='IN020'>
+            <div class='IN021' style='background-image:url(/media/img/concentration.png)'>
+            </div>
+        </div>
+    </div>
+</div>{%endif%}
+<div class='session'>
+    <div class='clear IN022'>
+        <!-- <div class="title">Recommended {{function.utc("Courses")}}</div> -->
+        <h2 class='title center IN014'>{{function.utc("Topics")}}</h2>
+        <div class='IN0104'>{%for insex in response.category %}
+            <div class='list boc button' onclick="$.onlink(this,'learning-link')">
+                <div class='IN0105'>
+                    <div class='logo'><img width="60" height="60" alt='{{insex.name}}' src='{{insex.img}}'
+                            loading="lazy" /></div>
+                    <div class='meta'>
+                        <div class='title'>{{insex.name}}</div>
+                        <a class='learning-link' href='{{insex.url}}'>{{function.utc('Start
+                            Learning')}}!</a>
+                    </div>
+                </div>
+            </div>{% endfor %}
+        </div>
+    </div>
+</div>
+<!--#ADS-->
+<div class='adscontainer clear'>
+    <div class='ads_container'><ins class='adsbywseditor' style='display:inline-block;width: auto;height:auto'></ins>
+    </div>
+</div>
+<div class='IN016'>
+    <main class='container'>
+        <!-- index Session -->
+        <div class='index section' id='IN097 '>
+            <h2 class='IN023 IN014'>{{function.utc("Latest Additions")}}</h2>
+            <div class='IN0104 IN024 '>{%for article in response.articles %}
+                <div class='IN025 boc'>
+                    <!-- <a class='image relative' href='{{article.url}}?action=image'>
+                        <img class="hiddens"  src="/img/{{article.hasTitle}}?size=320x200" loading="lazy" alt="Image">
+                    </a> -->
+                    <div class='meta'>
+                        <a href='{{article.url}}?action=title' page-id='{{article.id}}' title='{{article.title}}'>
+                            <h2 class='article-title arya home'>{{article.title}}</h2>
+                        </a>
+                        <div class='IN026'>
+                            <div class='article-info'>
+                                <span class='left-side DIS01'><span class='article-date'
+                                        datetime='{{article.timestamp}}'>{{article.date}}</span></span>
+                            </div>
+                        </div>
+                        <p class='post-snippet vesper-libre'>{{article.excerpt[0:150] | safe}}...</p>
+                        <a class='read-more hidden button' href='{{article.url}}?action=link' page-id='{{article.id}}'
+                            title='{{article.title}}'>Read More</a>
+                    </div>
+                </div>
+                {%endfor%}
+            </div>
+            <div class='paginator' id='paginator'>{%for insex in response.paginator or []%}
+                <a class='button {{insex.clas}}' href='{{insex.slug}}'
+                    title='Page {{insex.name}}'>{{insex.name}}</a>{%endfor%}
+            </div>
+        </div>
+    </main>
+</div>
+
+<div class='adscontainer clear'>
+    <div class='ads_container'><ins class='adsbywseditor' style='display:inline-block;width: auto;height:auto'></ins>
+    </div>
+</div>{% endblock %}

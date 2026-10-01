@@ -1,0 +1,21 @@
+body {
+    background: var(--bg-muted);
+}
+
+.page-session {
+    display: flex;
+    gap: 15px;
+    margin: 0 auto;
+    flex-direction: row-reverse;
+    width: -webkit-fill-available;;
+}
+.sidebar {
+    flex: none;
+    display: block;
+    min-width: 200px;
+    width: 280px;
+    margin-bottom: 10px;
+}
+
+
+

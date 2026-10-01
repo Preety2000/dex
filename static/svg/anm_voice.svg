@@ -1,0 +1,25 @@
+<svg class="IN0051" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100px" height="100px" version="1.1" viewBox="0 0 800 800" >
+   <defs>
+      <clipPath ifill-rule="evenodd" d="id0"><path fill-rule="evenodd"  d="M-2.99 840.48l838.74 0 0 -838.74 -838.74 0 0 838.74z"></path></clipPath>
+      <mask ifill-rule="evenodd" d="id1">
+         <linearGradient ifill-rule="evenodd" d="id2" gradientUnits="userSpaceOnUse" x1="417.45" y1="567.07" x2="416.25" y2="281.13">
+            <stop offset="0" style="stop-opacity:0; stop-color:white"></stop>
+            <stop offset="0.388235" style="stop-opacity:0.501961; stop-color:white"></stop>
+            <stop offset="1" style="stop-opacity:1; stop-color:white"></stop>
+         </linearGradient>
+         <rect style="fill:url(#id2)" x="270.07" y="276.13" width="289.97" height="289.96"></rect>
+      </mask>
+      <linearGradient ifill-rule="evenodd" d="id3" gradientUnits="userSpaceOnUse" x1="417.45" y1="567.07" x2="416.25" y2="281.13">
+         <stop offset="0" style="stop-opacity:1; stop-color:#1F43DF"></stop>
+         <stop offset="0.568627" style="stop-opacity:1; stop-color:#2241EF"></stop>
+         <stop offset="1" style="stop-opacity:1; stop-color:#263FFF"></stop>
+      </linearGradient>
+   </defs>
+   <g>
+      <path fill-rule="evenodd" d="M415.06 156.7c145.93,0 264.4,118.48 264.4,264.41 0,145.93 -118.47,264.41 -264.4,264.41 -145.94,0 -264.41,-118.48 -264.41,-264.41 0,-145.93 118.47,-264.41 264.41,-264.41z" style="fill: #0041FF;fill-rule: nonzero;fill-opacity: 0.039216;"></path>
+      <path fill-rule="evenodd" d="M415.06 74.78c191.14,0 346.33,155.19 346.33,346.33 0,191.14 -155.19,346.33 -346.33,346.33 -191.14,0 -346.34,-155.19 -346.34,-346.33 0,-191.14 155.2,-346.33 346.34,-346.33z" style="fill: #0041FF;fill-rule: nonzero;fill-opacity: 0.019608;"></path>
+      <path fill-rule="evenodd" d="M415.06 421.11m0 -141.17c77.91,0 141.17,63.26 141.17,141.17 0,77.91 -63.26,141.17 -141.17,141.17 -77.92,0 -141.18,-63.26 -141.18,-141.17 0,-77.91 63.26,-141.17 141.18,-141.17z" style=" mask:url(#id1); fill: url(#id3);fill-rule: nonzero;"></path>
+      <path fill-rule="evenodd" d="M443.33 418.44c0,16 -13.55,27.21 -28.27,27.21 -14.73,0 -28.28,-11.21 -28.28,-27.21 0,0 -9.07,0 -9.07,0 0,18.25 14.52,33.24 32.02,35.85 0,0 0,17.51 0,17.51 0,0 10.66,0 10.66,0 0,0 0,-17.51 0,-17.51 17.5,-2.56 32.01,-17.6 32.01,-35.85 0,0 -9.07,0 -9.07,0zm-28.27 16c8.85,0 15.95,-7.15 15.95,-16 0,0 0.05,-32 0.05,-32 0,-8.86 -7.15,-16.01 -16,-16.01 -8.86,0 -16.01,7.15 -16.01,16.01 0,0 0,32 0,32 0,8.85 7.15,16 16.01,16z" style="fill: white;fill-rule: nonzero;fill-opacity: 0.788235;"></path>
+   </g>
+
+</svg>

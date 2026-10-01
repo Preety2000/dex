@@ -1,0 +1,48 @@
+1. Pehle dependency vulnerabilities check karo
+pip install pip-audit
+pip-audit
+
+Ye installed Python packages me known vulnerabilities check karega.
+
+2. API endpoints identify karo
+FastAPI me normally:
+
+http://localhost:8000/docs
+http://localhost:8000/redoc
+
+Open karo. /docs se tumhe endpoints aur request parameters clearly mil jayenge.
+
+3. Har endpoint ko test karo
+For example:
+
+curl -i http://localhost:8000/users/123
+
+Test these cases:
+
+Authentication ke bina request
+
+Invalid/expired token
+
+Missing parameters
+
+Wrong data types
+
+Bahut large input
+
+Unauthorized user ka resource ID
+
+Unexpected HTTP methods
+
+4. Authorization bug specifically check karo
+Maan lo:
+
+GET /users/10/profile
+
+User 10 ka profile sirf user 10 ko milna chahiye. Login user 20 se request karke dekho ki user 10 ka data accidentally accessible to nahi.
+
+Ye IDOR/BOLA type vulnerability ho sakti hai.
+
+5. Automated scanner
+Apni local/staging API par OWASP ZAP use karke automated security testing kar sakte ho. Production/third-party APIs ko scan karne se pehle authorization zaroor hona chahiye.
+
+Agar tum chaho, apni FastAPI ka code yahan paste karo. Main line-by-line security audit karke bata sakta hoon ki kaha bug ho sakta hai aur uska secure fix kya hoga.

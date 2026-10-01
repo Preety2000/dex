@@ -1,0 +1,926 @@
+[
+  {
+    "name": "English Grammar",
+    "slug": "english-grammar",
+    "subject": "English",
+    "description": "English Grammar is the system of rules that explains how English words are formed, arranged, and used in sentences. It defines the correct structure and relationship between different parts of a sentence. This category focuses on understanding and applying the rules that make English language usage grammatically correct and meaningful."
+  },
+  {
+    "name": "Parts of Speech",
+    "slug": "parts-of-speech",
+    "subject": "English",
+    "description": "Parts of Speech is the classification of English words according to the role they perform in a sentence. It explains how different types of words function and how they relate to one another in language. This category helps in identifying and understanding the grammatical function of words."
+  },
+  {
+    "name": "Noun",
+    "slug": "noun",
+    "subject": "English",
+    "description": "A Noun is a word used to identify or name a person, place, thing, animal, idea, quality, or other entity. Nouns can perform different grammatical roles within sentences. This category deals with the nature, types, forms, and correct usage of nouns in English."
+  },
+  {
+    "name": "Pronoun",
+    "slug": "pronoun",
+    "subject": "English",
+    "description": "A Pronoun is a word used in place of a noun or noun phrase to avoid unnecessary repetition. It helps make sentences shorter, clearer, and more natural. This category explains the different kinds of pronouns and their correct grammatical use in English."
+  },
+  {
+    "name": "Adjective",
+    "slug": "adjective",
+    "subject": "English",
+    "description": "An Adjective is a word that describes, identifies, or gives additional information about a noun or pronoun. It can express qualities, characteristics, quantity, or other features of the person or thing being discussed. This category focuses on the forms, types, comparison, and proper use of adjectives."
+  },
+  {
+    "name": "Verb",
+    "slug": "verb",
+    "subject": "English",
+    "description": "A Verb is a word that expresses an action, occurrence, state, or condition. Verbs are central to English sentences because they indicate what the subject does or what happens to it. This category covers the forms, types, functions, and grammatical use of verbs."
+  },
+  {
+    "name": "Adverb",
+    "slug": "adverb",
+    "subject": "English",
+    "description": "An Adverb is a word that modifies or provides additional information about a verb, adjective, another adverb, or sometimes an entire sentence. It can explain how, when, where, how often, or to what degree something happens. This category deals with the meaning, forms, placement, and proper use of adverbs."
+  },
+  {
+    "name": "Preposition",
+    "slug": "preposition",
+    "subject": "English",
+    "description": "A Preposition is a word that shows the relationship between a noun or pronoun and another word or element in a sentence. It commonly expresses relationships involving place, time, direction, position, or connection. This category focuses on understanding and correctly using prepositions in English."
+  },
+  {
+    "name": "Conjunction",
+    "slug": "conjunction",
+    "subject": "English",
+    "description": "A Conjunction is a word used to connect words, phrases, clauses, or sentences. It establishes a logical or grammatical relationship between the elements being connected. This category explains the different types of conjunctions and how they are correctly used to form meaningful sentences."
+  },
+  {
+    "name": "Interjection",
+    "slug": "interjection",
+    "subject": "English",
+    "description": "An Interjection is a word or short expression used to convey a sudden feeling, emotion, reaction, or response. It can express emotions such as surprise, joy, pain, sadness, or excitement. This category focuses on the meaning, function, and appropriate use of interjections in English."
+  },
+  {
+    "name": "Articles",
+    "slug": "articles",
+    "subject": "English",
+    "description": "Articles are words used before nouns to indicate whether the noun refers to something specific or something in a general or non-specific sense. English primarily uses the articles a, an, and the according to established grammatical rules. This category explains when and why each article is used or omitted."
+  },
+  {
+    "name": "Tenses",
+    "slug": "tenses",
+    "subject": "English",
+    "description": "Tenses are grammatical forms used to indicate the time or temporal relationship of an action, event, or state. They help show whether something happens in the past, present, or future and how the action relates to that time. This category focuses on the formation, meaning, and correct use of English tenses."
+  },
+  {
+    "name": "Subject-Verb Agreement",
+    "slug": "subject-verb-agreement",
+    "subject": "English",
+    "description": "Subject-Verb Agreement is the grammatical principle that requires a verb to correspond correctly with its subject in number and person. A singular subject generally requires a singular verb, while a plural subject generally requires a plural verb. This category explains the rules used to maintain correct agreement between subjects and verbs."
+  },
+  {
+    "name": "Sentence",
+    "slug": "sentence",
+    "subject": "English",
+    "description": "A Sentence is a grammatically organized group of words that expresses a complete thought, statement, question, command, or exclamation. Sentences are formed by arranging words and clauses according to the rules of English grammar. This category deals with the structure, meaning, and grammatical organization of sentences."
+  },
+  {
+    "name": "Sentence Structure",
+    "slug": "sentence-structure",
+    "subject": "English",
+    "description": "Sentence Structure refers to the way words, phrases, and clauses are arranged to form a grammatically meaningful sentence. It determines how the different parts of a sentence are connected and organized. This category focuses on understanding and constructing sentences according to their structural patterns."
+  },
+  {
+    "name": "Types of Sentences",
+    "slug": "types-of-sentences",
+    "subject": "English",
+    "description": "Types of Sentences is the classification of sentences according to their purpose, function, or grammatical structure. Different sentence types are used to make statements, ask questions, give commands, or express strong feelings. This category explains how sentences are identified and distinguished according to their form and purpose."
+  },
+  {
+    "name": "Clauses",
+    "slug": "clauses",
+    "subject": "English",
+    "description": "A Clause is a group of words that contains a subject and a verb and forms part of a sentence or, in some cases, a complete sentence. Clauses can function independently or depend on another clause to express a complete meaning. This category explains the structure, types, functions, and correct use of clauses."
+  },
+  {
+    "name": "Phrases",
+    "slug": "phrases",
+    "subject": "English",
+    "description": "A Phrase is a group of related words that functions as a unit within a sentence but does not normally contain a complete subject-verb structure. Phrases add information and perform specific grammatical functions in sentences. This category focuses on identifying, understanding, and correctly using different types of phrases."
+  },
+  {
+    "name": "Active and Passive Voice",
+    "slug": "active-and-passive-voice",
+    "subject": "English",
+    "description": "Active and Passive Voice describe two different ways of presenting the relationship between an action and the participants involved in it. Active voice emphasizes the doer of the action, while passive voice emphasizes the receiver or result of the action. This category explains how voice is identified, formed, and changed in English sentences."
+  },
+  {
+    "name": "Direct and Indirect Speech",
+    "slug": "direct-and-indirect-speech",
+    "subject": "English",
+    "description": "Direct and Indirect Speech are two ways of reporting what a person has said. Direct speech presents the speaker's words as they were spoken, while indirect speech reports the meaning without necessarily using the exact words. This category explains the grammatical rules involved in changing and using reported speech."
+  },
+  {
+    "name": "Question Tags",
+    "slug": "question-tags",
+    "subject": "English",
+    "description": "Question Tags are short questions added to the end of a statement to seek confirmation, agreement, or a response from the listener. Their formation depends on the auxiliary verb, subject, and polarity of the main statement. This category focuses on the rules for forming and using question tags correctly."
+  },
+  {
+    "name": "Modals",
+    "slug": "modals",
+    "subject": "English",
+    "description": "Modals are auxiliary verbs used to express meanings such as ability, possibility, permission, necessity, obligation, advice, or intention. They affect the meaning of the main verb and follow specific grammatical patterns. This category explains the functions and correct usage of modal verbs in English."
+  },
+  {
+    "name": "Determiners",
+    "slug": "determiners",
+    "subject": "English",
+    "description": "Determiners are words placed before nouns to identify, specify, quantify, or limit the reference of the noun. They help indicate whether a noun is definite, indefinite, singular, plural, or related to a particular quantity or possession. This category explains the grammatical role and correct usage of determiners."
+  },
+  {
+    "name": "Conditionals",
+    "slug": "conditionals",
+    "subject": "English",
+    "description": "Conditionals are sentence structures used to express a condition and its possible, expected, imaginary, or past result. They establish a relationship between one situation and what may or would happen as a consequence. This category explains the different conditional patterns and the grammatical rules governing their use."
+  },
+  {
+    "name": "Non-Finite Verbs",
+    "slug": "non-finite-verbs",
+    "subject": "English",
+    "description": "Non-Finite Verbs are verb forms that do not change according to the subject or tense in the same way as finite verbs. They can perform functions similar to nouns, adjectives, or adverbs within a sentence. This category explains infinitives, participles, gerunds, and their grammatical functions."
+  },
+  {
+    "name": "Vocabulary",
+    "slug": "vocabulary",
+    "subject": "English",
+    "description": "Vocabulary refers to the collection of words used and understood in the English language. It includes knowledge of word meanings, forms, relationships, and appropriate usage in different contexts. This category focuses on developing and testing the understanding and effective use of English words."
+  },
+  {
+    "name": "Synonyms",
+    "slug": "synonyms",
+    "subject": "English",
+    "description": "Synonyms are words that have the same or a similar meaning to another word or expression. They allow speakers and writers to express similar ideas using different words and can provide variation and precision in communication. This category focuses on identifying and understanding words with related meanings."
+  },
+  {
+    "name": "Antonyms",
+    "slug": "antonyms",
+    "subject": "English",
+    "description": "Antonyms are words whose meanings are opposite or strongly contrasted with the meaning of another word. They help express differences, contrasts, and opposing ideas in English. This category focuses on recognizing and understanding words that have opposite or contrasting meanings."
+  },
+  {
+    "name": "One Word Substitution",
+    "slug": "one-word-substitution",
+    "subject": "English",
+    "description": "One Word Substitution is the use of a single word to express a meaning that might otherwise require a phrase or a longer description. It provides a concise way to represent a person, object, action, quality, or situation. This category focuses on identifying the appropriate single word for a given description."
+  },
+  {
+    "name": "Idioms and Phrases",
+    "slug": "idioms-and-phrases",
+    "subject": "English",
+    "description": "Idioms and Phrases are established expressions whose meanings may differ from the literal meanings of the individual words used in them. They are commonly used to convey ideas, situations, emotions, or experiences in a natural and expressive way. This category focuses on understanding their meanings and appropriate usage."
+  },
+  {
+    "name": "Phrasal Verbs",
+    "slug": "phrasal-verbs",
+    "subject": "English",
+    "description": "Phrasal Verbs are combinations of a verb with one or more particles that together create a meaning that may differ from the original verb. They are an important part of natural and everyday English usage. This category explains the meanings, structures, and correct contexts of commonly used phrasal verbs."
+  },
+  {
+    "name": "Spelling",
+    "slug": "spelling",
+    "subject": "English",
+    "description": "Spelling refers to the correct arrangement of letters used to write English words. Accurate spelling is essential for clear written communication and helps distinguish between words that may sound similar or have different meanings. This category focuses on recognizing, correcting, and applying standard English spelling."
+  },
+  {
+    "name": "Common Errors",
+    "slug": "common-errors",
+    "subject": "English",
+    "description": "Common Errors refers to frequent mistakes made in English grammar, vocabulary, spelling, sentence construction, and usage. Understanding these errors helps learners recognize incorrect forms and replace them with grammatically or contextually appropriate forms. This category focuses on identifying and correcting common English mistakes."
+  },
+  {
+    "name": "Error Detection",
+    "slug": "error-detection",
+    "subject": "English",
+    "description": "Error Detection is the process of identifying grammatical, structural, lexical, or usage errors in an English sentence or expression. It requires examining different parts of a sentence to determine whether they follow standard English rules. This category focuses on recognizing the incorrect part and understanding the reason for the error."
+  },
+  {
+    "name": "Sentence Improvement",
+    "slug": "sentence-improvement",
+    "subject": "English",
+    "description": "Sentence Improvement involves identifying an incorrect or unsuitable part of a sentence and replacing it with a grammatically or contextually better expression. The aim is to make the sentence correct, clear, and natural according to standard English usage. This category focuses on improving sentence construction and language accuracy."
+  },
+  {
+    "name": "Sentence Completion",
+    "slug": "sentence-completion",
+    "subject": "English",
+    "description": "Sentence Completion is the process of selecting or supplying the word or expression that logically and grammatically completes an incomplete sentence. It requires understanding the meaning, structure, and context of the sentence. This category focuses on completing sentences accurately according to both grammar and meaning."
+  },
+  {
+    "name": "Fill in the Blanks",
+    "slug": "fill-in-the-blanks",
+    "subject": "English",
+    "description": "Fill in the Blanks is a language exercise in which one or more words are omitted from a sentence or passage and must be supplied correctly. The missing word is determined by considering grammar, vocabulary, meaning, and context. This category focuses on selecting the most appropriate word or expression for the given blank."
+  },
+  {
+    "name": "Reading Comprehension",
+    "slug": "reading-comprehension",
+    "subject": "English",
+    "description": "Reading Comprehension is the ability to understand, interpret, and evaluate information presented in a written passage. It involves identifying the main idea, details, relationships, meanings, and conclusions contained in the text. This category focuses on understanding written English accurately and answering questions based on the given passage."
+  },
+  {
+    "name": "Cloze Test",
+    "slug": "cloze-test",
+    "subject": "English",
+    "description": "A Cloze Test is a language exercise in which selected words are removed from a passage and the reader must determine the most suitable words to restore the meaning and grammatical flow. It tests vocabulary, grammar, comprehension, and contextual understanding together. This category focuses on selecting words that fit both the structure and meaning of the passage."
+  },
+  {
+    "name": "Para Jumbles",
+    "slug": "para-jumbles",
+    "subject": "English",
+    "description": "Para Jumbles are exercises in which the sentences of a paragraph are presented in an incorrect order and must be rearranged into a logical sequence. The correct order is determined by examining ideas, references, connectors, chronology, and overall meaning. This category focuses on understanding the logical organization and flow of written English."
+  },
+  {
+    "name": "Sentence Rearrangement",
+    "slug": "sentence-rearrangement",
+    "subject": "English",
+    "description": "Sentence Rearrangement involves changing the order of words, phrases, or sentences to create a grammatically correct and logically meaningful expression. The correct arrangement depends on English sentence structure and the relationship between the individual parts. This category focuses on reconstructing language in the appropriate grammatical and logical order."
+  },
+  {
+    "name": "Writing Skills",
+    "slug": "writing-skills",
+    "subject": "English",
+    "description": "Writing Skills refer to the ability to communicate ideas, information, opinions, and messages effectively through written English. Good writing requires appropriate vocabulary, grammar, organization, clarity, and coherence. This category focuses on the principles and practices needed to produce clear, accurate, and effective written communication."
+  },
+  {
+    "name": "Speaking Skills",
+    "slug": "speaking-skills",
+    "subject": "English",
+    "description": "Speaking Skills refer to the ability to communicate ideas, information, feelings, and opinions clearly and effectively through spoken English. Effective speaking involves appropriate pronunciation, vocabulary, grammar, fluency, and expression. This category focuses on developing accurate, understandable, and natural spoken communication."
+  },
+  {
+    "name": "Listening Skills",
+    "slug": "listening-skills",
+    "subject": "English",
+    "description": "Listening Skills refer to the ability to understand and interpret spoken English accurately. Effective listening requires recognizing words, understanding meaning, following context, and identifying important information from spoken communication. This category focuses on developing the ability to comprehend and respond appropriately to spoken English."
+  },
+  {
+    "name": "Pronunciation",
+    "slug": "pronunciation",
+    "subject": "English",
+    "description": "Pronunciation refers to the way English words and sounds are produced and spoken. Correct pronunciation helps make spoken communication clear and understandable and involves the accurate production of individual sounds, stress, rhythm, and intonation. This category focuses on the standard spoken forms and sound patterns of English."
+  },
+  {
+    "name": "English Literature",
+    "slug": "english-literature",
+    "subject": "English",
+    "description": "English Literature is the study of literary works written in the English language and the ideas, forms, styles, and contexts associated with them. It examines how writers use language and literary techniques to express experiences, themes, emotions, and ideas. This category focuses on the study and understanding of major works, writers, periods, and literary traditions."
+  },
+  {
+    "name": "Literary Terms",
+    "slug": "literary-terms",
+    "subject": "English",
+    "description": "Literary Terms are specialized concepts and expressions used to describe the techniques, structures, forms, and features of literary writing. They provide a common vocabulary for analyzing and discussing literature. This category focuses on understanding the meaning, function, and application of important literary concepts."
+  },
+  {
+    "name": "Figures of Speech",
+    "slug": "figures-of-speech",
+    "subject": "English",
+    "description": "Figures of Speech are deliberate uses of language in which words or expressions are presented in ways that go beyond their ordinary literal meaning or structure. They are used to create emphasis, comparison, imagery, emotion, or stylistic effect. This category focuses on identifying, understanding, and interpreting these expressive uses of language."
+  },
+  {
+    "name": "Word Formation",
+    "slug": "word-formation",
+    "subject": "English",
+    "description": "Word Formation is the process through which new English words are created or existing words are changed into different grammatical or meaningful forms. It explains how words can be developed, modified, combined, or derived from other words. This category focuses on understanding the structural processes through which English vocabulary is formed."
+  },
+  {
+    "name": "Prefixes and Suffixes",
+    "slug": "prefixes-and-suffixes",
+    "subject": "English",
+    "description": "Prefixes and Suffixes are word elements added to the beginning or end of a base word to change its meaning or grammatical form. They play an important role in creating related words and expanding English vocabulary. This category focuses on understanding how these elements affect the meaning and form of words."
+  },
+  {
+    "name": "Homonyms",
+    "slug": "homonyms",
+    "subject": "English",
+    "description": "Homonyms are words that share the same spelling, pronunciation, or both but have different meanings. Their meanings are determined by their usage and context within language. This category focuses on identifying and distinguishing words that appear or sound alike but represent different meanings."
+  },
+  {
+    "name": "Homophones",
+    "slug": "homophones",
+    "subject": "English",
+    "description": "Homophones are words that have the same or very similar pronunciation but differ in spelling and meaning. They can create confusion in written English because words that sound alike may represent completely different ideas. This category focuses on recognizing their meanings, spellings, and correct usage."
+  },
+  {
+    "name": "Homographs",
+    "slug": "homographs",
+    "subject": "English",
+    "description": "Homographs are words that have the same spelling but can have different meanings and, in some cases, different pronunciations. Their intended meaning is determined by the context in which they are used. This category focuses on identifying and understanding words that share written forms but differ in meaning or pronunciation."
+  },
+  {
+    "name": "Collocations",
+    "slug": "collocations",
+    "subject": "English",
+    "description": "Collocations are combinations of words that commonly occur together in natural English usage. Although the individual words may be grammatically possible with other words, certain combinations are preferred by native usage. This category focuses on understanding natural word combinations and using them appropriately in context."
+  },
+  {
+    "name": "Contextual Vocabulary",
+    "slug": "contextual-vocabulary",
+    "subject": "English",
+    "description": "Contextual Vocabulary refers to understanding the meaning and appropriate use of words according to the situation or passage in which they appear. A word can have different meanings depending on its surrounding words and context. This category focuses on determining the intended meaning and suitable usage of vocabulary from context."
+  },
+  {
+    "name": "Word Usage",
+    "slug": "word-usage",
+    "subject": "English",
+    "description": "Word Usage refers to the correct and appropriate use of English words according to their meaning, grammatical function, and context. Words with similar meanings may differ in formality, structure, or situations in which they can be used. This category focuses on choosing and applying words accurately in English communication."
+  },
+  {
+    "name": "Confusing Words",
+    "slug": "confusing-words",
+    "subject": "English",
+    "description": "Confusing Words are English words that are easily mistaken for one another because of similarities in spelling, pronunciation, meaning, or usage. Understanding their differences is necessary for accurate communication and writing. This category focuses on distinguishing between similar-looking or similar-sounding words and using each correctly."
+  },
+  {
+    "name": "Punctuation",
+    "slug": "punctuation",
+    "subject": "English",
+    "description": "Punctuation is the system of marks used in written English to organize sentences, clarify meaning, indicate pauses, and show relationships between different parts of text. Correct punctuation helps readers understand the intended structure and meaning of writing. This category focuses on the rules and functions of punctuation marks in English."
+  },
+  {
+    "name": "Capitalization",
+    "slug": "capitalization",
+    "subject": "English",
+    "description": "Capitalization refers to the use of uppercase letters in specific positions and for particular purposes in English writing. It helps identify sentence beginnings, proper names, titles, and other elements that follow standard writing conventions. This category focuses on the rules governing when words or letters should begin with a capital letter."
+  },
+  {
+    "name": "Subject and Predicate",
+    "slug": "subject-and-predicate",
+    "subject": "English",
+    "description": "Subject and Predicate are the two fundamental parts of a basic English sentence. The subject identifies who or what the sentence is about, while the predicate provides information about the subject. This category focuses on understanding how these parts function together to form complete and meaningful sentences."
+  },
+  {
+    "name": "Sentence Transformation",
+    "slug": "sentence-transformation",
+    "subject": "English",
+    "description": "Sentence Transformation is the process of changing the form or structure of a sentence while preserving its essential meaning. The transformation may involve changes in grammatical construction, voice, degree, or sentence pattern. This category focuses on applying grammatical rules to express the same idea in a different structure."
+  },
+  {
+    "name": "Degrees of Comparison",
+    "slug": "degrees-of-comparison",
+    "subject": "English",
+    "description": "Degrees of Comparison are grammatical forms used to compare the qualities or characteristics of people, things, or situations. They indicate whether a quality is presented in its basic form or compared between entities. This category focuses on the formation and correct use of positive, comparative, and superlative forms."
+  },
+  {
+    "name": "Question Formation",
+    "slug": "question-formation",
+    "subject": "English",
+    "description": "Question Formation refers to the grammatical process of constructing questions in English. It involves arranging auxiliary verbs, subjects, main verbs, and question words according to the type of information being requested. This category focuses on forming grammatically correct questions and understanding their structures."
+  },
+  {
+    "name": "Negation",
+    "slug": "negation",
+    "subject": "English",
+    "description": "Negation is the grammatical process of expressing that an action, condition, statement, or idea is not true or does not occur. English commonly uses negative words and structures to change affirmative meanings into negative ones. This category focuses on the formation and correct use of negative sentences and expressions."
+  },
+  {
+    "name": "Agreement and Concord",
+    "slug": "agreement-and-concord",
+    "subject": "English",
+    "description": "Agreement and Concord refer to the grammatical relationship in which related words must correspond correctly in features such as number, person, or grammatical form. This relationship helps maintain consistency and grammatical accuracy within sentences. This category focuses on the rules that govern agreement between different elements of English sentences."
+  },
+  {
+    "name": "Finite Verbs",
+    "slug": "finite-verbs",
+    "subject": "English",
+    "description": "Finite Verbs are verb forms that are grammatically connected to the subject and can indicate tense, person, or number. They normally function as the main verb of an independent or dependent clause. This category focuses on identifying finite verbs and understanding their grammatical role in English sentences."
+  },
+  {
+    "name": "Auxiliary Verbs",
+    "slug": "auxiliary-verbs",
+    "subject": "English",
+    "description": "Auxiliary Verbs are helping verbs used with main verbs to form tenses, questions, negatives, passive constructions, and other grammatical structures. They provide important grammatical information without necessarily carrying the main lexical meaning of the sentence. This category focuses on the functions and correct use of auxiliary verbs."
+  },
+  {
+    "name": "Gerunds",
+    "slug": "gerunds",
+    "subject": "English",
+    "description": "A Gerund is a verb form ending in -ing that functions grammatically as a noun within a sentence. Although it originates from a verb, it can perform noun-like roles such as serving as a subject or object. This category focuses on recognizing gerunds and understanding their grammatical functions and usage."
+  },
+  {
+    "name": "Infinitives",
+    "slug": "infinitives",
+    "subject": "English",
+    "description": "An Infinitive is a basic form of a verb that is commonly introduced by the word 'to', although English also has bare infinitive constructions. It can perform several grammatical functions within a sentence and may express purpose, intention, or action. This category focuses on the forms, functions, and correct usage of infinitives."
+  },
+  {
+    "name": "Participles",
+    "slug": "participles",
+    "subject": "English",
+    "description": "Participles are verb forms that can function as parts of verb phrases or as modifiers within sentences. They are commonly used to form progressive and perfect structures and can also describe nouns or pronouns. This category focuses on the grammatical forms, functions, and proper use of present and past participles."
+  },
+  {
+    "name": "Reported Questions",
+    "slug": "reported-questions",
+    "subject": "English",
+    "description": "Reported Questions are questions that are communicated indirectly rather than repeated using the speaker's exact original words. Their grammatical structure differs from direct questions and follows specific rules for tense, word order, and reporting expressions. This category focuses on correctly converting and using questions in reported speech."
+  },
+  {
+    "name": "Conditional Sentences",
+    "slug": "conditional-sentences",
+    "subject": "English",
+    "description": "Conditional Sentences are sentence structures that connect a condition with its possible, expected, imaginary, or past consequence. They express relationships between situations and the results that may or would follow from them. This category focuses on the grammatical patterns and meanings used to express different kinds of conditions."
+  },
+  {
+    "name": "Narration",
+    "slug": "narration",
+    "subject": "English",
+    "description": "Narration in English grammar refers to the way spoken or written statements are reported from one form to another. It involves understanding how the original speaker's words are presented directly or indirectly while maintaining the intended meaning. This category focuses on the grammatical principles used in changing and reporting statements."
+  },
+  {
+    "name": "Comprehension Skills",
+    "slug": "comprehension-skills",
+    "subject": "English",
+    "description": "Comprehension Skills are the abilities required to understand, interpret, analyze, and evaluate information presented through written or spoken English. They involve recognizing meaning, relationships, important details, implied ideas, and overall purpose. This category focuses on the broader ability to understand English communication accurately."
+  },
+  {
+    "name": "Precis Writing",
+    "slug": "precis-writing",
+    "subject": "English",
+    "description": "Precis Writing is the process of reducing a longer passage into a shorter and coherent form while preserving its central meaning and important ideas. It requires selecting essential information and expressing it concisely without changing the original message. This category focuses on accurate, clear, and concise summarization of written English."
+  },
+  {
+    "name": "Essay Writing",
+    "slug": "essay-writing",
+    "subject": "English",
+    "description": "Essay Writing is the organized presentation of ideas, arguments, information, or opinions on a specific subject in written English. A good essay develops a clear central idea through an appropriate structure and connected paragraphs. This category focuses on the principles of planning, organizing, developing, and presenting ideas effectively in essay form."
+  },
+  {
+    "name": "Letter Writing",
+    "slug": "letter-writing",
+    "subject": "English",
+    "description": "Letter Writing is the structured method of communicating information, requests, feelings, or official messages through a written letter. Different situations require different levels of formality, organization, and language. This category focuses on the appropriate structure, tone, format, and language used in English letters."
+  },
+  {
+    "name": "Precis and Summary",
+    "slug": "precis-and-summary",
+    "subject": "English",
+    "description": "Precis and Summary refer to the concise presentation of the essential meaning and main ideas of a longer piece of writing. The purpose is to reduce unnecessary detail while preserving the central message and logical sense of the original text. This category focuses on understanding, selecting, organizing, and expressing the most important information concisely."
+  },
+  {
+    "name": "Translation",
+    "slug": "translation",
+    "subject": "English",
+    "description": "Translation is the process of expressing the meaning of a text or statement from one language in another language accurately and naturally. Effective translation requires understanding both the original meaning and the grammatical and contextual conventions of the target language. This category focuses on transferring meaning while maintaining clarity, accuracy, and appropriate expression."
+  },
+  {
+    "name": "English Usage",
+    "slug": "english-usage",
+    "subject": "English",
+    "description": "English Usage refers to the accepted and appropriate ways in which words, expressions, grammatical structures, and language forms are used in English. Correct usage depends not only on grammar but also on meaning, context, convention, and communication purpose. This category focuses on choosing language forms that are accurate and appropriate for a given context."
+  },
+  {
+    "name": "Vocabulary in Context",
+    "slug": "vocabulary-in-context",
+    "subject": "English",
+    "description": "Vocabulary in Context refers to determining the meaning and appropriate interpretation of a word from the surrounding text or situation. The same word may carry different meanings depending on how it is used. This category focuses on understanding vocabulary through contextual clues rather than relying only on isolated dictionary meanings."
+  },
+  {
+    "name": "Literary Genres",
+    "slug": "literary-genres",
+    "subject": "English",
+    "description": "Literary Genres are broad category used to classify literary works according to their form, purpose, structure, and style. Different genres have distinctive characteristics that influence how a literary work is written and interpreted. This category focuses on understanding the major forms and classifications of literature."
+  },
+  {
+    "name": "Poetry",
+    "slug": "poetry",
+    "subject": "English",
+    "description": "Poetry is a form of literary expression that uses carefully selected language, rhythm, imagery, sound, and structure to communicate ideas, emotions, and experiences. It often uses language in highly condensed or imaginative ways. This category focuses on understanding the forms, features, meanings, and techniques associated with English poetry."
+  },
+  {
+    "name": "Drama",
+    "slug": "drama",
+    "subject": "English",
+    "description": "Drama is a form of literature designed primarily for performance in which characters, dialogue, action, and events are presented to communicate a story or ideas. Dramatic works are structured around interactions and developments that can be represented on stage. This category focuses on understanding the nature, structure, elements, and interpretation of English drama."
+  },
+  {
+    "name": "Prose",
+    "slug": "prose",
+    "subject": "English",
+    "description": "Prose is ordinary written or spoken language organized into sentences and paragraphs rather than the structured lines and patterns commonly associated with poetry. It is the principal form used for many kinds of narrative, descriptive, informative, and argumentative writing. This category focuses on understanding the forms, characteristics, and literary use of English prose."
+  },
+  {
+    "name": "Literary Devices",
+    "slug": "literary-devices",
+    "subject": "English",
+    "description": "Literary Devices are techniques deliberately used by writers to create meaning, emphasis, imagery, emotion, rhythm, or stylistic effect in literary works. They help writers communicate ideas in more expressive and memorable ways. This category focuses on identifying, understanding, and interpreting the techniques used in literary writing."
+  },
+  {
+    "name": "Literary Criticism",
+    "slug": "literary-criticism",
+    "subject": "English",
+    "description": "Literary Criticism is the systematic study, interpretation, and evaluation of literary works. It examines how texts create meaning and considers their themes, forms, language, techniques, contexts, and artistic qualities. This category focuses on the analytical approaches used to understand and evaluate literature."
+  },
+  {
+    "name": "English Authors and Poets",
+    "slug": "english-authors-and-poets",
+    "subject": "English",
+    "description": "English Authors and Poets refers to the study of writers who have made significant contributions to English literature through their literary works. Understanding these writers involves recognizing their major works, literary contributions, periods, and distinctive styles. This category focuses on the literary identity and contributions of important English-language writers."
+  },
+  {
+    "name": "Literary Movements",
+    "slug": "literary-movements",
+    "subject": "English",
+    "description": "Literary Movements are groups or periods in literature characterized by shared ideas, styles, themes, techniques, or approaches to writing. They often develop in response to social, cultural, intellectual, or artistic changes. This category focuses on understanding the characteristics, development, and literary significance of major movements."
+  },
+  {
+    "name": "English Literary History",
+    "slug": "english-literary-history",
+    "subject": "English",
+    "description": "English Literary History is the study of the development of English literature across different historical periods. It examines how literary forms, themes, writers, styles, and ideas changed in response to changing cultural and historical conditions. This category focuses on understanding the major periods and overall development of English literature."
+  },
+  {
+    "name": "Grammar Rules",
+    "slug": "grammar-rules",
+    "subject": "English",
+    "description": "Grammar Rules are the established principles that determine how English words and sentences should be formed and used correctly. They provide the structural foundation needed to communicate ideas accurately and clearly. This category focuses on the general rules that govern correct English usage."
+  },
+  {
+    "name": "Word Classes",
+    "slug": "word-classes",
+    "subject": "English",
+    "description": "Word Classes are groups into which English words are classified according to their grammatical function and behavior. A word's class helps determine how it can be used and what role it can perform in a sentence. This category focuses on understanding the grammatical classification and function of English words."
+  },
+  {
+    "name": "Countable and Uncountable Nouns",
+    "slug": "countable-and-uncountable-nouns",
+    "subject": "English",
+    "description": "Countable and Uncountable Nouns are classified according to whether the things they refer to can be individually counted. Countable nouns can normally have singular and plural forms, while uncountable nouns generally refer to substances, concepts, or quantities treated as a whole. This category focuses on understanding their grammatical behavior and correct usage."
+  },
+  {
+    "name": "Gender",
+    "slug": "gender",
+    "subject": "English",
+    "description": "Gender in English Grammar refers to the grammatical or natural distinction associated with people, animals, and certain nouns. It can indicate whether a person or living being is male, female, or referred to without specifying gender. This category focuses on the forms and grammatical use of gender-related expressions in English."
+  },
+  {
+    "name": "Number",
+    "slug": "number",
+    "subject": "English",
+    "description": "Number is a grammatical feature that indicates whether a noun or related expression refers to one entity or more than one entity. English generally distinguishes between singular and plural forms. This category focuses on the formation, identification, and correct grammatical use of singular and plural forms."
+  },
+  {
+    "name": "Case",
+    "slug": "case",
+    "subject": "English",
+    "description": "Case refers to the grammatical relationship that shows the function or role of a noun or pronoun within a sentence. In modern English, case is most clearly visible in certain pronoun forms and possessive constructions. This category focuses on understanding how grammatical roles are expressed through case."
+  },
+  {
+    "name": "Possessives",
+    "slug": "possessives",
+    "subject": "English",
+    "description": "Possessives are grammatical forms used to express ownership, belonging, association, or relationship between people, things, or ideas. English commonly expresses possession through possessive nouns and pronouns. This category focuses on the formation and correct use of possessive structures."
+  },
+  {
+    "name": "Quantifiers",
+    "slug": "quantifiers",
+    "subject": "English",
+    "description": "Quantifiers are words or expressions used to indicate the amount or quantity of something referred to by a noun. They help communicate whether the quantity is large, small, sufficient, limited, or unspecified. This category focuses on the grammatical use of quantity-related expressions with different types of nouns."
+  },
+  {
+    "name": "Relative Clauses",
+    "slug": "relative-clauses",
+    "subject": "English",
+    "description": "Relative Clauses are clauses that provide additional information about a noun or pronoun in a sentence. They are commonly introduced by relative pronouns or related structures and connect the additional information to the word being described. This category focuses on the structure, types, and correct use of relative clauses."
+  },
+  {
+    "name": "Noun Clauses",
+    "slug": "noun-clauses",
+    "subject": "English",
+    "description": "Noun Clauses are dependent clauses that perform functions normally associated with nouns within a sentence. They can act as subjects, objects, or complements and allow complex ideas to be expressed as a grammatical unit. This category focuses on identifying, forming, and correctly using noun clauses."
+  },
+  {
+    "name": "Adjective Clauses",
+    "slug": "adjective-clauses",
+    "subject": "English",
+    "description": "Adjective Clauses are dependent clauses that modify or describe a noun or pronoun. They provide additional information about the person, thing, or idea being discussed. This category focuses on their structure, function, and correct connection with the noun or pronoun they describe."
+  },
+  {
+    "name": "Adverb Clauses",
+    "slug": "adverb-clauses",
+    "subject": "English",
+    "description": "Adverb Clauses are dependent clauses that function like adverbs by providing information about circumstances such as time, reason, condition, purpose, contrast, or manner. They establish a meaningful relationship between one part of a sentence and another. This category focuses on their structure, meaning, and correct grammatical use."
+  },
+  {
+    "name": "Conjunctions and Connectors",
+    "slug": "conjunctions-and-connectors",
+    "subject": "English",
+    "description": "Conjunctions and Connectors are words or expressions used to establish relationships between words, phrases, clauses, sentences, or ideas. They help show relationships such as addition, contrast, cause, result, sequence, and condition. This category focuses on connecting ideas clearly and logically in English."
+  },
+  {
+    "name": "Discourse Markers",
+    "slug": "discourse-markers",
+    "subject": "English",
+    "description": "Discourse Markers are words or expressions used to organize spoken or written communication and show how one idea relates to another. They can indicate contrast, addition, sequence, conclusion, emphasis, or a change in topic. This category focuses on how these expressions improve the organization and coherence of English communication."
+  },
+  {
+    "name": "Parallelism",
+    "slug": "parallelism",
+    "subject": "English",
+    "description": "Parallelism is the grammatical principle of using similar structures for words, phrases, or clauses that have similar functions in a sentence. It creates balance, clarity, and consistency in English expression. This category focuses on identifying and maintaining parallel grammatical structures."
+  },
+  {
+    "name": "Modifiers",
+    "slug": "modifiers",
+    "subject": "English",
+    "description": "Modifiers are words, phrases, or clauses that provide additional information about another element in a sentence. They can describe, limit, specify, or add detail to nouns, verbs, adjectives, adverbs, or other expressions. This category focuses on the correct placement and use of modifiers to maintain clear meaning."
+  },
+  {
+    "name": "Dangling and Misplaced Modifiers",
+    "slug": "dangling-and-misplaced-modifiers",
+    "subject": "English",
+    "description": "Dangling and Misplaced Modifiers are grammatical problems that occur when a modifying word, phrase, or clause is positioned incorrectly or does not clearly refer to the intended element. Such errors can make a sentence confusing or unintentionally change its meaning. This category focuses on identifying and correcting these modifier-related errors."
+  },
+  {
+    "name": "Redundancy",
+    "slug": "redundancy",
+    "subject": "English",
+    "description": "Redundancy in English occurs when unnecessary words or repeated ideas are included without adding meaningful information. Removing redundant expressions makes communication more concise, clear, and effective. This category focuses on recognizing unnecessary repetition and improving sentences by expressing ideas more efficiently."
+  },
+  {
+    "name": "Conciseness",
+    "slug": "conciseness",
+    "subject": "English",
+    "description": "Conciseness is the ability to express an idea clearly and completely using only the words necessary to communicate the intended meaning. It avoids unnecessary repetition, complicated wording, and excessive detail. This category focuses on making English expressions shorter, clearer, and more effective without losing meaning."
+  },
+  {
+    "name": "Cohesion and Coherence",
+    "slug": "cohesion-and-coherence",
+    "subject": "English",
+    "description": "Cohesion and Coherence refer to the qualities that make a piece of English writing logically connected and easy to understand. Cohesion concerns the linguistic connections between sentences and parts of a text, while coherence concerns the overall logical flow of ideas. This category focuses on creating well-connected and meaningful communication."
+  },
+  {
+    "name": "Formal and Informal English",
+    "slug": "formal-and-informal-english",
+    "subject": "English",
+    "description": "Formal and Informal English are different styles of language chosen according to the situation, audience, relationship, and purpose of communication. Formal English generally follows more conventional and professional patterns, while informal English allows more conversational forms. This category focuses on understanding and choosing language appropriate to different contexts."
+  },
+  {
+    "name": "Commonly Used Expressions",
+    "slug": "commonly-used-expressions",
+    "subject": "English",
+    "description": "Commonly Used Expressions are established words, phrases, and patterns frequently used in everyday English communication. Their meanings and usage often depend on common language conventions and conversational context. This category focuses on understanding and appropriately using expressions that occur regularly in practical English."
+  },
+  {
+    "name": "Functional English",
+    "slug": "functional-english",
+    "subject": "English",
+    "description": "Functional English is the practical use of English for communicating specific purposes in everyday, academic, social, and professional situations. It focuses on using language effectively according to the purpose and context of communication. This category develops the ability to perform common communication tasks accurately and appropriately."
+  },
+  {
+    "name": "Communication Skills",
+    "slug": "communication-skills",
+    "subject": "English",
+    "description": "Communication Skills are the abilities required to exchange information, ideas, opinions, and feelings clearly and effectively through English. They involve selecting appropriate language, organizing information, understanding others, and responding suitably. This category focuses on using English successfully in practical communication situations."
+  },
+  {
+    "name": "Business English",
+    "slug": "business-english",
+    "subject": "English",
+    "description": "Business English is the form of English used for professional, commercial, workplace, and organizational communication. It emphasizes clear, precise, appropriate, and professional language for business-related situations. This category focuses on the language conventions and communication practices required in professional environments."
+  },
+  {
+    "name": "Academic English",
+    "slug": "academic-english",
+    "subject": "English",
+    "description": "Academic English is the form of English used in education, research, scholarly writing, and formal academic communication. It generally requires precise vocabulary, logical organization, formal style, and clear presentation of evidence or ideas. This category focuses on the language skills needed for academic study and communication."
+  },
+  {
+    "name": "Vocabulary Development",
+    "slug": "vocabulary-development",
+    "subject": "English",
+    "description": "Vocabulary Development is the process of increasing the range, depth, and effective use of English words and expressions. It involves understanding meanings, relationships, forms, contexts, and appropriate usage of vocabulary. This category focuses on building a stronger and more flexible English vocabulary."
+  },
+  {
+    "name": "Etymology",
+    "slug": "etymology",
+    "subject": "English",
+    "description": "Etymology is the study of the origins and historical development of words and their meanings. It examines how English vocabulary has been influenced by different languages and how words have changed over time. This category focuses on understanding the historical sources and development of English words."
+  },
+  {
+    "name": "Dialect and Variation",
+    "slug": "dialect-and-variation",
+    "subject": "English",
+    "description": "Dialect and Variation refer to differences in English pronunciation, vocabulary, grammar, and usage that occur across regions, communities, and social contexts. These variations show that English exists in multiple forms rather than one completely uniform variety. This category focuses on understanding major patterns of variation within the English language."
+  },
+  {
+    "name": "Semantics",
+    "slug": "semantics",
+    "subject": "English",
+    "description": "Semantics is the study of meaning in language, including the meanings of words, phrases, sentences, and larger expressions. It examines how meaning is represented and how different linguistic elements contribute to interpretation. This category focuses on understanding meaning and relationships between meanings in English."
+  },
+  {
+    "name": "Pragmatics",
+    "slug": "pragmatics",
+    "subject": "English",
+    "description": "Pragmatics is the study of how language meaning is understood in relation to context, situation, speaker, listener, and communicative purpose. The intended meaning of an expression can depend on circumstances beyond its literal wording. This category focuses on how English is interpreted and used in real communication."
+  },
+  {
+    "name": "Phonetics",
+    "slug": "phonetics",
+    "subject": "English",
+    "description": "Phonetics is the study of the physical production, transmission, and perception of speech sounds. It examines how English sounds are articulated and how they can be represented and distinguished. This category focuses on the sound system of spoken English from a physical and articulatory perspective."
+  },
+  {
+    "name": "Phonology",
+    "slug": "phonology",
+    "subject": "English",
+    "description": "Phonology is the study of how speech sounds are organized and function as a system within a language. It examines sound patterns, contrasts, and rules that contribute to meaningful differences in English. This category focuses on the structural organization and behavior of English sounds."
+  },
+  {
+    "name": "Stress and Intonation",
+    "slug": "stress-and-intonation",
+    "subject": "English",
+    "description": "Stress and Intonation are important features of spoken English that influence emphasis, rhythm, attitude, and meaning. Stress determines which syllables or words receive greater prominence, while intonation describes changes in pitch across spoken expressions. This category focuses on how these features contribute to clear and meaningful spoken communication."
+  },
+  {
+    "name": "Text Analysis",
+    "slug": "text-analysis",
+    "subject": "English",
+    "description": "Text Analysis is the systematic examination of a written or spoken text to understand its structure, meaning, language, purpose, and organization. It considers how individual linguistic elements work together to communicate the overall message. This category focuses on interpreting and analyzing texts using linguistic and contextual evidence."
+  },
+  {
+    "name": "Critical Reading",
+    "slug": "critical-reading",
+    "subject": "English",
+    "description": "Critical Reading is the active process of examining a text beyond its surface meaning by evaluating its ideas, evidence, assumptions, reasoning, and purpose. It requires readers to question and assess information rather than simply accept it. This category focuses on analytical and evaluative understanding of English texts."
+  },
+  {
+    "name": "Lexicology",
+    "slug": "lexicology",
+    "subject": "English",
+    "description": "Lexicology is the systematic study of words and the vocabulary of a language. It examines the meaning, formation, relationships, development, and usage of words within English. This category focuses on understanding English vocabulary as a structured linguistic system."
+  },
+  {
+    "name": "Morphology",
+    "slug": "morphology",
+    "subject": "English",
+    "description": "Morphology is the study of the internal structure and formation of words. It examines how words are built from smaller meaningful units and how these units contribute to grammatical form and meaning. This category focuses on understanding the structure and formation of English words."
+  },
+  {
+    "name": "Syntax",
+    "slug": "syntax",
+    "subject": "English",
+    "description": "Syntax is the study of how words and phrases are arranged to form grammatically correct sentences. It explains the structural relationships between different parts of a sentence and the rules governing their arrangement. This category focuses on understanding the sentence structure and grammatical organization of English."
+  },
+  {
+    "name": "Discourse Analysis",
+    "slug": "discourse-analysis",
+    "subject": "English",
+    "description": "Discourse Analysis is the study of language as it is used in connected speech and writing rather than in isolated sentences. It examines how ideas, meanings, relationships, and communication are organized across larger stretches of language. This category focuses on understanding how English functions in real communication and extended texts."
+  },
+  {
+    "name": "Stylistics",
+    "slug": "stylistics",
+    "subject": "English",
+    "description": "Stylistics is the systematic study of language style and the ways linguistic choices create particular effects in a text. It examines vocabulary, sentence structure, sound, imagery, and other features that contribute to an author's distinctive expression. This category focuses on analyzing how language choices shape meaning and style."
+  },
+  {
+    "name": "Rhetoric",
+    "slug": "rhetoric",
+    "subject": "English",
+    "description": "Rhetoric is the study and use of language to communicate ideas persuasively and effectively. It examines how speakers and writers organize arguments and use language to influence understanding, emotion, or judgment. This category focuses on the principles and techniques used to make communication more persuasive and impactful."
+  },
+  {
+    "name": "Argumentation",
+    "slug": "argumentation",
+    "subject": "English",
+    "description": "Argumentation is the process of presenting and connecting claims, reasons, evidence, and conclusions to support a particular position or idea. Effective argumentation requires logical organization and appropriate support for the claims being made. This category focuses on understanding and constructing clear, logical, and convincing arguments in English."
+  },
+  {
+    "name": "Logical Reasoning in English",
+    "slug": "logical-reasoning-in-english",
+    "subject": "English",
+    "description": "Logical Reasoning in English involves understanding relationships between statements, identifying conclusions, and evaluating whether ideas follow logically from available information. It combines language comprehension with the ability to recognize patterns of reasoning. This category focuses on interpreting and evaluating logical relationships expressed through English."
+  },
+  {
+    "name": "Vocabulary Relationships",
+    "slug": "vocabulary-relationships",
+    "subject": "English",
+    "description": "Vocabulary Relationships refer to the different semantic connections that exist between English words. These relationships help explain how words can be similar, opposite, related, hierarchical, or associated in meaning. This category focuses on understanding how English words are connected to one another by meaning."
+  },
+  {
+    "name": "Word Meaning",
+    "slug": "word-meaning",
+    "subject": "English",
+    "description": "Word Meaning refers to the meaning conveyed by an English word in isolation or within a particular context. Understanding meaning requires considering both the basic sense of a word and the way it is used in communication. This category focuses on accurately interpreting and distinguishing the meanings of English words."
+  },
+  {
+    "name": "Contextual Meaning",
+    "slug": "contextual-meaning",
+    "subject": "English",
+    "description": "Contextual Meaning is the specific meaning that a word, phrase, or expression conveys in the situation or passage where it occurs. A linguistic expression can have different interpretations depending on its surrounding information and communicative context. This category focuses on determining intended meaning from context."
+  },
+  {
+    "name": "Literal and Figurative Meaning",
+    "slug": "literal-and-figurative-meaning",
+    "subject": "English",
+    "description": "Literal and Figurative Meaning distinguish between language used in its direct, ordinary sense and language used to convey an extended or non-literal idea. Understanding this distinction is important for interpreting everyday expressions as well as literary language. This category focuses on identifying and interpreting literal and figurative uses of English."
+  },
+  {
+    "name": "Register",
+    "slug": "register",
+    "subject": "English",
+    "description": "Register refers to the variety or level of language chosen according to the situation, audience, relationship, and purpose of communication. English may be expressed differently in academic, professional, formal, casual, or specialized settings. This category focuses on selecting language that is appropriate for a particular communicative context."
+  },
+  {
+    "name": "Specialized English",
+    "slug": "specialized-english",
+    "subject": "English",
+    "description": "Specialized English refers to language used within a particular professional, academic, technical, or occupational field. It contains terminology and expressions that have specific meanings within that field. This category focuses on understanding English as it is adapted to specialized areas of communication."
+  },
+  {
+    "name": "Technical English",
+    "slug": "technical-english",
+    "subject": "English",
+    "description": "Technical English is the form of English used to communicate specialized technical information clearly and accurately. It emphasizes precise terminology, structured explanations, and unambiguous communication. This category focuses on the language conventions used for technical and scientific communication."
+  },
+  {
+    "name": "Editing",
+    "slug": "editing",
+    "subject": "English",
+    "description": "Editing is the process of reviewing written English to identify and improve problems in grammar, spelling, punctuation, word choice, structure, clarity, and overall expression. It aims to make writing accurate, coherent, and effective. This category focuses on systematically improving a written text before it is finalized."
+  },
+  {
+    "name": "Proofreading",
+    "slug": "proofreading",
+    "subject": "English",
+    "description": "Proofreading is the final careful examination of written text to identify surface-level errors before publication or submission. It primarily checks spelling, punctuation, grammar, formatting, and typographical accuracy. This category focuses on detecting and correcting remaining mistakes in a completed piece of writing."
+  },
+  {
+    "name": "Paraphrasing",
+    "slug": "paraphrasing",
+    "subject": "English",
+    "description": "Paraphrasing is the process of expressing the meaning of an existing statement or passage using different words and sentence structures. A good paraphrase preserves the original idea while presenting it in a new form. This category focuses on accurately restating English content without changing its essential meaning."
+  },
+  {
+    "name": "Summarization",
+    "slug": "summarization",
+    "subject": "English",
+    "description": "Summarization is the process of reducing a longer text to a shorter form while retaining its central ideas and most important information. It requires identifying what is essential and removing unnecessary details. This category focuses on understanding and presenting the main content of English texts concisely."
+  },
+  {
+    "name": "Note Making",
+    "slug": "note-making",
+    "subject": "English",
+    "description": "Note Making is the process of extracting and organizing important information from a longer text into a concise and structured form. It helps preserve essential ideas while reducing unnecessary detail. This category focuses on identifying key information and arranging it in a clear, useful format for later understanding or revision."
+  },
+  {
+    "name": "Precis Comprehension",
+    "slug": "precis-comprehension",
+    "subject": "English",
+    "description": "Precis Comprehension combines the understanding of a passage with the ability to express its essential meaning in a concise form. It requires identifying the central idea, important supporting points, and overall purpose of the original text. This category focuses on accurately understanding and condensing written English."
+  },
+  {
+    "name": "Dialogue Completion",
+    "slug": "dialogue-completion",
+    "subject": "English",
+    "description": "Dialogue Completion involves supplying an appropriate response or missing expression within a conversation. The correct response depends on the meaning, grammatical structure, tone, and context of the dialogue. This category focuses on understanding conversational situations and selecting language that logically completes them."
+  },
+  {
+    "name": "Conversation Skills",
+    "slug": "conversation-skills",
+    "subject": "English",
+    "description": "Conversation Skills are the abilities needed to participate effectively in spoken interactions in English. They involve understanding questions, giving suitable responses, maintaining a topic, taking turns, and expressing ideas naturally. This category focuses on practical spoken communication in interactive situations."
+  },
+  {
+    "name": "Situational English",
+    "slug": "situational-english",
+    "subject": "English",
+    "description": "Situational English refers to the use of appropriate English expressions according to a particular real-life situation or communicative purpose. Different situations require different vocabulary, tone, sentence patterns, and levels of formality. This category focuses on selecting suitable English for specific practical contexts."
+  },
+  {
+    "name": "Vocabulary Exercises",
+    "slug": "vocabulary-exercises",
+    "subject": "English",
+    "description": "Vocabulary Exercises are structured activities designed to test or develop understanding of English words and their meanings. They require learners to recognize relationships, meanings, forms, and appropriate usage of vocabulary. This category focuses on practicing and evaluating English vocabulary knowledge."
+  },
+  {
+    "name": "Grammar Exercises",
+    "slug": "grammar-exercises",
+    "subject": "English",
+    "description": "Grammar Exercises are structured activities designed to test or strengthen the ability to apply English grammatical rules. They require learners to recognize correct forms, identify errors, and construct grammatically appropriate expressions. This category focuses on practical application and assessment of English grammar."
+  },
+  {
+    "name": "Language Aptitude",
+    "slug": "language-aptitude",
+    "subject": "English",
+    "description": "Language Aptitude refers to the ability to recognize, understand, learn, and apply patterns in a language. It involves sensitivity to vocabulary, grammar, structure, meaning, and relationships between linguistic elements. This category focuses on measuring and developing the ability to work with English language patterns."
+  },
+  {
+    "name": "English Usage in Competitive Exams",
+    "slug": "english-usage-in-competitive-exams",
+    "subject": "English",
+    "description": "English Usage in Competitive Exams refers to the application and assessment of English language knowledge in objective and examination-oriented contexts. It combines grammar, vocabulary, comprehension, sentence usage, and language reasoning according to exam requirements. This category focuses on the practical examination-oriented use of English."
+  }
+]

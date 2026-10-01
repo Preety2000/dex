@@ -1,0 +1,172 @@
+{% extends "base.html" %}{% block head %}
+<!-- <link rel="stylesheet" href="/css/welcome.css?m={{device_info.device_type}}"> -->
+<style>
+    .successfully-account {
+        max-width: 780px;
+        margin: 15vh auto;
+        padding: 24px;
+        box-shadow: 0 3px 24px -3px rgba(10, 8, 59, .12);
+    }
+
+    .successfully-account .submit {
+        margin-left: 15px;
+        float: right;
+        padding: 8px 16px;
+        outline: none;
+        border: none;
+    }
+
+    .block-hidden {
+        display: block;
+        overflow: hidden;
+    }
+</style>{% endblock %}{% block body %}
+<div class="session-container"></div>
+<script>
+    (function (s, u) {
+        const request = new $.request();
+        $.DOMContentLoaded(function (a, b, success) {
+            var container = a("session-container");
+
+            request.isPathname("/success")
+                ? success(request, container)
+                : function (a, b) {
+                    const data = {
+                        class: "body-wrap",
+                        children: [
+                            {
+                                tagName: "section",
+                                class: "hero",
+                                children: [
+                                    {
+                                        class: "container",
+                                        children: [
+                                            {
+                                                class: "hero-inner",
+                                                children: [
+                                                    {
+                                                        class: "hero-copy",
+                                                        children: [
+                                                            {
+                                                                tagName: "h1",
+                                                                class: "hero-title mt-0",
+                                                                inner: "Landing template for startups"
+                                                            },
+                                                            {
+                                                                tagName: "p",
+                                                                class: "hero-paragraph",
+                                                                inner: "Our landing page template works on all devices, so you only have to set it up once, and get beautiful results forever."
+                                                            },
+                                                            {
+                                                                class: "hero-cta",
+                                                                children: [
+                                                                    {
+                                                                        tagName: "a",
+                                                                        class: "button button-primary",
+                                                                        href: "#",
+                                                                        inner: "Pre order now"
+                                                                    },
+                                                                    {
+                                                                        tagName: "a",
+                                                                        class: "button",
+                                                                        href: "#",
+                                                                        inner: "Get in touch"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        class: "hero-figure anime-element",
+                                                        children: [
+                                                            {
+                                                                tagName: "svg",
+                                                                class: "placeholder",
+                                                                width: "528",
+                                                                height: "396",
+                                                                viewBox: "0 0 528 396",
+                                                                children: [
+                                                                    {
+                                                                        tagName: "rect",
+                                                                        width: "528",
+                                                                        height: "396",
+                                                                        cssText: "fill:transparent;"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                class: "hero-figure-box hero-figure-box-01",
+                                                                dataRotation: "45deg",
+                                                                cssText: "transform: rotate(45deg) scale(1); opacity: 1;"
+                                                            },
+                                                            {
+                                                                class: "hero-figure-box hero-figure-box-02",
+                                                                dataRotation: "-45deg",
+                                                                cssText: "transform: rotate(-45deg) scale(1); opacity: 1;"
+                                                            },
+                                                            {
+                                                                class: "hero-figure-box hero-figure-box-03",
+                                                                dataRotation: "0deg",
+                                                                cssText: "transform: rotate(0deg) scale(1); opacity: 1;"
+                                                            },
+                                                            {
+                                                                class: "hero-figure-box hero-figure-box-04",
+                                                                dataRotation: "-135deg",
+                                                                cssText: "transform: rotate(-135deg) scale(1); opacity: 1;"
+                                                            },
+                                                            {
+                                                                class: "hero-figure-box hero-figure-box-05",
+                                                                cssText: "transform: scaleX(1) scaleY(1) perspective(500px) rotateY(-15deg) rotateX(8deg) rotateZ(-1deg);"
+                                                            },
+                                                            {
+                                                                class: "hero-figure-box hero-figure-box-06",
+                                                                cssText: "transform: scaleX(1) scaleY(1) perspective(500px) rotateZ(20deg);"
+                                                            },
+                                                            {
+                                                                class: "hero-figure-box hero-figure-box-07",
+                                                                cssText: "transform: scaleX(1) scaleY(1) perspective(500px) rotateZ(20deg);"
+                                                            },
+                                                            {
+                                                                class: "hero-figure-box hero-figure-box-08",
+                                                                dataRotation: "-22deg",
+                                                                cssText: "transform: rotate(-22deg) scale(1); opacity: 1;"
+                                                            },
+                                                            {
+                                                                class: "hero-figure-box hero-figure-box-09",
+                                                                dataRotation: "-52deg",
+                                                                cssText: "transform: rotate(-52deg) scale(1); opacity: 1;"
+                                                            },
+                                                            {
+                                                                class: "hero-figure-box hero-figure-box-10",
+                                                                dataRotation: "-50deg",
+                                                                cssText: "transform: rotate(-50deg) scale(1); opacity: 1;"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    };
+                    b.create(data)
+                    console.log("welcome", JSON.stringify(data));
+                }(request, container)
+
+        }, document.body, function (a, b) {
+            for (const e of ["clear", "successfully-account b_tween boc", "block-hidden"]) {
+                b = b.create(e)
+            }
+            for (const e of [
+                { tagName: "h1", inner: "Thanks for being awesome!" },
+                { tagName: "p", inner: "Your account has been successfully create. We will contact you very soon!<br>Talk to you soon," },
+                { tagName: "button", roll: "button", id: "skip", class: "submit button-secondary", inner: "Skip", on: ev => location = '/' },
+                { tagName: "button", roll: "button", id: "update", class: "submit button", inner: "Update Profile", on: ev => u(a) },
+            ]) b.create(e);
+        })
+    }(this, function (a) {
+        location = '/settings/profiles/edit'
+    }))
+</script>{% endblock %}

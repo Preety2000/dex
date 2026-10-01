@@ -1,0 +1,77 @@
+.IN017 {
+    display: block;
+    overflow: hidden;
+    width: -webkit-fill-available;;
+    padding: 0 5px;
+}
+
+.IN017 .session {
+    height: 160px;
+    background: #c61f26;
+}
+
+.navebar-session {
+    display: block;
+    overflow: hidden;
+    width: -webkit-fill-available;;
+    height: auto;
+}
+
+.navbar {
+    display: flex;
+    justify-content: center;
+    gap: 1px;
+    list-style: none;
+    padding: 0 5px;
+    margin: 0;
+}
+
+.navbar .button {
+    width: -webkit-fill-available;;
+    text-align: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 0;
+}
+
+.navbar a {
+    display: block;
+    color: #FFFFFF;
+    padding: 5px 12px;
+    overflow: hidden;
+}
+
+.jobs-container{
+    display: block;
+    overflow: hidden;
+    width: -webkit-fill-available;;
+    padding: 0 5px;
+    margin-top: 40px;
+}
+
+.jobs-container .gropu-number {
+    padding: 0;
+    width: -webkit-fill-available;;
+}
+
+.jobs-container .title-session {
+    padding: 10px;
+    text-align: center;
+    background: #292a2d;
+    color: var(--bg-muted);
+}
+
+.jobs-container .container-session {
+    padding-right: 5px;
+}
+
+.jobs-containera {
+    margin-bottom: 15px;
+    display: block;
+}
+
+.jobs-container .view-more a {
+    float: right;
+    width: fit-content;
+    margin-right: 15px;
+}

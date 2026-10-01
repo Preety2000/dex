@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="/css/login.css?m={{device_info.device_type}}">
+<style>
+    .IN094 {
+        margin: 30px 0;
+    }
+
+    .IN094 .button {
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+{% block body %}
+<div class="IN003 clear">{%if response.auth_session%}
+    <main class="aside" style="margin: 23% 6%;">
+        <h1 class="title">Welcome Back !</h1>
+        <p>Hi {{response.auth_session.name}}, You are already logged in.</p>
+        <a href="/liked-questions" class="IN087"> <i>Liked Question</i><svg viewBox="0 0 24 24" focusable="false"
+                width="24px" height="24px">
+                <g>
+                    <path
+                        d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z">
+                    </path>
+                </g>
+            </svg></a>
+        <div class="IN094">
+            <a href="/" class="button manage">Go home page</a>
+            <a href="/settings/edit" class="button manage">Edit Account</a>
+        </div>
+    </main>{%else%}
+    <script>
+
+    </script>
+    {%endif%}
+</div>
+{% endblock %}

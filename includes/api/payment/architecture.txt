@@ -1,0 +1,58 @@
+FastAPI
+│
+├── /api/payment/create
+│      └── PhonePe payment order/create
+│
+├── /api/payment/status/{merchant_order_id}
+│      └── Payment status check
+│
+├── /api/payment/callback
+│      └── PhonePe callback/webhook
+│
+├── services/
+│      └── phonepe_service.py
+│
+├── models/
+│      └── payment.py
+│
+├── schemas/
+│      └── payment.py
+│
+├── core/
+│      └── config.py
+│
+└── database/
+       └── payment records
+
+
+
+phonepe_fastapi/
+│
+├── app/
+│   ├── entry.py
+│   ├── main.py
+│   │
+│   ├── core/
+│   │   ├── entry.py
+│   │   └── config.py
+│   │
+│   ├── db/
+│   │   ├── entry.py
+│   │   ├── database.py
+│   │   └── models.py
+│   │
+│   ├── schemas/
+│   │   ├── entry.py
+│   │   └── payment.py
+│   │
+│   ├── services/
+│   │   ├── entry.py
+│   │   └── phonepe.py
+│   │
+│   └── api/
+│       ├── entry.py
+│       └── payment.py
+│
+├── .env
+├── .gitignore
+└── requirements.txt

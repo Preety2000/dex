@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+    body {
+        background: #ffffff;
+    }
+
+    .container-loged {
+        font-size: 15px;
+        display: grid;
+        grid-template-areas: "main aside";
+        gap: 15px;
+        margin: 80px auto;
+        padding: 24px;
+        max-width: 830px;
+    }
+
+    .button_group {
+        gap: 10px;
+    }
+
+    .f4n50 {
+        margin: 20px auto;
+    }
+
+    @media screen and (max-width: 780px) {
+        aside.aside {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- {{params}} -->
+<div class="ads_container"><ins class="adsbywseditor" style="display:inline-block;width: 728px;height:90px;"></ins>
+</div>
+<div class="IN003 clear">
+    <div class="container-loged">
+        <main class="main" class="">
+            <div class="b_tween boc_searchResults" data-bm="4">
+                <h1 class="title">You must be loogged in to access this page.</h1>
+                <p>The following benefits ofter logging int this Website</p>
+                <ul class="f4n50">
+                    <li>
+                        <p>65% of the advertisement will now be visible.</p>
+                    </li>
+                    <li>
+                        <p>You will get to reading 70% premium articles every day</p>
+                    </li>
+                    <li>
+                        <p>You will get premission to comment.</p>
+                    </li>
+                    <li>
+                        <p>Try once.</p>
+                    </li>
+                </ul>
+                <div class="button_group DIS01">
+                    <a href="/ut/accounts/login?redirect={{request.url}}" class="button">{{function.utc('Login')}}</a>
+                    <a href="/" class="button">{{function.utc("Home Page")}}</a>
+                </div>
+            </div>
+        </main>
+        <aside class="aside" aria-label="Additional Results">
+            <img src="/static/img/blockchain-workshop.png" alt="">
+        </aside>
+    </div>
+</div>
+
+
+
+
+{% endblock %}

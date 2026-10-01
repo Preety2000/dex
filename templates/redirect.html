@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>redirect</title>
+    <script src="/script/index.js"></script>
+    <script>
+        (function (r) { window.location = r.search.get("redirect") || decodeURIComponent("{{redirect or redirect_url}}").replace(/&amp;/g, '&') || r.url.origin }(new $.request()))
+    </script>
+</head>
+
+<body></body>
+
+</html>

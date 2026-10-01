@@ -1,0 +1,776 @@
+{% extends "base.html" %}
+{% set footer_hide = True %}
+{% block body %}
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f5f7fb;
+        color: #1f2937;
+    }
+
+    .top-session {
+        text-align: center;
+        padding: 55px 20px 30px;
+    }
+
+    .logo {
+        color: #2563eb;
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+    }
+
+    .top-session h1 {
+        font-size: 38px;
+        color: #111827;
+        margin-bottom: 12px;
+    }
+
+    .top-session p {
+        max-width: 720px;
+        margin: auto;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    /* ROLE SWITCH */
+
+    .role-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 10px auto 35px;
+    }
+
+    .role-btn {
+        padding: 12px 32px;
+        border-radius: 30px;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .role-btn:hover {
+        border-color: #2563eb;
+    }
+
+    .role-btn.active {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }
+
+    /* PLAN SECTION */
+
+    .plan-section {
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    .section-heading {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .section-heading h2 {
+        font-size: 28px;
+        color: #111827;
+    }
+
+    .section-heading p {
+        margin-top: 8px;
+        color: #6b7280;
+    }
+
+    /* PLANS */
+
+    .plans {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+    }
+
+    .plan {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 30px;
+        position: relative;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, .06);
+        transition: .25s;
+    }
+
+    .plan:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, .09);
+    }
+
+    .plan.popular {
+        border: 2px solid #2563eb;
+    }
+
+    .popular-badge {
+        position: absolute;
+        top: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+
+        background: #2563eb;
+        color: white;
+
+        padding: 7px 20px;
+        border-radius: 20px;
+
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .plan h3 {
+        font-size: 24px;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+
+    .description {
+        min-height: 45px;
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    /* PRICE */
+
+    .price {
+        margin: 22px 0;
+        font-size: 38px;
+        font-weight: 800;
+        color: #2563eb;
+    }
+
+    .price span {
+        font-size: 14px;
+        font-weight: 500;
+        color: #6b7280;
+    }
+
+    /* FEATURE LIST */
+
+    .feature-list {
+        margin-top: 15px;
+    }
+
+    .feature {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        padding: 12px 0;
+
+        border-bottom: 1px solid #eef2f7;
+
+        font-size: 14px;
+        color: #4b5563;
+    }
+
+    .feature:last-child {
+        border-bottom: none;
+    }
+
+    .check {
+        width: 22px;
+        height: 22px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: #dcfce7;
+        color: #16a34a;
+
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .feature strong {
+        margin-left: auto;
+        color: #111827;
+        white-space: nowrap;
+    }
+
+    /* BUY BUTTON */
+
+    .button {
+        display: block;
+        width: 100%;
+
+        margin-top: 25px;
+        padding: 14px;
+
+        border-radius: 9px;
+
+        background: #2563eb;
+        color: white;
+
+        font-size: 15px;
+        font-weight: 700;
+
+        text-align: center;
+        text-decoration: none;
+
+        transition: .2s;
+    }
+
+    .button:hover {
+        background: #1d4ed8;
+    }
+
+    /* TEACHER COLORS */
+
+    .teacher-section .section-heading h2 {
+        color: #7c3aed;
+    }
+
+    .teacher-section .plan.popular {
+        border-color: #7c3aed;
+    }
+
+    .teacher-section .popular-badge {
+        background: #7c3aed;
+    }
+
+    .teacher-section .price {
+        color: #7c3aed;
+    }
+
+    .teacher-section .button {
+        background: #7c3aed;
+    }
+
+    .teacher-section .button:hover {
+        background: #6d28d9;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 950px) {
+
+        .plans {
+            grid-template-columns: 1fr;
+            max-width: 550px;
+            margin: auto;
+        }
+    }
+
+    @media (max-width: 500px) {
+
+        .top-session {
+            padding-top: 40px;
+        }
+
+        .top-session h1 {
+            font-size: 30px;
+        }
+
+        .top-session p {
+            font-size: 14px;
+        }
+
+        .role-btn {
+            padding: 11px 22px;
+        }
+
+        .plan {
+            padding: 25px;
+        }
+
+        .price {
+            font-size: 34px;
+        }
+    }
+</style>
+
+
+
+<!-- HEADER -->
+
+
+<header class="top-session">
+
+    <h1>Choose Your Vidta Plan</h1>
+
+    <p>
+        Choose a plan designed for your learning or teaching
+        needs. Upgrade anytime as your requirements grow.
+    </p>
+
+</header>
+
+
+
+<!-- STUDENT PLANS -->
+<section id="studentPlans" class="plan-section">
+
+    <div class="section-heading">
+
+        <h2>
+            Student Plans
+        </h2>
+
+        <p>
+            Learn more, practice more and access premium
+            educational content.
+        </p>
+
+    </div>
+
+
+    <div class="plans">
+
+
+        <!-- ================================== -->
+        <!-- STUDENT BASIC -->
+        <!-- ================================== -->
+
+        <div class="plan">
+
+            <h3>
+                Basic
+            </h3>
+
+            <p class="description">
+                Essential tools for students getting started
+                with Vidta.
+            </p>
+
+            <div class="price">
+                ₹49
+                <span>/ month</span>
+            </div>
+
+
+            <div class="feature-list">
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Exams Limit
+                    <strong>20/Day</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Premium Articles
+                    <strong>20%</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Advertisements
+                    <strong>100%</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Comments
+                    <strong>No</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Learning Progress
+                    <strong>Basic</strong>
+                </div>
+
+            </div>
+
+
+            <a href="/payment/plan/student-basic" class="button">
+                Choose Basic
+            </a>
+
+        </div>
+
+
+        <!-- ================================== -->
+        <!-- STUDENT STANDARD -->
+        <!-- ================================== -->
+
+        <div class="plan popular">
+
+            <div class="popular-badge">
+                MOST POPULAR
+            </div>
+
+            <h3>
+                Standard
+            </h3>
+
+            <p class="description">
+                More exams and premium content for
+                regular learners.
+            </p>
+
+            <div class="price">
+                ₹999
+                <span>/ year</span>
+            </div>
+
+
+            <div class="feature-list">
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Exams Limit
+                    <strong>20/Day</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Premium Articles
+                    <strong>50%</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Advertisements
+                    <strong>30%</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Comments
+                    <strong>Yes</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Learning Progress
+                    <strong>Advanced</strong>
+                </div>
+
+            </div>
+
+
+            <a href="/payment/plan/student-standard" class="button">
+                Choose Standard
+            </a>
+
+        </div>
+
+
+        <!-- ================================== -->
+        <!-- STUDENT PREMIUM -->
+        <!-- ================================== -->
+
+        <div class="plan">
+
+            <h3>
+                Premium
+            </h3>
+
+            <p class="description">
+                Complete learning experience for serious
+                students.
+            </p>
+
+            <div class="price">
+                ₹9,999
+                <span>/ lifetime</span>
+            </div>
+
+
+            <div class="feature-list">
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Exams Limit
+                    <strong>Unlimited</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Premium Articles
+                    <strong>70%</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Advertisements
+                    <strong>0%</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Comments
+                    <strong>Yes</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Learning Analytics
+                    <strong>Advanced</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    New Features
+                    <strong>Priority</strong>
+                </div>
+
+            </div>
+
+
+            <a href="/payment/plan/student-premium" class="button">
+                Choose Premium
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- TEACHER PLANS -->
+<section id="teacherPlans" class="plan-section teacher-section">
+
+    <div class="section-heading">
+
+        <h2>
+            Teacher Plans
+        </h2>
+
+        <p>
+            Create exams, manage students and analyze
+            student performance.
+        </p>
+
+    </div>
+
+
+    <div class="plans">
+
+
+        <!-- ================================== -->
+        <!-- TEACHER BASIC -->
+        <!-- ================================== -->
+
+        <div class="plan">
+
+            <h3>
+                Basic Teacher
+            </h3>
+
+            <p class="description">
+                Start creating online exams and managing
+                your students.
+            </p>
+
+            <div class="price">
+                ₹499
+                <span>/ month</span>
+            </div>
+
+
+            <div class="feature-list">
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Exams Limit
+                    <strong>15/Day</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Students
+                    <strong>200</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Question Bank
+                    <strong>Basic</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Exam Reports
+                    <strong>Basic</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Student Analytics
+                    <strong>No</strong>
+                </div>
+
+            </div>
+
+
+            <a href="/payment/plan/teacher-basic" class="button">
+                Choose Basic
+            </a>
+
+        </div>
+
+
+        <!-- ================================== -->
+        <!-- TEACHER STANDARD -->
+        <!-- ================================== -->
+
+        <div class="plan popular">
+
+            <div class="popular-badge">
+                MOST POPULAR
+            </div>
+
+            <h3>
+                Standard Teacher
+            </h3>
+
+            <p class="description">
+                Advanced tools for teachers managing
+                online assessments.
+            </p>
+
+            <div class="price">
+                ₹999
+                <span>/ month</span>
+            </div>
+
+
+            <div class="feature-list">
+
+
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Exams Limit
+                    <strong>35/Day</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Students
+                    <strong>1,000</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Question Bank
+                    <strong>Advanced</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Automatic Evaluation
+                    <strong>Yes</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Student Analytics
+                    <strong>Yes</strong>
+                </div>
+
+            </div>
+
+
+            <a href="/payment/plan/teacher-standard" class="button">
+                Choose Standard
+            </a>
+
+        </div>
+
+
+        <!-- ================================== -->
+        <!-- TEACHER PREMIUM -->
+        <!-- ================================== -->
+
+        <div class="plan">
+
+            <h3>
+                Premium Teacher
+            </h3>
+
+            <p class="description">
+                Complete solution for professional
+                educators and institutions.
+            </p>
+
+            <div class="price">
+                ₹4,999
+                <span>/ month</span>
+            </div>
+
+
+            <div class="feature-list">
+
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Exams Limit
+                    <strong>Unlimited</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Students
+                    <strong>50,000</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Question Bank
+                    <strong>Unlimited</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Automatic Evaluation
+                    <strong>Yes</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Advanced Analytics
+                    <strong>Yes</strong>
+                </div>
+
+                <div class="feature">
+                    <span class="check">✓</span>
+                    Priority Support
+                    <strong>Yes</strong>
+                </div>
+
+            </div>
+
+
+            <a href="/payment/plan/teacher-premium" class="button">
+                Choose Premium
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+{% endblock %}

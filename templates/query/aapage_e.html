@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/css/page.css?m={{device_info.device_type}}">
+{% endblock %}
+
+{% block body %}
+
+
+
+<div class="IN016">
+
+  <main class="container">
+    <h1 class="article-title" title="{{response.data_querys.title}}">{{response.data_querys.title}}</h1>
+    <nav class="breadcrumbs" style="margin-left: 2px;">
+      <a array-menu="true" href="/" title="{{function.utc('Home')}}">{{function.utc("Home")}}</a>
+      <em class="delimiter">&gt;</em>
+      <span class="current">{{response.data_querys.title}}</span>
+    </nav>
+    <!-- <div class="ads_container" style="margin: 15px auto;"><ins class="adsbywseditor"style="display:inline-block;width: 728px;height:90px;"></ins></div> -->
+    <div class="page-content" style="text-align: justify;">
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </main>
+  <aside class="sidebar" id="sidebar-container">
+    {%if response.page_list %}
+    <div class="section" id="sidebar-section2">
+      <h2 array-menu="true" class="title">{{function.utc("Links")}}</h2>
+      <ul class="IN0104 vesper-libre">{% for item in response.page_list %}
+        <li><a class="list" href="{{item.url}}" page-id="{{item.id}}" title=" {{item.title}}"> {{item.title}}</a></li>
+        {%endfor%}
+      </ul>
+      <div array-size="280" class="ads-session"></div>
+    </div>
+    {%endif%}
+  </aside>
+</div>
+{% endblock %}

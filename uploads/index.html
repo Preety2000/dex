@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 15px;
+            background:
+                radial-gradient(circle at 10% 10%, rgba(99, 102, 241, .18), transparent 30%),
+                radial-gradient(circle at 90% 90%, rgba(14, 165, 233, .18), transparent 30%),
+                linear-gradient(135deg, #eef2ff, #f8fafc);
+        }
+
+        .signup-wrapper {
+            width: 100%;
+            max-width: 470px;
+        }
+
+        .signup-card {
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 38px;
+            box-shadow:
+                0 25px 60px rgba(15, 23, 42, 0.12),
+                0 5px 15px rgba(15, 23, 42, 0.05);
+            backdrop-filter: blur(12px);
+        }
+
+        .logo {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 18px;
+            border-radius: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 25px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #2563eb);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, .3);
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .heading h1 {
+            color: #111827;
+            font-size: 28px;
+            font-weight: 750;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .heading p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group input {
+            width: 100%;
+            height: 52px;
+            padding: 0 16px;
+            border: 1px solid #dbe1ea;
+            border-radius: 12px;
+            outline: none;
+            background: #f8fafc;
+            color: #111827;
+            font-size: 14px;
+            transition: all .2s ease;
+        }
+
+        .input-group input::placeholder {
+            color: #94a3b8;
+        }
+
+        .input-group input:hover {
+            border-color: #cbd5e1;
+            background: #fff;
+        }
+
+        .input-group input:focus {
+            border-color: #6366f1;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, .11);
+        }
+
+        /* CAPTCHA */
+        .captcha-box {
+            display: grid;
+            grid-template-columns: 160px 42px 1fr;
+            align-items: center;
+            gap: 9px;
+            margin-top: 2px;
+        }
+
+        .captcha-box img {
+            width: 160px !important;
+            height: 48px;
+            object-fit: cover;
+            border: 1px solid #dbe1ea;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .refresh {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #475569;
+            background: #f1f5f9;
+            transition: all .2s ease;
+        }
+
+        .refresh:hover {
+            color: #4f46e5;
+            background: #e0e7ff;
+            transform: rotate(-20deg);
+        }
+
+        .refresh svg {
+            width: 21px;
+            height: 21px;
+        }
+
+        .captcha_input {
+            width: 100%;
+            height: 48px;
+            padding: 0 12px;
+            border: 1px solid #dbe1ea;
+            border-radius: 10px;
+            outline: none;
+            background: #f8fafc;
+            font-size: 13px;
+        }
+
+        .captcha_input:focus {
+            border-color: #6366f1;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, .1);
+        }
+
+        /* Terms */
+        .appt {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 2px;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .appt input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            margin-top: 1px;
+            accent-color: #4f46e5;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .appt a {
+            color: #4f46e5;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .appt a:hover {
+            text-decoration: underline;
+        }
+
+        /* Submit */
+        .submit {
+            width: 100%;
+            height: 53px;
+            border: none;
+            border-radius: 12px;
+            margin-top: 3px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: .2px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            box-shadow: 0 10px 22px rgba(79, 70, 229, .25);
+            transition: all .2s ease;
+        }
+
+        .submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(79, 70, 229, .32);
+        }
+
+        .submit:active {
+            transform: translateY(0);
+        }
+
+        .submit:focus-visible {
+            outline: 3px solid rgba(99, 102, 241, .25);
+            outline-offset: 3px;
+        }
+
+        /* Login */
+        .login-text {
+            text-align: center;
+            margin-top: 20px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .login-text a {
+            color: #4f46e5;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .login-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* Mobile */
+        @media (max-width: 520px) {
+            body {
+                padding: 15px;
+            }
+
+            .signup-card {
+                padding: 28px 20px;
+                border-radius: 20px;
+            }
+
+            .heading h1 {
+                font-size: 24px;
+            }
+
+            .captcha-box {
+                grid-template-columns: 1fr 42px;
+            }
+
+            .captcha-box img {
+                width: 100% !important;
+            }
+
+            .captcha_input {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .signup-card {
+                padding: 24px 16px;
+            }
+
+            .input-group input {
+                height: 49px;
+            }
+
+            .captcha-box {
+                gap: 7px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="signup-wrapper">
+
+        <div class="signup-card">
+
+            <div class="logo">+</div>
+
+            <div class="heading">
+                <h1>Create Account</h1>
+                <p>Sign up to create your account and get started.</p>
+            </div>
+
+            <form class="form" method="post">
+
+                <div class="input-group">
+                    <input name="name" type="text" class="name" placeholder="Full Name" autocomplete="name" required>
+                </div>
+
+                <div class="input-group">
+                    <input name="email" type="email" class="email" placeholder="Email Address" autocomplete="email"
+                        required>
+                </div>
+
+                <div class="input-group">
+                    <input name="mobile" type="tel" class="mobile" placeholder="Mobile Number" autocomplete="tel"
+                        required>
+                </div>
+
+                <div class="input-group">
+                    <input name="password" type="password" class="password" placeholder="Password"
+                        autocomplete="new-password" required>
+                </div>
+
+                <div class="input-group">
+                    <input name="cpassword" type="password" class="cpassword" placeholder="Confirm Password"
+                        autocomplete="new-password" required>
+                </div>
+
+                <!-- CAPTCHA -->
+                <div class="captcha-box">
+
+                    <img class="F0022" src="/img/captcha?go=?" alt="Captcha">
+
+                    <div class="refresh" onclick="setCaptcha(this)" title="Refresh captcha" role="button" tabindex="0">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 12a9 9 0 0 1 15.36-6.36L21 8" />
+                            <path d="M21 3v5h-5" />
+                            <path d="M21 12a9 9 0 0 1-15.36 6.36L3 16" />
+                            <path d="M3 21v-5h5" />
+                        </svg>
+                    </div>
+
+                    <input class="captcha_input" type="text" name="captcha" placeholder="Enter Captcha"
+                        id="captcha_input" autocomplete="off" required>
+
+                </div>
+
+                <!-- Terms -->
+                <label class="appt">
+                    <input type="checkbox" name="terms" required>
+
+                    <span>
+                        I agree to the
+                        <a href="/terms-and-conditions" target="_blank" rel="noopener">
+                            Terms and Conditions
+                        </a>.
+                    </span>
+                </label>
+
+                <!-- Submit -->
+                <button type="submit" class="submit">
+                    Sign Up
+                </button>
+
+            </form>
+
+            <p class="login-text">
+                Already have an account?
+                <a href="/ut/accounts/login">Login</a>
+            </p>
+
+        </div>
+
+    </div>
+
+    <script>
+        function setCaptcha(element) {
+            const captchaImage = document.querySelector(".F0022");
+
+            if (!captchaImage) return;
+
+            // Add a unique query parameter to force CAPTCHA refresh
+            const separator = captchaImage.src.includes("?") ? "&" : "?";
+            captchaImage.src =
+                captchaImage.src.split("&_captcha=")[0] +
+                separator +
+                "_captcha=" +
+                Date.now();
+
+            const input = document.querySelector("#captcha_input");
+
+            if (input) {
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        // Confirm password validation
+        const form = document.querySelector(".form");
+
+        form.addEventListener("submit", function (event) {
+            const password = document.querySelector(".password").value;
+            const confirmPassword =
+                document.querySelector(".cpassword").value;
+
+            if (password !== confirmPassword) {
+                event.preventDefault();
+
+                alert("Password and Confirm Password do not match.");
+
+                document.querySelector(".cpassword").focus();
+            }
+        });
+    </script>
+
+</body>
+
+</html>

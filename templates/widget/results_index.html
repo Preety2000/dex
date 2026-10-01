@@ -1,0 +1,722 @@
+{% extends "base.html" %}
+{% block body %}
+<style>
+    .IN038 {
+        background: transparent;
+        border-bottom: none
+    }
+</style>
+
+<!--#ADS-->
+<div class='adscontainer clear'>
+    <div class='ads_container'>
+        <ins class='adsbywseditor' style='display:inline-block;width: auto;height:auto; max-height: 90px;'></ins>
+    </div>
+</div>
+<div class='IN016'>
+    <div class="__result"></div>
+</div>
+
+{% if record %}
+<div id="result_dg" style="display: none;">
+    <div class="container">
+        <style type="text/css">
+            .main-container {
+                position: relative;
+                width: 820px;
+                margin: 20px auto auto;
+            }
+
+            table {
+                border-collapse: collapse;
+                border-spacing: 0;
+            }
+
+            .table>tbody>tr>td,
+            .table>tbody>tr>th,
+            .table>tfoot>tr>td,
+            .table>tfoot>tr>th,
+            .table>thead>tr>td,
+            .table>thead>tr>th {
+                padding: 8px 5px;
+            }
+
+            .container,
+            .button_group {
+                font-size: initial;
+                position: relative;
+                background: var(--bg-secondary);
+                padding: 15px;
+                color: var(--text-secondary);
+                border: 1px solid var(--border-light);
+                width: 985px;
+                margin: 20px auto auto;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .main-footer {
+                margin-left: 0px;
+            }
+
+            .page-container {
+                padding-bottom: 40px;
+            }
+
+            div.conatiner {
+                border: 2px solid black;
+                min-height: 29.7cm;
+                width: 985px;
+                margin-left: auto;
+                margin-right: auto;
+                margin-bottom: auto;
+                margin-top: 20px;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            th {
+                text-align: left;
+            }
+
+            div.header {
+                color: black;
+                background: white;
+                text-align: center;
+                margin-bottom: 30px;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            div.table {
+                margin-top: 20px;
+                padding-bottom: 1px;
+                font-weight: bold;
+                font-size: 14px;
+                align: center;
+                font-family: Arial, Helvetica, sans-serif;
+                line-height: 2.18234;
+            }
+
+            .table1 {
+                font-weight: bold;
+                font-size: 14px;
+                font-family: Arial, Helvetica, sans-serif;
+                line-height: 2.18234;
+                width: 93% !important;
+                text-align: center;
+            }
+
+            div.table2 {
+                padding-bottom: 3px;
+                align: center;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .myverified {
+                background: #FF6347;
+                color: #000;
+            }
+
+            .ng-bott {
+                text-align: left;
+                padding-left: 34px;
+            }
+
+            @media print {
+                @page {
+                    size: A4;
+                    margin: auto 0;
+                    margin-top: 40px;
+                }
+
+                html,
+                body {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    background: #fff !important;
+                    font-size: initial;
+                }
+
+                .page {
+                    width: 100%;
+                    min-height: 0;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                .container {
+                    position: relative;
+                    z-index: 1;
+                    height: auto !important;
+                    min-height: 0 !important;
+                    margin: 40px auto 0 !important;
+                    padding: 0;
+                    box-sizing: border-box;
+                    overflow: hidden;
+                    background: #fff !important;
+                    color: #000 !important;
+                    border: 2px solid #000;
+                    box-shadow: none !important;
+                    font-family: Arial, sans-serif;
+                    page-break-inside: avoid;
+                    break-inside: avoid;
+                }
+
+
+                .container::before {
+                    display: block !important;
+                    position: absolute;
+                    top: -288px;
+                    left: -250px;
+                    width: 150%;
+                    height: 200%;
+                    font-size: 18px;
+                    font-weight: bold;
+                    transform: rotate(324deg);
+                    line-height: 28px;
+                    letter-spacing: 1px;
+                    pointer-events: none;
+                    color: #000000;
+                    opacity: 0.05;
+                }
+
+                .container>* {
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .prints,
+                .button_group,
+                .adscontainer,
+                .answer_sheet,
+                .IN001,
+                .IN053,
+                .IN038 {
+                    display: none !important;
+                }
+            }
+
+
+            /* @media print {
+                body {
+                    padding-top: 10px;
+                    background: #FFFFFF !important;
+                    font-size: initial;
+                }
+                .page {
+                    size: A4;
+                }
+
+                .container{
+                    position: relative;
+                    background: #fff;
+                    color: rgb(0, 0, 0);
+                    border: 1px solid #eceff7;
+                    font-family: Arial, sans-serif;
+                    overflow: hidden;
+                    height: auto;
+                }
+
+                .container::before {
+                    display: block !important;
+                    position: absolute;
+                    top: -288px;
+                    left: -250px;
+                    width: 150%;
+                    height: 200%;
+                    font-size: 18px;
+                    font-weight: bold;
+                    transform: rotate(324deg);
+                    line-height: 28px;
+                    letter-spacing: 1px;
+                    pointer-events: none;
+                    color: #000000;
+                    opacity: 0.05;
+                }
+
+                .container>* {
+                    position: relative;
+                    z-index: 2;
+                }
+
+                .container{
+                    border: 2px solid black;
+                    margin-top: 80px;
+                    box-shadow: none;
+                }
+
+                .prints,
+                .button_group,
+                .adscontainer,
+                .answer_sheet,
+                .IN001,
+                .IN053,
+                .IN038 {
+                    display: none !important;
+                }
+
+                
+            } */
+        </style>
+        <div class="headerresult" style="display: block; margin-top: 40px;">
+            <div style="position: absolute;top: 25px;margin-left: 20px;">
+                <img src="/static/logo1x1.png" data-ilt="1721278513922" style="height: 100px;">
+            </div>
+            <div
+                style="text-align: center; font-size: 21px; text-decoration: underline; font-weight: bold; margin-bottom: 6px;">
+                myapplication TRAINING INSTITUTE </div>
+            <div
+                style="text-align: center; font-size: 14px; text-decoration: underline; font-weight: bold; margin-bottom: 6px;">
+                <span class="ng-scope">{{"{{exam_name}}"}}</span> Examination - <span
+                    class="ng-binding ng-scope">{{"{{result_year}}"}}</span>
+            </div>
+            <div style="text-align: center; text-decoration: underline; font-weight: bold; font-size: 15px;">Statement
+                of Marks</div>
+        </div>
+        <div style="float: right; position: absolute;right: 50px;">
+            <div class="result-id" style="margin-bottom: 5px;">{{function.utc('Result No')}}.
+                <b>{{"{{result_no}}"}}</b>
+            </div>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&amp;data={{function.utc('Student Name')}} : {{"
+                {{sname}}"}},Roll No : {{"{{roll_number}}"}},Registration No : {{"{{ragistration_number}}"}},Grand Ratio
+                : {{"{{total_marks}}"}}/{{"{{total_obtained_marks}}"}},Result : {{"{{result}}"}}" class="qrcodeimg"
+                data-ilt="1721278513683" style="width: 140px; height: 145px;">
+        </div>
+        <table class="table" style="width: 80%;margin: 40px 30px;">
+            <tbody>
+                <tr>
+                    <th style="border-top: 0px;">ROLL NO.</th>
+                    <th class="ng-binding" style="border-top: 0px;">{{"{{roll_number}}"}}</th>
+                </tr>
+                <tr>
+                    <th nowrap="" style="border-top: 0px;">REGISTRATION NO.</th>
+                    <th class="ng-binding" style="border-top: 0px;">{{"{{ragistration_number}}"}}</th>
+                </tr>
+                <tr>
+                    <th nowrap="" style="border-top: 0px;">NAME OF THE STUDENT</th>
+                    <th class="ng-binding" style="border-top: 0px;">{{"{{sname}}"}}</th>
+                </tr>
+                <tr>
+                    <th style="border-top: 0px;">ANSWERED RATIO</th>
+                    <th class="ng-binding" style="border-top: 0px;">
+                        {{"{{total_questions}}"}}/{{"{{attempt_questions}}"}}</th>
+                </tr>
+                <tr class="examinant">
+                    <th style="border-top: 0px;">EXAMINANT</th>
+                    <th class="ng-binding" style="border-top: 0px;">{{"{{examinant}}"}}</th>
+                </tr>
+            </tbody>
+        </table>
+        <div style="width: 980px; text-align: center;">
+            <table align="center" class="table1 ng-scope" border="1px solid black">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding-left: 10px;">Paper Name</th>
+                        <th style="text-align: center;">Marks</th>
+                        <th style="text-align: center;">Total</th>
+                        <th style="text-align: center;">Marks in Words</th>
+                        <th style="text-align: center;">Grade</th>
+                    </tr>
+                </thead>
+                <tbody class="list_on_paper">
+                    <tr align="center">
+                        <td class="ng-binding" style="text-align: left; padding-left: 10px;text-transform: capitalize;">
+                            {{"{{paper_name}}"}}</td>
+                        <td class="ng-binding">{{"{{paper_obtained_marks}}"}}</td>
+                        <td class="ng-binding">{{"{{paper_total_marks}}"}}</td>
+                        <td class="ng-binding" style="text-transform: capitalize;">{{"{{marks_in_word}}"}}</td>
+                        <td class="ng-binding">{{"{{paper_grade}}"}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div class="table2">
+            <table class="table1 ng-scope">
+                <tbody>
+                    <tr></tr>
+                    <tr>
+                        <td class="ng-bott">Result :<label> {{"{{result}}"}}</label></td>
+                        <td class="ng-bott">Full Marks : <label>{{"{{total_marks}}"}}</label></td>
+                        <td class="ng-bott">Grand Total : <label>{{"{{total_obtained_marks}}"}}</label></td>
+                        <td class="ng-bott">Percentage: <label>{{"{{percentage}}"}}</label></td>
+                        <td class="ng-bott">Grade :<label> {{"{{total_grade}}"}} </label></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="instructor"
+                style="width: 190px;height: 100px;float: right;margin-right: 32px;padding: 28px 0;text-align: center;display: flex;flex-direction: column;align-items: center;">
+                <img width="100px" class="instructor_img" height="40px" src="/static/logo1x.png"
+                    style="width: 100px; height: 40px;display: block;" alt="Instructor">
+                Controller of Examination
+            </div>
+            <div style="margin-top: 56px; margin-left: 30px;"><b class="ng-binding">Date of Result Publication :
+                    {{"{{published}}"}}</b></div>
+            <div class="ng-scope"
+                style="text-align: left; padding-left: 30px; font-weight: bold; padding-top: 17px; font-size: 15px;">
+                Remark:<label style="padding-left:10px;font-size:13px;"> In order to qualify, an examinee has to obtain
+                    minimum 33% in each aggregate.</label></div>
+        </div>
+    </div>
+    <div class="button_group" style="padding: 16px;">
+        <div class="button-grop" style="display: flex;justify-content: space-between;">
+            <button class="button prints" onclick="window.;">{{function.utc('Click here to download
+                Result')}}</button>
+            <button class="button answer_sheet"
+                onclick="window.location.pathname = window.location.pathname.replace('result', 'answer_sheet')">{{function.utc('Show
+                Answer Sheets')}}</button>
+        </div>
+    </div>
+</div>
+{% else %}
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    /* Main Container */
+    .container {
+        padding: 0 !important;
+    }
+
+    /* Main Content */
+    .content {
+        display: flex;
+        min-height: 550px;
+    }
+
+    /* =========================
+   LEFT SECTION
+========================= */
+
+    .left-section {
+        width: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+
+    .left-section img {
+        width: 100%;
+        object-fit: cover;
+        position: relative;
+        transition: 0.4s ease;
+    }
+
+
+    /* =========================
+   RIGHT SECTION
+========================= */
+
+    .right-section {
+        width: 50%;
+        padding: 40px;
+        background: #ffffff;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+
+    /* =========================
+   TOP BUTTONS
+========================= */
+
+    .top-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 35px;
+        padding: 5px;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+    }
+
+    /* Buttons */
+    .top-buttons label {
+        flex: 1;
+        text-align: center;
+        padding: 13px 15px;
+        border-radius: 9px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    /* Hover */
+    .top-buttons label:hover {
+        color: #1e3c72;
+        background: #e5ebf5;
+    }
+
+
+    /* =========================
+   ACTIVE BUTTON
+========================= */
+
+    #practice:checked~.content .top-buttons label[for="practice"],
+    #examiner:checked~.content .top-buttons label[for="examiner"] {
+        background: var(--brand);
+        color: #ffffff;
+
+        box-shadow:
+            0 5px 12px rgba(30, 60, 114, 0.25);
+    }
+
+
+    /* =========================
+   FORM
+========================= */
+
+    .form-box {
+        width: 100%;
+        max-width: 420px;
+        margin: auto;
+    }
+
+    .form-box h2 {
+        color: #222;
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+
+    .form-box p {
+        margin-bottom: 30px;
+    }
+
+
+    /* =========================
+   FORM GROUP
+========================= */
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .form-group input {
+        width: 100%;
+        height: 50px;
+        padding: 0 15px;
+        border-radius: 10px;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+
+
+
+    /* =========================
+   SUBMIT BUTTON
+========================= */
+
+    .submit-btn {
+        width: 100%;
+        height: 50px;
+        border: none;
+        border-radius: 10px;
+
+        background: linear-gradient(135deg,
+                #1e3c72,
+                #2a5298);
+
+        color: #ffffff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+
+
+    /* =========================
+   FORM SHOW / HIDE
+========================= */
+
+    .exam-form {
+        display: none;
+    }
+
+    /* Practice Form */
+    #practice:checked~.content .practice-form {
+        display: block;
+    }
+
+    /* Examiner Form */
+    #examiner:checked~.content .examiner-form {
+        display: block;
+    }
+
+
+    /* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        .content {
+            flex-direction: column;
+        }
+
+        .left-section {
+            width: 100%;
+            min-height: 300px;
+            padding: 25px;
+        }
+
+        .left-section img {
+            width: 230px;
+            height: 230px;
+        }
+
+        .right-section {
+            width: 100%;
+            padding: 30px 25px;
+        }
+
+        .top-buttons {
+            margin-bottom: 25px;
+        }
+
+        .form-box h2 {
+            font-size: 24px;
+        }
+    }
+
+
+    /* =========================
+   SMALL MOBILE
+========================= */
+
+    @media (max-width: 480px) {
+
+        body {
+            padding: 10px;
+        }
+
+        .container {
+            border-radius: 15px;
+        }
+
+        .left-section {
+            min-height: 240px;
+        }
+
+        .left-section img {
+            width: 180px;
+            height: 180px;
+        }
+
+        .right-section {
+            padding: 25px 20px;
+        }
+
+        .top-buttons {
+            gap: 5px;
+        }
+
+        .top-buttons label {
+            padding: 11px 7px;
+            font-size: 12px;
+        }
+
+        .form-box h2 {
+            font-size: 22px;
+        }
+    }
+</style>
+
+
+<div class="container">
+
+    <!-- Hidden Radio Buttons -->
+    <input type="radio" name="examType" id="practice" checked style="display: none !important;">
+    <input type="radio" name="examType" id="examiner" style="display: none !important;">
+
+
+
+    <!-- Main Content -->
+    <div class="content">
+
+        <!-- Left Image -->
+        <div class="left-section">
+            <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=700&q=80"
+                alt="Exam Image">
+        </div>
+
+        <!-- Right Forms -->
+        <div class="right-section">
+            <!-- Top Buttons -->
+            <div class="top-buttons">
+                <label for="practice">Practice</label>
+                <label for="examiner">Examiner Conducted</label>
+            </div>
+
+            <!-- Practice Form -->
+            <form class="form-box exam-form practice-form">
+
+                <h2>Practice Exam</h2>
+                <p>Enter your details to start the practice exam.</p>
+
+                <div class="form-group">
+                    <label for="rollno">Roll No.</label>
+                    <input type="text" id="rollno" name="rollno" placeholder="Enter Roll Number" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="resultno">Result No.</label>
+                    <input type="text" id="resultno" name="resultno" placeholder="Enter Result Number" required>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Start Practice
+                </button>
+
+            </form>
+
+
+            <!-- Examiner Conducted Form -->
+            <form class="form-box exam-form examiner-form">
+
+                <h2>Examiner Conducted</h2>
+                <p>Enter the Exam ID to continue.</p>
+
+                <div class="form-group">
+                    <label for="examid">Exam ID</label>
+                    <input type="text" id="examid" name="examid" placeholder="Enter Exam ID" required>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Continue Exam
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+{% endif %}
+<div class="IN013" style="display: flex;">
+    <div class="icon"></div>
+</div>
+<script src="/script/exam/results.js"></script>
+
+{% set footer_hide = True %}
+{% endblock %}

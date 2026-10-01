@@ -1,0 +1,22 @@
+User-Agent: *
+
+Disallow: /u/signup
+Disallow: /u/signup/
+Disallow: /u/signup?
+Disallow: /api/*
+Disallow: /review/*
+Disallow: /u/*
+Allow: /
+User-agent: Yahoo Pipes 1.0
+Disallow: /
+User-agent: 008
+Disallow: /
+User-agent: voltron
+Disallow: /
+User-agent: Bytespider
+Disallow: /
+User-agent: Amazonbot
+Disallow: /
+User-Agent: PerplexityBot
+Disallow: /
+User-agent: Googlebot-Image

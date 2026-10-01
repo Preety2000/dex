@@ -1,0 +1,574 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    body {
+        overflow: hidden;
+        background: var(--bg-muted);
+    }
+
+    .window {
+        max-height: 74vh;
+        height: 74vh;
+        position: relative;
+        border-radius: 6px;
+        display: flex;
+        line-height: 1.2;
+        background: var(--bg-muted);
+        font-family: system-ui;
+    }
+
+    .conv-list-view {
+        max-width: 360px;
+        height: 100%;
+        width: -webkit-fill-available;
+        flex: none;
+        display: flex;
+        flex-direction: column;
+        border-right: solid 1px var(--border-light);
+    }
+
+    .mobile .conv-list-view {
+        max-width: -webkit-fill-available;
+        width: -webkit-fill-available;
+    }
+
+    .conv-list-view .block {
+        position: relative;
+        overflow: hidden;
+        padding: 0 16px;
+        height: auto;
+        height: -webkit-fill-available;
+    }
+
+    .conv-list-view__header {
+        padding: 12px 16px 0px;
+        margin-bottom: 4px;
+    }
+
+    .status__indicator:after,
+    .status__indicator:before {
+        position: absolute;
+        content: '';
+    }
+
+    .cf {
+        member-select: none;
+        margin: 20px 4px;
+        border-radius: 10px;
+    }
+
+
+    .conv-list li {
+        float: left;
+    }
+
+    .conv-list button {
+        padding: 4px 12px;
+        margin: 0 2px;
+        border-radius: 6px;
+        font-size: 90%;
+        border: 0;
+    }
+
+    .conv-list button:nth-child(2) {
+        background: var(--btn-outline-hover);
+        color: var(--text-secondary);
+        border: 0;
+    }
+
+    .conv-list {
+        display: block;
+        position: relative;
+        list-style: none;
+        height: auto;
+        height: -webkit-fill-available;
+    }
+
+    .cp224 {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: -webkit-fill-available;
+        padding: 8px;
+        border-radius: 5px;
+    }
+
+    .conv-list .selected {
+        background: var(--btn-primary-hover);
+        border-radius: 8px;
+    }
+
+
+    .cp224:hover {
+        background: var(--btn-primary-hover);
+    }
+
+    .status {}
+
+    .conv-list .status {
+        position: relative;
+        width: -webkit-fill-available;
+        display: block;
+    }
+
+
+
+
+    .status__indicator {
+        position: absolute;
+        left: 0;
+        width: 8px;
+        height: 100%;
+    }
+
+    .status__indicator:after,
+    .status__indicator:before,
+    .status__indicator--unread-message:before {
+        top: 50%;
+    }
+
+    .__avatar,
+    .__avatar--small,
+    .message__avatar {
+        position: relative;
+        display: block;
+        float: left;
+        border-radius: 50%;
+        margin: 0 8px 0 0;
+        overflow: hidden;
+        flex: none;
+    }
+
+    .__avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .conv-list .__avatar {
+        width: 50px;
+        height: 50px;
+    }
+
+    .meta__name {
+        font-size: medium;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+
+    .__avatar img,
+    .__avatar--small img,
+    .message__avatar img {
+        width: inherit;
+        height: inherit;
+    }
+
+    .meta-see {
+        padding-top: 6px;
+        width: -webkit-fill-available;
+        white-space: nowrap;
+    }
+
+    .meta__sub--dark {
+        color: #8D8D8D;
+    }
+
+    .sub--dark {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-clamp: 1;
+    }
+
+    .meta__sub--light {
+        color: #A5A5A4;
+    }
+
+    .chat-view {
+        position: relative;
+        width: -webkit-fill-available;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .chatactive {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        z-index: 9999;
+        height: 100%;
+        width: -webkit-fill-available;
+        background: var(--bg-soft);
+    }
+
+    .chat-view__header {
+        position: sticky;
+        top: 0;
+        display: block;
+        padding: 8px 0;
+        transition: all 0.3s;
+        background: var(--bg-muted);
+        border-bottom: solid 1px var(--border-light);
+    }
+
+    .window .back-button {
+        width: 40px;
+        height: 40px;
+        flex: none;
+        padding: 6px;
+        margin-left: 6px;
+    }
+
+    .chat-view::before {
+        content: '';
+        background-image: url('/static/img/chatlight.jpg');
+        background-position: center;
+        background-size: contain;
+        position: absolute;
+        width: -webkit-fill-available;
+        height: 100%;
+        left: 0;
+        top: 0;
+        opacity: 0.1;
+    }
+
+    .chat-view .chat-view__header .status {
+        display: flex;
+        gap: 5px;
+        margin-left: 16px;
+    }
+
+    .chat-view__header button {
+        border-radius: 5px !important;
+        border: none;
+    }
+
+    .message-view {
+        position: relative;
+        flex: 1;
+        padding: 6px;
+        overflow: hidden;
+        overflow-y: scroll;
+    }
+
+    .mobile .message-view::-webkit-scrollbar {
+        width: 1px;
+    }
+
+
+    .DIS02 {
+        display: flex;
+        flex-direction: column;
+    }
+
+
+
+    .message-footer {
+        padding: 0 10px;
+        margin-bottom: 5px;
+    }
+
+    .message-footer input {
+        min-height: 46px;
+        padding-right: 80px;
+        padding-left: 22px;
+        background: var(--bg-muted);
+        border-radius: 25px;
+        font-size: 100%;
+    }
+
+    .message-footer .width {
+        position: relative;
+    }
+
+    .send-message {
+        position: absolute;
+        right: 8px;
+        top: 0;
+        height: -webkit-fill-available;
+        display: flex;
+        align-items: center;
+    }
+
+    .send-message .button {
+        height: 34px;
+        margin: 2px;
+        padding: 4px 16px;
+        background: var(--select-bg);
+        border-color: var(--border-light);
+    }
+
+    .send-message .button[disabled="true"] {
+        opacity: 0.5;
+    }
+
+    .send-message .button svg {
+        fill: var(--bg-muted);
+    }
+
+    .send-message .button:hover {
+        /* background: transparent; */
+    }
+
+    .message--send {
+        float: right;
+    }
+
+    .message__bubble,
+    .message__bubble--send {
+        float: left;
+        position: relative;
+        display: inline-block;
+        margin: 1px 4px;
+        padding: 5px 10px;
+        background: var(--bg-muted);
+        border: 1px solid var(--border-light);
+        overflow: hidden;
+    }
+
+    .message__bubble {
+        border-radius: 0px 10px 10px 10px;
+        margin-right: 10vw;
+    }
+
+    .message__bubble--send {
+        background: var(--btn-dark-bg);
+        border: 1px solid var(--border);
+        margin-left: 10vw;
+        border-radius: 10px 0px 10px 10px;
+    }
+
+    /* .DIS02 .message__bubble--send:first-child{border-radius: 10px 10px 0px 0px;}
+    .DIS02 .message__bubble--send:last-child{border-radius: 0px 0px  10px 10px;} */
+
+    .message,
+    .message--send {
+        display: flex;
+    }
+
+    .message__avatar {
+        flex: none;
+        margin-right: 0;
+        height: 34px;
+        width: 34px;
+    }
+
+
+    h1 {
+        text-align: center;
+        text-shadow: 0 1px 1px white;
+    }
+
+    .credit {
+        color: gray;
+        width: 840px;
+        margin: 0 auto;
+        text-align: center;
+        text-shadow: 0 1px 1px white;
+    }
+
+    a {
+        color: darkblue;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .cf:before,
+    .cf:after {
+        content: " ";
+        display: table;
+    }
+
+    .cf:after {
+        clear: both;
+    }
+
+    .chat-info {
+        padding: 12vw;
+        text-align: center;
+    }
+
+    .chat-info .logo {
+        padding: 4vw;
+        max-width: 290px;
+        margin: 0 auto;
+    }
+
+    .cp005 {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .IN094 {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin: 0 20px 12px;
+    }
+
+    .xtr458 input {
+        margin: 0 20px 12px;
+        border-radius: 27px;
+    }
+
+    .window button {
+        padding: 5px 12px;
+        cursor: pointer;
+        background: transparent;
+        color: var(--text-secondary);
+        border-radius: 30px;
+    }
+
+    .window button.active {
+        color: var(--btn-outline-bg);
+        background: var(--btn-primary-bg);
+    }
+
+    .meta-see-head {
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .meta_last_time {
+        font-size: 80%;
+    }
+
+    .online {
+        color:var(--success-text);
+    }
+
+    .acbulo {
+        position: absolute;
+        right: 0;
+        height: 24px;
+        top: 0;
+        z-index: 999;
+        opacity: 0;
+        background: linear-gradient(to right, #0000, var(--border-light) 50%);
+        transition: 0.3s;
+    }
+
+    .acbulo button {
+        background: transparent;
+        border: none;
+        padding: 0px 7px;
+        border-radius: 0;
+    }
+
+    .display-message {
+        font-size: 110%;
+        font-family: system-ui;
+        font-weight: 400;
+    }
+
+
+    /* reads */
+    .dartr,
+    .message-time {
+        margin-left: 10px;
+        margin-top: 10px;
+        float: right;
+        font-family: system-ui;
+        color: var(--text-secondary);
+    }
+
+    .wamere icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .chat-view .wamere icon {
+        margin-left: 8px;
+    }
+
+    .wamere svg,
+    .wamere icon {
+        fill: var(--text-secondary);
+        width: 18px;
+        height: 18px;
+    }
+
+    .reads .icon_ic_msg_dblcheck svg {
+        fill: var(--select-bg);
+    }
+</style>
+
+<style>
+    /* index past  */
+
+</style>
+
+
+
+{% endblock %}
+
+
+{% block body %}
+<script>$.loader(true);</script>
+<div class="window clear">
+    <aside class="conv-list-view">
+        <header class="conv-list-view__header">
+            <div class="cp005">
+                <h2>Sambad 😊</h2>
+                <div class="hbg85"></div>
+            </div>
+        </header>
+        <div class="side">
+            <div class="xtr458">
+                <input type="text" name="search" placeholder="Search...">
+            </div>
+            <div class="IN0104 IN094">
+            </div>
+        </div>
+        <div class="block">
+            <div class="conv-list IN028">
+                <div class="cp224">
+                    <div class="status">
+                        <figure class="__avatar"></figure>
+                        <div class="meta-see">
+                            <div class="meta__name"></div>
+                            <div class="meta__sub--dark"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cp224" selected>
+                    <div class="status">
+                        <figure class="__avatar"></figure>
+                        <div class="meta-see">
+                            <div class="meta__name"></div>
+                            <div class="meta__sub--dark"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cp224">
+                    <div class="status">
+                        <figure class="__avatar"></figure>
+                        <div class="meta-see">
+                            <div class="meta__name"></div>
+                            <div class="meta__sub--dark"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <section class="chat-view">
+        <div class="chat-info">
+            <div class="logo"><img src="/static/img/blockchain-workshop.png" alt=""></div>
+            <h2 class="title">Your messages</h2>
+            <p class="desc">Send a message to start a chat.</p>
+        </div>
+    </section>
+</div>
+<script src="/script/scopes/chat.js"></script>
+{% endblock %}

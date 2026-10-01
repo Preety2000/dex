@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/widgets/exams.css">
+{% endblock %}
+{% set footer_hide = True %}
+{% set search_hide = True %}
+{% block body %}
+<script type="application/json" data-sjs data-content-len="4">
+    {"require":["usepass", [
+        ["selectQuestion", "Select Question"],
+        ["startTest", "Start Test"],
+        ["buttonCreateRoom", "Create Exam Room"],
+        ["hrefCreateRoom", "/exam/r/create"],
+        ["descCreateRoom", "Create a secure online exam room for students. Configure exam settings, invite participants, and monitor the examination in real time."],
+        ["buttonPracticeTest", "Practice Test"],
+        ["hrefPracticeTest", "/exam/create"],
+        ["descPracticeTest", "Take a personal practice test anytime to evaluate your knowledge, improve your preparation, and review your performance instantly"]
+    ], null, ["4582575854750", "{{'soHxf' if auth_session.eduAuth == True else 'soHxg'}}"]]}
+</script>
+<div class="IN013" style="display: flex;">
+    <div class="icon"></div>
+</div>
+<div class='IN016'>
+    <div class="T001">
+        <div class="adscontainer">
+            <div class="ads_container"><ins class="adsbywseditor"
+                    style="display:inline-block;width: 728px;height:90px; max-height: 90px;"></ins></div>
+        </div>
+        <div class="T020" id="index">
+            <div class="T021">
+                <div class="T022 DIS00">
+                    <div class="T023">
+                        <h1>{{ function.utc('Online Test Series')}}</h1>
+                        <p style="font-size: 130%;">{{ function.utc('Take online exam from anywhere with
+                            {0} and improve your skills.').replace("{0}", site_name)}}</p>
+                        <div class="T024 DIS03">
+                            <div class="button-container">
+                                <button class="button" jsname="createTest" data-controller="{{auth_session.eduAuth}}">{{
+                                    function.utc( "Create Test" if auth_session.eduAuth == True else "Your
+                                    Self"
+                                    )}}</button>
+                            </div>
+                            <div class="T025 DIS01">
+                                <input name="join" type="text" value="" id="joincode" class="input"
+                                    aria-label="Enter a code or link" placeholder="Enter a code or link"
+                                    spellcheck="false" maxlength="50" autocomplete="off" aria-invalid="false">
+                                <div class="button-container">
+                                    <button class="button join">Join</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border"></div>
+                        <p style="margin-top: 10px;font-size: 80%;">
+                            {{function.utc("<a href='{0}' target='_blank'>Learn more</a> about Test
+                            Series.").format("#") | safe}}
+                        </p>
+                    </div>
+
+
+                    <div class="T026">
+                        <div class="T027">
+                            <img src="/static/img/blockchain-workshop.png" alt="" width="300" height="300">
+                            <h2>{{ function.utc('Get a link you can share')}}</h2>
+                            <p>{{ function.utc('Click <strong>Your Self</strong> to get a link you can send
+                                to
+                                people you want to meet with') | safe}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            @media screen and (max-width:880px) {
+                body {
+                    background: var(--bg-muted);
+                }
+            }
+        </style>
+    </div>
+</div>
+<script type="text/javascript">// Test Script {% include 'exam/index.js' %}</script>
+<script type="text/javascript">// Test Script {% include 'widgets/forms.js' %}</script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js"></script> -->
+<script src="/script/cdn/math.js"></script>
+{% endblock %}

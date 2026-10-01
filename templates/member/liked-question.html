@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/search.css?m={{device_info.device_type}}">
+{% endblock %}
+
+{% block body %}
+
+<div class="adscontainer clear">
+    <div class="ads_container"><ins class="adsbywseditor" style="display:inline-block;width: 728px;height:90px;"></ins>
+    </div>
+</div>
+<div class="IN003 clear">
+    <div class="b_tween boc" class="">
+        <div class="b_tween boc_searchResults" data-bm="4">
+            <h1 class="sb_count">
+                {{function.utc('Questions You Like! Answer You Need! ({0} Questions)').format(response.results)}}</h1>
+        </div>
+    </div>
+    <main class="search-result-container">
+        <ol class="b_results">{% for query in response.data_querys %}
+            <li class="IN079 boc questions">
+                <div class="post-summary">
+                    <h2 class="post-summary-title"><a href="{{query.url}}">{{query.title}}</a></h2>
+                    <div class="post-summary-meta-options karla">
+                        <span class="views">{{ function.utc('Read {0} times').format('<strong class="view">' ~
+                                query.views ~ '</strong>') | safe }},</span>
+                        <span class="date">{{query.date}}</span>
+                    </div>
+                    <p class="post-summary-content-excerpt textline">{{query.excerpt[0:180] | safe }}...</p>
+                    <div class="post-summary-meta">
+                        <div class="post-summary-meta-tags">
+                            <ul class="IN0104">{% for tags in query.category %}
+                                <li class="list"><a class="button button-primary" href="{{tags.url}}">{{tags.name}}</a>
+                                </li>
+                                {%endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </li>{% endfor %}
+            {%if response.suggestion%}
+            <li class="IN079 boc questions related-search">
+                <h2 class="title">Related searches for {{response.search_term}}</h2>
+                <div class="IN0104">{%for item in response.suggestion%}
+                    <div class="IN004">
+                        <a title="{{item.name}}" href="{{item.url}}">
+                            <span class="icon"><svg focusable="false" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                                    </path>
+                                </svg></span>
+                            <span class="item">{{item.name}}</span>
+                        </a>
+                    </div>{% endfor%}
+                </div>
+            </li>{%endif%}
+
+        </ol>
+        <div class='paginator' id='paginator'>{%for insex in response.paginator or []%}
+            <a class='button {{insex.clas}}' href='{{insex.slug}}'
+                title='Page {{insex.name}}'>{{insex.name}}</a>{%endfor%}
+        </div>
+    </main>
+    <aside class="aside" aria-label="Additional Results">
+        <ol class="b_context">{%if response.terms%}
+            <li class="IN079 boc">
+                <h2 class="title">{{response.terms.name}}</h2>
+                <p class="description">{{response.terms.description}}</p>
+            </li>{%endif%}
+            <div class="ads_container">
+                <ins class="adsbywseditor" style="display:inline-block;width: auto;height:auto"></ins>
+            </div>
+        </ol>
+    </aside>
+</div>
+
+
+
+{% endblock %}

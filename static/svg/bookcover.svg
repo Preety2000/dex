@@ -1,0 +1,56 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="91.44mm" height="121.92mm" version="1.1" 
+viewBox="0 0 9000 12400"
+ 
+ xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+  
+    .str0 {stroke:white;stroke-width:135.47;stroke-miterlimit:1145.92}
+    .str1 {stroke:#3776B9;stroke-width:135.47;stroke-miterlimit:22.9256}
+    .fil11 {fill:none}
+    .fil2o {fill:#FEFEFE}
+    .fil0b {fill:#3776B9}
+    .fnt0b {font-weight:bold;font-size:900px;}
+    .fnt1o {font-weight:normal;font-size:1481px;}
+    .fnt1u {font-weight:normal;font-size:500px;}
+   ]]>
+  </style>
+    <clipPath ifill-rule="evenodd" d="id0">
+     <path fill-rule="evenodd" d="M5656.45 5543.95l1485.56 -1485.55 1760.69 1760.69 -1868.66 1868.65 -1377.59 -1377.58c-210.71,-210.71 -210.71,-555.5 0,-766.21z"/>
+    </clipPath>
+    <clipPath ifill-rule="evenodd" d="id1">
+     <path fill-rule="evenodd" d="M3896.16 3776.84l1485.55 -1485.56 1760.69 1760.69 -1868.66 1868.66 -1377.58 -1377.59c-210.71,-210.71 -210.71,-555.49 0,-766.2z"/>
+    </clipPath>
+    <clipPath ifill-rule="evenodd" d="id2">
+     <path fill-rule="evenodd" d="M3796.72 7398.14l742.78 -742.77 726.93 -726.93c111.44,-113.88 306.19,-313.62 410.68,-416.57 -128.23,153.87 -248.29,489.84 -49.25,757.86l1415.11 1403.55 -1868.66 1868.66 -1377.59 -1377.58c-210.71,-210.71 -210.71,-555.51 0,-766.22z"/>
+    </clipPath>
+ </defs>
+ <g ifill-rule="evenodd" d="Layer_x0020_1">
+ 
+  <g ifill-rule="evenodd" d="_3113792197488">
+   <path class="fil0b" fill-rule="evenodd" d="M5656.45 5543.95l1485.56 -1485.55 1760.69 1760.69 -1868.66 1868.65 -1377.59 -1377.58c-210.71,-210.71 -210.71,-555.5 0,-766.21z"/>
+   <g style="clip-path:url(#id0)">
+     <image ifill-rule="evenodd" d="history-of-india.png" x="4427.95" y="4129.13" width="5080.38" height="3454.75" xlink:href="/media/img/category/history-of-india.png"/>
+   </g>
+   <path class="fil11 str0" fill-rule="evenodd" d="M5656.45 5543.95l1485.56 -1485.55 1760.69 1760.69 -1868.66 1868.65 -1377.59 -1377.58c-210.71,-210.71 -210.71,-555.5 0,-766.21z"/>
+   <path class="fil0b" fill-rule="evenodd" d="M3896.16 3776.84l1485.55 -1485.56 1760.69 1760.69 -1868.66 1868.66 -1377.58 -1377.59c-210.71,-210.71 -210.71,-555.49 0,-766.2z"/>
+   <g style="clip-path:url(#id1)">
+     <image ifill-rule="evenodd" d="war.png" x="3579.43" y="2245.12" width="3721.67" height="3721.67" xlink:href="/media/img/category/war.png"/>
+   </g>
+   <path class="fil11 str0" fill-rule="evenodd" d="M3896.16 3776.84l1485.55 -1485.56 1760.69 1760.69 -1868.66 1868.66 -1377.58 -1377.59c-210.71,-210.71 -210.71,-555.49 0,-766.2z"/>
+   <path class="fil0b" fill-rule="evenodd" d="M3796.72 7398.14l742.78 -742.77 726.93 -726.93c111.44,-113.88 306.19,-313.62 410.68,-416.57 -128.23,153.87 -248.29,489.84 -49.25,757.86l1415.11 1403.55 -1868.66 1868.66 -1377.59 -1377.58c-210.71,-210.71 -210.71,-555.51 0,-766.22z"/>
+   <g style="clip-path:url(#id2)">
+     <image ifill-rule="evenodd" d="world-history.jpg" x="3469.99" y="5750.71" width="4065.77" height="3764.97" xlink:href="/media/img/category/world-history.jpg"/>
+   </g>
+   <path class="fil11 str0" fill-rule="evenodd" d="M3796.72 7398.14l742.78 -742.77 726.93 -726.93c111.44,-113.88 306.19,-313.62 410.68,-416.57 -128.23,153.87 -248.29,489.84 -49.25,757.86l1415.11 1403.55 -1868.66 1868.66 -1377.59 -1377.58c-210.71,-210.71 -210.71,-555.51 0,-766.22z"/>
+   <path class="fil0b" fill-rule="evenodd"  d="M-76.2 14.23l0 8513.78 4184.95 12.07 -356.29 -353.47c-215.46,-213.77 -213.2,-595.42 -29.46,-779.29 0,0 1484.47,-1486.45 1484.47,-1486.45l-1329.86 -1328.55c-324.97,-356.89 -184.2,-733 75.5,-940.01l3713.54 -3652.78 -7742.85 14.7z"/>
+  </g>
+  </text>
+  <image ifill-rule="evenodd" d="logo1x1.png" x="6900.32" y="551.72" width="1793.56" height="1793.56" xlink:href="/media/img/logo1x1.png"/>
+  <text x="300" y="10500"  class="fil0b fnt1o">2024</text>
+  <line class="fil11 str1" x1="296.33" y1="10710.33" x2="4119.22" y2= "10693.39" />
+  <text x="300" y="12000"  class="fil0b fnt1u">www.vidayavistar.com</text>
+ </g>
+</svg>

@@ -1,0 +1,268 @@
+{% extends "admin/base.html" %}
+
+{% block head %}
+<style>
+    #option-wrap {
+        font-size: 16px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 15px;
+    }
+
+
+    #option-wrap textarea {
+        width: -webkit-fill-available;
+        padding: 10px;
+    }
+</style>
+{% endblock %}
+
+
+{% block leftSide %}
+<a href="javascript:void(0)" class="button add-quiz-json-list" jsname="ACAJQ">Add Json Data</a>
+{% endblock %}
+
+{% block body %}
+
+{% if data_querys %}
+<form class="form as-action-form" id="form" action="" method="post">
+    <div id="post-body" class="metabox-holder columns-2">
+        <div id="post-body-content">
+
+            <div id="titlediv">
+                <div id="titlewrap">
+                    <label class="screen-F0019" id="title-prompt-text" for="title">Add title</label>
+                    <input type="text" name="question" size="30" value="{{data_querys.question}}" id="title"
+                        spellcheck="true" autocomplete="off">
+                </div>
+                <div class="inside">
+                    <div id="edit-slug-box"></div>
+                </div>
+            </div>
+
+            <div id="postdivrich" class="postbox editor-expand">
+                <div class="F0006">
+                    <h2 class="hndle">First Option is Correct Answer</h2>
+                    <div class="handle-actions hide-if-no-js"></div>
+                </div>
+                <div id="option-wrap" class="inside ">
+                    <div class="option-container">
+                        <label class="screen-F0019" id="title-prompt-text" for="option1">Add title</label>
+                        <textarea type="text" name="correct_answer" size="30" value="{{data_querys.correct_answer}}"
+                            id="option1" spellcheck="true" autocomplete="off"
+                            placeholder="Qptions">{{data_querys.correct_answer}}</textarea>
+
+                    </div>{%for item in data_querys.incorrect_answers%}
+                    <div class="option-container">
+                        <label class="screen-F0019" id="title-prompt-text" for="option2">Add title</label>
+                        <textarea type="text" name="incorrect_answers[]" size="30" value="{{item}}" id="option2"
+                            spellcheck="true" autocomplete="off" placeholder="Qptions">{{item}}</textarea>
+                    </div>{%endfor%}
+                </div>
+            </div>
+
+
+            <div id="categorydiv" class="postbox ">
+                <div class="F0006">
+                    <h2 class="hndle">Categories</h2>
+                    <div class="handle-actions"></div>
+                </div>
+                <div class="inside">
+                    <div id="taxonomy-category" class="categorydiv">
+                        <ul id="category-tabs" class="category-tabs DIS01">
+                            <li>
+                                <select name="hidden-info" id="hidden-info" jsname="ACSSC">
+                                    <option value="0">All Categories</option>
+                                    {% for subject in subjects %}
+                                    <option value="{{subject.id}}" id="subject-{{subject.id}}">{{subject.name}}
+                                    </option>
+                                    {%endfor%}
+                                </select>
+                            </li>
+                            <li> <a id="category-add-toggle" href="javascript:void(0)" jsname="ACANC"
+                                    class="add-new-category button">+ Add New Category </a></li>
+                        </ul>
+
+                        <div id="category-all" class="tabs-panel category-all">
+                            <ul id="categorychecklist" data-lists="list:category"
+                                class="grid categorychecklist form-no-clear">
+                                <li class="popular-category">
+                                    <span class="F0009">TG | PR | Category Name</span>
+                                </li>
+                                {% for category in response.category %}
+
+                                <li id="category{{category.id}}" class="category" sub-id="{{category.subject_id}}">
+                                    <label class="F0009">
+                                        <input value="{{category.id}}" {{category.checked}}
+                                            class="category-input category-{{category.id}}"
+                                            aria-label="category-{{category.id}}" type="checkbox" name="category[]">
+                                        <input type="radio" {{category.type}} name="type" id="post-type"
+                                            value="{{category.id}}">
+                                        {{category.name}}
+                                    </label>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+
+                        <div id="category-pop" class="tabs-panel category-pop" style="display: none;">
+                            <ul id="categorychecklist-pop" class="selected-category-list form-no-clear">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="postbox-container-1" class="postbox-container">
+            <div id="side-sortables" class="meta-box-sortables">
+                <div id="submitdiv" class="postbox ">
+                    <div class="F0006">
+                        <h2 class="hndle">Publish</h2>
+                        <div class="handle-actions hide-if-no-js"></div>
+                    </div>
+                    <div class="inside">
+                        <div class="submitbox" id="submitpost">
+                            <div id="minor-publishing">
+                                <div id="minor-publishing-actions">
+                                    <div id="save-action">
+                                        <input type="submit" name="action" id="save-post" value="Save Draft"
+                                            class="button">
+                                    </div>
+
+                                    <div id="preview-action">
+                                        <a class="preview button" href="" target="_blank" id="post-preview">Preview
+                                            <span class="screen-F0019"> (opens in a new tab)</span></a>
+                                        <input type="hidden" name="preview" id="preview" value="">
+                                    </div>
+                                </div>
+
+                                <div class="misc-pub-section DIS01" id="visibility">
+                                    Subject: <b><span id="subject-display">{{data_querys.subject_name}} </span></b>
+
+                                    <select name="subject_id" id="subjects" jsname="ACSTC">
+                                        <option value="">Select Subject</option>
+                                        {% for subject in subjects %}<option value="{{subject.id}}"
+                                            sub-id="{{subject.id}}">{{subject.name}}</option>{%endfor%}
+                                    </select>
+                                </div>
+
+
+                                <div class="misc-pub-section misc-pub-post-status" id="status">
+                                    Status: <b><span id="status-display">{{data_querys.status or 'Publish'}} </span></b>
+
+                                    <a href="javascript:void(0)" class="edit-status edit" aria-label="status-select"
+                                        role="button">
+                                        <span class="span" aria-hidden="true">Edit</span><span class="screen-F0019">Edit
+                                            status </span>
+                                    </a>
+                                    <div id="status-select" class="status-select hidden hide-if-js">
+                                        <div class="grid insides border-bottom">
+                                            <label class="status" for="status-draft">
+                                                <input onclick="title_set('Draft', 'status-display')" type="radio"
+                                                    name="status" id="status-draft" value="Draft">
+                                                Draft
+                                            </label>
+                                            <label class="status" for="status-publish">
+                                                <input onclick="title_set('Publish', 'status-display')" type="radio"
+                                                    checked name="status" id="status-publish" value="Publish">
+                                                Publish
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="misc-publishing-actions">
+                                    <div class="misc-pub-section curtime misc-pub-curtime">
+                                        <span id="timestamp">
+                                            Publish <b>immediately</b> </span>
+                                        <a href="javascript:void(0)" class="edit-timestamp edit hide-if-no-js"
+                                            aria-label="timestampdiv" role="button">
+                                            <span aria-hidden="true">Edit</span>
+                                            <span class="screen-F0019">Edit date and time </span>
+                                        </a>
+                                        <fieldset id="timestampdiv" class="timestampdiv hidden hide-if-js">
+                                            <legend class="screen-F0019">Date and time </legend>
+                                            <div class="timestamp-wrap">
+                                                <label>
+                                                    <span class="screen-F0019">Date</span>
+                                                    <input type="date" name="date" id="" value="{{ data_querys.date}}">
+                                                    at
+                                                    <label>
+                                                        <span class="screen-F0019">Hour</span>
+                                                        <input type="text" id="hh" name="hour"
+                                                            value="{{ data_querys.hour}}" size="2" maxlength="2"
+                                                            autocomplete="off" class="form-required">
+                                                    </label>:
+                                                    <label>
+                                                        <span class="screen-F0019">Minute</span>
+                                                        <input type="text" id="mn" name="minute"
+                                                            value="{{ data_querys.minute}}" size="2" maxlength="2"
+                                                            autocomplete="off" class="form-required">
+                                                    </label>
+                                            </div>
+
+
+                                            <p>
+                                                <a href="javascript:void(0)" class="save hide-if-no-js button">OK</a>
+                                                <a href="javascript:void(0)"
+                                                    class="cancel hide-if-no-js button-cancel">Cancel</a>
+                                            </p>
+                                        </fieldset>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div id="major-publishing-actions">
+                                <div id="delete-action">
+                                    <a class="submitdelete deletion"
+                                        href="/content/add-new?post={{data_querys.id}}&action=trash">Move to
+                                        Bin</a>
+                                </div>
+
+                                <div id="publishing-action">
+                                    <input type="submit" name="action" id="publish"
+                                        class="button button-primary button-large" value="Publish">
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="submitdiv" class="postbox ">
+                    <div class="F0006">
+                        <h2 class="hndle">Excerpt</h2>
+                        <div class="handle-actions hide-if-no-js"></div>
+                    </div>
+                    <div class="inside">
+                        <label class="screen-F0019" for="excerpt">Excerpt</label>
+                        <textarea rows="1" cols="50" name="excerpt" id="excerpt">{{data_querys.excerpt}}</textarea>
+                        <p> Excerpts are optional hand-crafted summaries of your content that can be used in your theme.
+                            <a href="/what-is-an-excerpt-classic-editor">Learn more about manual excerpts</a>.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+</form>
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+    // var category = { {% for item in all_category%}{{item.id}}:'{{item.name}}',{%endfor%} };
+    // console.log(category)
+</script>
+<script src="/script/dm/article.js"></script>
+{% endblock %}

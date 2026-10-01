@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/css/practice.css?m={{device_info.device_type}}">
+
+<style>
+    .IN016 {
+        margin: 10px auto;
+        width: -webkit-fill-available;
+    }
+
+    .IN094.DIS01 {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 12px;
+        width: fit-content;
+        margin: 0 auto;
+        justify-content: center;
+    }
+
+    .title {
+        text-align: center;
+        font-size: 22px;
+        margin-bottom: 30px;
+        margin-top: 50px;
+    }
+
+    label .button {
+        background: #ffffff;
+        color: #121212;
+        padding: 7px 12px;
+    }
+
+    input:checked+label .button {
+        background: #158dd4;
+        color: #ffffff;
+    }
+
+    icon.icon_loader_2 {
+        display: flex;
+        margin: auto;
+        height: 400px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon_loader_2 svg {
+        position: relative;
+        overflow: hidden;
+        width: 100px;
+        height: 100px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="adscontainer">
+    <div class="ads_container"><ins class="adsbywseditor" style="display:inline-block;width: 728px;height:90px;"></ins>
+    </div>
+</div>
+<div class='IN016'>{% if response.category_selector %}
+    <form method="get">
+        <div class="title">Select Number Question</div>
+        <div class="IN094 DIS01">{% for value in ["20", "25", "30", "40", "50", "60", "70", "75", "80", "90", "100"] %}
+            <div class="F0011">
+                <input class="hidden" type="radio" required name="NtX" id="F{{ value }}" value="{{ value }}">
+                <label for="F{{ value }}"><span class="button">{{ value }}</span></label>
+            </div>{% endfor %}
+        </div>
+        <div class="title">Select Category</div>
+        <ol class="b_results IN080">
+            <li class="IN079 boc category">
+                <button class="button boc" type="submit" name="category" value="default">All Category</button>
+            </li>{% for query in response.category_selector %}
+            <li class="IN079 boc category">
+                <button class="button boc" type="submit" name="category" value="{{query.slug}}">{{query.name}} <span
+                        class="count">{{query.results_count}}</span></button>
+            </li>{% endfor %}
+        </ol>
+        <input type="hidden" name="qr" value="{{response.key}}">
+    </form>{% else %}
+    <style>
+        @media screen and (max-width:880px) {
+            body {
+                background: var(--bg-muted);
+            }
+        }
+    </style>
+    <div class="quiz-containerboc">
+        <div class="options-container" style="display: flex;align-items: center;justify-content: center;">
+            {{svg.loader | safe}}
+        </div>
+    </div>
+    <script>
+        (!function (query) {
+            const option_name = "abcd";
+            const subject = "";
+            const container = query("quiz-container");
+            const users_name = "{{ response.auth_session.name | safe}}";
+            const Questions = {{ response.quiz_question_list | safe
+        }};
+
+        {% include 'script/practice.js' %}
+    
+    }(query))
+    </script>
+    {% endif %}
+</div>
+{% endblock %}

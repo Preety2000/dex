@@ -1,0 +1,80 @@
+{% extends "admin/base.html" %}
+
+{% block head %}
+<style>
+    .column-last-email {
+        width: 190px;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+{% block leftSide %}{% endblock %}
+
+{% block rightSide %}
+
+
+{% endblock %}
+
+{% block body %}
+<div id="member" class="content-query striped">
+    <table>
+        <thead>
+            <tr>
+                <th class="manage-column check-column">
+                    <label class="screen-F0019" for="cb-select-all">Select all</label>
+                    <input id="cb-select-all" type="checkbox">
+                </th>
+                <th class="manage-column column-image">Image</th>
+                <th class="manage-column column-name">
+                    <a href="" class="query-title">Name</a>
+                </th>
+                <th class="manage-column column-last-email">Contect</th>
+                <th class="manage-column column-role">Request Time</th>
+                <th class="manage-column column-last-ligin">Last Login</th>
+                <th class="manage-column column-signup-date">SineUp Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <script>
+                const reasons = JSON.parse('{{ rejection_reasons | tojson | safe }}');
+            </script>
+
+            {% for content in data_querys %}
+
+            <tr id="ls_{{ content.id }}" dd="{{content.status}}"
+                class="{{ 'list' if content.status == 0  else 'success-list' if content.status == 1 else 'trash-list' }}">
+                <th class="manage-column check-column">
+                    <script type="application/json" data-sjs
+                        data-content-len="{{content.id}}">{{content | tojson | safe}}</script>
+                    <label class="screen-F0019" for="cb-select-{{content.id}}">Select</label>
+                    <input class="cb-select" id="cb-select-{{content.id}}" type="checkbox">
+                </th>
+                <th class="manage-column column-image">{{content.status}}<img width="40" height="40"
+                        style="width: 40px;height:40px;" src="{{content.img}}" alt="{{content.name }}"></th>
+                <th class="manage-column column-name">
+                    <strong><span class="query-title action-member">{{content.name}}</span></strong>
+                    <div class="row-actions">
+                        <span class="edit"><a jsname="teacherVerifyTndentityView" data-content-len="{{content.id}}"
+                                href="/admin/teacher-verify-indentity?item={{content.id}}">Edit</a> | </span>
+                        <span class="edit"><a jsname="ACTVU" data-content-len="{{content.id}}"
+                                href="javascript:void(0)">
+                                {{ 'Unverify' if content.status == 1 else 'Verify' }}
+                            </a> | </span>
+                        <span class="view"><a jsname="teacherVerifyTndentityView" data-content-len="{{content.id}}"
+                                href="javascript:void(0)">View</a></span>
+                    </div>
+                </th>
+                <th class="manage-column column-email">
+                    <strong class="query-title">{{content.phone}}</strong></br>{{content.email}}
+                </th>
+                <th class="manage-column column-views">{{content.request_timestamp}}</th>
+                <th class="manage-column column-used">{{content.last_login}}</th>
+                <th class="manage-column column-used">{{content.timestamp}}</th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="/script/dm/article.js"></script>
+{% endblock %}

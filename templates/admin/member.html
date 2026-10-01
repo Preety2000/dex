@@ -1,0 +1,81 @@
+{% extends "admin/base.html" %}
+
+{% block head %}
+<style>
+.column-last-email {
+    width: 190px;
+    overflow: hidden;
+}
+</style>
+{% endblock %}
+{% block leftSide %}{% endblock %}
+
+{% block rightSide %}
+
+
+{% endblock %}
+
+{% block body %}
+{{ index_header | safe }}
+<div id="member" class="content-query striped">
+<table>
+    <thead>
+        <tr>
+            <th class="manage-column check-column">
+                <label class="screen-F0019" for="cb-select-all">Select all</label>
+                <input id="cb-select-all" type="checkbox">
+            </th>
+            <th class="manage-column column-image">Image</th>
+            <th class="manage-column column-name">
+                <a href="" class="query-title">Name</a>
+            </th>
+            <th class="manage-column column-last-email">UserName & Email Id</th>
+            <th class="manage-column column-phone">Contect</th>
+            <th class="manage-column column-role">Role</th>
+            <th class="manage-column column-last-ligin">Last Login</th>
+            <th class="manage-column column-signup-date">SineUp Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for content in data_querys %}
+        <!-- {{content}} -->
+        <tr {% if content.status == 3 %}class="trash-list"{%endif%}>
+            <th class="manage-column check-column">
+                <div class="hidden query-{{content.id}}" style="display: none;">
+                    <div id="{{content.id}}" class="quick-editesDIS00width">
+                        <div class="input-box">
+                            <input type="text" name="title" value="{{content.name}}">
+                            <label for="title">User Name</label>
+                        </div>
+                    </div>
+                </div>
+                <textarea style="display: none;" class="query-data hidden">{{content}} </textarea>
+                <label class="screen-F0019" for="cb-select-{{content.id}}">Select</label>
+                <input class="cb-select" id="cb-select-{{content.id}}" type="checkbox">
+            </th>
+            <th class="manage-column column-image">
+                <img width="40" height="40" style="width: 40px;height:40px;" src="{{content.img}}" alt="{{content.name }}">
+            </th>
+            <th class="manage-column column-name">
+                <strong>
+                    <a href="/admin/member/update?item={{content.id}}&action=edit" class="query-title action-member">{{content.name}}</a>
+                </strong>
+                <div class="row-actions">
+                    <span class="edit"><a href="javascript:void(0)">Edit</a> | </span>
+                    <span class="inline"><a type="button" class="button-link editinline" aria_data="{{content.id}}"  aria-expanded="false" href="/admin/member/{% if content.status == 3 %}unblock{%else%}block{%endif%}?item={{content.id}}&action=return">{% if content.status == 3 %}Unblock{%else%}Block{%endif%}</a> | </span>
+                    <span class="trash"><a href="/admin/member/delete?item={{content.id}}&action=trash" class="submitdelete" >Bin</a> | </span>
+                    <span class="view"><a href="javascript:void(0)">View</a></span>
+                </div>
+            </th>
+            <th class="manage-column column-email"><strong class="query-title">{{content.username}}</strong></br>{{content.email}}</th>
+            <th class="manage-column column-views">{{content.phone}}</th>
+            <th class="manage-column column-views">{{content.role}}-{{content.status}}</th>
+            <th class="manage-column column-used">{{content.last_login.login_time}}</th>
+            <th class="manage-column column-used">{{content.timestamp}}</th>
+            <!-- <th class="manage-column column-description">{{content | safe }}...</th> -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

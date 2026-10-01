@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/{{response.themes}}/login.css">
+{% endblock %}
+{% block body %}{{params}}
+<div class="IN003 clear">
+    <div class="b_tween boc">
+        <!-- <h2 class="title">User Sign Up Guidelines</h2> -->
+        <!-- <table class="table table-striped">
+            <tbody>
+              
+                <tr>
+                    <th>1.</th>
+                    <td>
+                        <span>Full Name - Full Name Should be as per Your Certificate.</span>
+                        <span>( Full Name आपके प्रमाणपत्र के अनुसार होना चाहिए! )</span>
+                    </td>
+                </tr>
+
+            
+                <tr>
+                    <th>2.</th>
+                    <td>
+                        <span> EmailID & Mobile No - Email Id will use for communication purpose keep It remember for future reference</span>
+                        <span>( EmailID & Mobile No संचार उद्देश्य के लिए उपयोग की जाएगी इसे भविष्य के संदर्भ के लिए याद रखें! )</span>
+                    </td>
+                </tr>
+
+              
+                <tr>
+                    <th>3.</th>
+                    <td>
+                        <span>User Name - User name will be used for login to Chancellor Portal. Please Keep It Remember As Login CredentialsUser Sign Up Guidelines</span>
+                        <span>( चांसलर पोर्टल में लॉग इन करने के लिए यूजर नेम का इस्तेमाल किया जाएगा। कृपया इसे लॉगिन क्रेडेंशियल के रूप में याद रखें! )</span>
+                    </td>
+                </tr>
+
+
+           
+                <tr>
+                    <th>4.</th>
+                    <td>
+                        <span> Password - Create a Password to login Chancellor Portal. Please Keep It Remembered as Login Credentials</span>
+                        <span>( चांसलर पोर्टल लॉगिन करने के लिए एक पासवर्ड बनाएं कृपया इसे लॉगिन क्रेडेंशियल के रूप में याद रखें! )</span>
+                        
+                    </td>
+                </tr>
+
+            </tbody>
+        </table> -->
+        <main class="box-value-prop">
+            <h2 class="hdr-better-way">
+                <span class="txt-nobreak">Stop memorizing.</span>
+                <span class="txt-nobreak">Start mastering.</span>
+            </h2>
+            <h3 class="hdr-create-to">Create an account to</h3>
+            <ul class="list-value">
+                <li class="item-value">
+                    Start learning with vocabulary lists related to your favorite subject, seasonal
+                    themes, or the book you’re reading
+                </li>
+                <li class="item-value">
+                    Create your own custom lists and flashcards to learn the words you want to know
+                </li>
+                <li class="item-value">Chart your points, achievements, and trouble words</li>
+                <li class="item-value">Compete against others in fun, friendly Vocab Jams</li>
+            </ul>
+           
+        </main>
+    </div>
+    <main class="loginForm aside">
+        <h1 class="swith-button">Create your free learner account</h1>
+        <form action="/ut/accounts/login" class="form" method="post">
+            <input name="email" type="email" class="email" placeholder="Email Id" />
+            <input name="password" type="password" class="password" placeholder="Password" />
+            <div class="show-password"><span class="show"></span> Show Password</div>
+            <button class="submit">Sign Up</button>
+            <div class="link"><a href="#">Forgot password?</a></div>
+        </form>
+        <!-- <form action="/ut/accounts/login" class="form" method="post">
+            <input name="name" type="text" class="name" placeholder="Full Name" />
+            <input name="email" type="email" class="email" placeholder="Email Id" />
+            <input name="mobile" type="text" class="mobile" placeholder="Mobile Number" />
+            <input name="password" type="password" class="password" placeholder="Password" />
+            <input name="cpassword" type="password" class="cpassword" placeholder="Conform Password" />
+            <div class="show-password"><span class="show"></span> Show Password</div>
+            <button class="submit">Sign Up</button>
+            <div class="link"><a href="#">Forgot password?</a></div>
+        </form> -->
+    </main>
+</div>
+
+<script>
+
+    var a = document.querySelector('.swith-button').getElementsByTagName('a')
+    var nx = document.querySelectorAll('.ar');
+    var button = document.querySelector('.submit');
+    for (const item of a) {
+        item.addEventListener('click', function () {
+            if (this.class_name == 'signup') { for (const item of nx) { item.classList.remove('ar') } }
+            else { for (const item of nx) { item.classList.add('ar') } }
+
+            for (const element of a) {
+                element == this
+                    ? element.classList.add('active')
+                    : element.classList.remove('active');
+            }
+            button.innerHTML = this.innerHTML;
+        });
+    }
+
+    document.querySelector('.show').addEventListener('click', function () {
+        var password = document.querySelector('.password');
+        this.getAttribute('array') == 'true'
+            ? (this.setAttribute('array', false), password.setAttribute('type', 'password'))
+            : (this.setAttribute('array', true), password.setAttribute('type', 'text'));
+
+    });
+
+</script>
+{% endblock %}

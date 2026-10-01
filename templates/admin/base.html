@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Admin ~ {{ container_title or 'Error '~(response.status_code or 404)~' - Page not found.' }}</title>
+    <link rel="stylesheet" href="/static/css/fontAwesome/css/all.css">
+    <link rel="stylesheet" href="/static/css/admin/style.css">
+    <link rel="stylesheet" href="/static/css/widgets/forms.css">
+    <link rel="stylesheet" href="/static/css/admin/main.styles.css">
+    <link rel="stylesheet" href="/static/css/admin/article.css">
+    {% block head %}{% endblock %}
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <script>const None = null, Geolobal = eval(`{{response.Geolobal | safe}}`), GeolobalData = {
+            subjects: eval(`{{response.subjects | safe}}`),
+
+        }</script>
+    <script src="/script/index.js"></script>
+
+</head>
+
+
+
+{% set index_header %}
+<div class="flexCenter">
+
+    {# Status filters #}
+    {% if total %}
+    <div class="all">
+        <a href="?" class="current" aria-current="page">All <span class="count">({{ total }})</span></a>
+    </div>
+    {% endif %}
+
+    {% if publish %}
+    <span class="separator">|</span>
+    <div class="publish">
+        <a href="?where=/status=publish/&order=/asc=id">Published <span class="count">({{ publish }})</span></a>
+    </div>
+    {% endif %}
+
+    {% if draft %}
+    <span class="separator">|</span>
+    <div class="draft">
+        <a href="?where=/status=draft/&order=/asc=id"> Draft <span class="count">({{ draft }})</span></a>
+    </div>
+    {% endif %}
+
+</div>
+{% endset %}
+
+
+
+
+<body class="{{collapsed_nav}}" theme="{{_andow.theme}}">
+    {{app_context.checked}}
+    <button class="button hideView"
+        style="position: absolute;left: 45px;top: 4.5px;z-index: 999999;background: #fff;width: fit-content;height: fit-content;padding: 1px 12px;display: block;overflow: hidden;">View
+        Checks Query</button>
+    <div class="hidden ddd"
+        style="position: absolute;left: 0;right: 0; z-index: 99999;background: #fff;overflow: scroll;    height: -webkit-fill-available;">
+    </div>
+
+    <br>Error : {{app_context.error}}
+    <br>
+    <script>
+        var hideView = document.querySelector(".hideView");
+        hideView.onclick = function hideView() {
+            let hiddens = document.querySelector(".ddd");
+            hiddens.classList.toggle("hidden")
+        }
+    </script>
+    <div class="DIS02 app">
+        <header class="header flexCenter">
+            <!-- Navigation Header  -->
+            <div class="nv-header flexCenter">
+                <div class="icon menu-button"><i class="fa-classic fa-bars"></i></div>
+                <div class="logo flexCenter">
+                    <div class="siteName">{{app_context.site_name | safe}}</div>
+                </div>
+            </div>
+            <form action="" class="form">
+                <input type="text" placeholder="Search across your blog" name="gs" id="search"
+                    value="{{request.query_params.get('gs', '')}}">
+                <label for="search" class="icon"><i class="fa fa-search"></i></label>
+            </form>
+
+            <div class="rightSide flexCenter">
+                <div class="IN088">
+                    <input class="auto theme-button" type="checkbox" id="auto" {%if _andow.theme=="dark" %}checked
+                        {%endif%}>
+                    <label for="auto"></label>
+                    <label class="option fa-classic fa-sun-bright"></label>
+                    <label class="option fa-classic fa-moon"></label>
+                </div>
+
+                <div jsname="setting" class="icon">
+                    <i class="fa-classic fa-gear"></i>
+                </div>
+                <div jsname="userInfo" class="icon">
+                    <i class="fa-classic fa-member"></i>
+                </div>
+            </div>
+        </header>
+        <div class="DIS00 container">
+            <div id="navigation" class="navigation main-manu">
+
+                <!-- Navigation Body  -->
+                <div class="nv-body">
+                    <ul class="IN0104">
+                        <a href="" class="indector" style="top: {{(menu_position or 0 )* 36}}px;"></a>
+                        <a href="/admin/dashboard" class="list flexCenter">
+                            <div class="icon"><i class="fa-classic fa-list-tree"></i></div>
+                            <div class="menu-title">Dashboard</div>
+                        </a>
+                        <a href="/admin/analytics" class="list flexCenter">
+                            <div class="icon"><i class="fa-classic fa-chart-line"></i></div>
+                            <div class="menu-title">Analytics</div>
+                        </a>
+                        <a href="/admin/syllabus" class="list flexCenter">
+                            <!-- <div class="icon"><i class="fa-classic fa-solid fa-books fa-fw"></i></div> -->
+                            <div class="icon"><i class="fa-classic fa-books"></i></div>
+                            <div class="menu-title">Syllabus</div>
+                        </a>
+                        <a href="/admin/courses" class="list flexCenter">
+                            <div class="icon"><i class="fa-classic fa-notebook"></i></div>
+                            <div class="menu-title">Courses</div>
+                        </a>
+                        <a href="/admin/content" class="list flexCenter">
+                            <div class="icon"><i class="fa-classic fa-newspaper"></i></div>
+                            <div class="menu-title">Content</div>
+                        </a>
+                        <a href="/admin/category" class="list flexCenter">
+                            <div class="icon"><i class="fa-classic fa-layer-group"></i></div>
+                            <div class="menu-title">Categories</div>
+                        </a>
+                        <a href="/admin/books" class="list flexCenter">
+                            <div class="icon"><i class="fa-classic fa-book"></i></div>
+                            <div class="menu-title">StudyMaterial</div>
+                        </a>
+                        <a href="/admin/practice" class="list flexCenter" title="Multiple Choice Question">
+                            <div class="icon"><i class="fa-classic fa-puzzle"></i></div>
+                            <div class="menu-title">Questionnaire</div>
+                        </a>
+                        <a href="/admin/comments" class="list flexCenter">
+                            <div class="icon"><i class="fa-classic fa-message-lines"></i></div>
+                            <div class="menu-title">Comments</div>
+                        </a>
+                        <a href="/admin/customisation" class="list flexCenter">
+                            <div class="icon"><i class="fa-classic fa-screwdriver-wrench"></i></div>
+                            <div class="menu-title">Customisation</div>
+                        </a>
+                        <a href="/admin/media" class="list flexCenter">
+                            <div class="icon"><i class="fa-duotone fa-photo-film"></i></div>
+                            <div class="menu-title">Media</div>
+                        </a>
+                        <a href="/admin/member" class="list flexCenter">
+                            <div class="icon"><i class="fa-duotone fa-member"></i></div>
+                            <div class="menu-title">Members</div>
+                        </a>
+                        <a href="/admin/teacher-verify-indentity" class="list flexCenter">
+                            <div class="icon"><i class="fa-duotone fa-member"></i></div>
+                            <div class="menu-title">Verify Indentity</div>
+                        </a>
+                        <a href="" class="list flexCenter">
+                            <div class="icon"><i class="fa-classic fa-heart"></i></div>
+                            <div class="menu-title">Favoritos</div>
+                        </a>
+                        <a href="/admin/backup" class="list flexCenter">
+                            <div class="icon"><i class="fa-classic fa-trash-can-undo"></i></div>
+                            <div class="menu-title">Beckup</div>
+                        </a>
+                        <a href="/admin/logout" class="list flexCenter">
+                            <div class="icon"><i class="fa-duotone fa-right-from-bracket"></i></div>
+                            <div class="menu-title">Logout</div>
+                        </a>
+                    </ul>
+                </div>
+
+                <!-- Navigation Footer  -->
+                <div class="nv-footer">
+                    <ul class="IN0104">
+                        <a href="#" class="list flexCenter" jsname="setting" jsname="setting">
+                            <div class="icon"><i class="fa-classic fa-gear"></i></div>
+                            <div class="menu-title">Settings</div>
+                        </a>
+                        <a href="#" class="list flexCenter" jsname="false">
+                            <div class="icon"><i class="fa-classic fa-circle-info"></i></div>
+                            <div class="menu-title">Help</div>
+                        </a>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Main Session  -->
+            <main class="main">
+                <!-- Main Body  -->
+                <div class="main-container">{%if error %}
+                    <div class="error-message">
+                        <div class="message-container IN009 boc">
+                            <h2 class="heading">Sorry!</h2>
+                            <p>{{error | safe}}</p>
+                        </div>
+                    </div>{%endif%}{%if message %}
+                    <div class="ses-message">
+                        <div class="ses-message-container IN009 boc">
+                            <p>{{message | safe}}</p>
+                        </div>
+                    </div>{%endif%}
+                    <div class="main-header flexCenter">
+                        <div class="leftSide DIS00">
+                            <h2 class="main-title flexCenter">{{container_title}}</h2>{% block leftSide %}{% endblock %}
+                        </div>
+                        <div class="rightSide flexCenter">
+
+                            {% block rightSide %}{% endblock %}
+                            <span class="spinner spinner-main"></span>
+                            {# Table actions and pagination #}
+                            {% if bulk_actions %}
+                            <div class="alignleft actions bulkactions">
+                                <label for="bulk-action-choose-top" class="screen-F0019">Select bulk
+                                    action</label>
+                                <select name="action" id="bulk-action-choose-top">
+                                    <option value="-1">Bulk actions</option>
+                                    <option value="edit" class="hide-if-no-js">Edit</option>
+                                    <option value="trash">Move to Bin</option>
+                                </select>
+                            </div>
+                            {% endif %}
+                            {% if paginator %}
+                            <a href="javascript:void(0)" class="button" jsname="filter" role="button">Filter</a>
+                            <div class="paginator" id="paginator">
+                                {% for index in paginator %}
+                                <a class="button {{ index.clas }}" href="{{ index.slug }}"
+                                    title="Page {{ index.name }}">{{ index.name
+                                    }}</a>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="main-body">
+                        {% block body %}{% endblock %}
+                    </div>
+                </div>
+
+                <div class="main-footer border">
+                    <p class="copyright" aria-label="Copyright © 2021-2023 | CodewithAr | All Right Reserved">Copyright
+                        ©
+                        2021-2023 | <a href="https://code-with-ar.blogspot.com/" aria-label="CodewithAr">CodewithAr</a>
+                        | All
+                        Right Reserved</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+
+
+        console.log(Geolobal);
+
+
+    </script>
+
+    <script src="/script/dm/action.js"></script>
+    <script src="/script/dm/script.js"></script>
+    <script src="/script/dm/article.js"></script>
+
+    {% block script %}{% endblock %}
+    {%if response.pop_message and response.pop_message.title %}
+    <script>$.alert("{{response.pop_message.title | safe}}", e => $.go("{{response.pop_message.url | safe}}", document.title))</script>
+    {%endif%}
+
+</body>
+
+</html>

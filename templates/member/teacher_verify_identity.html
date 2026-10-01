@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Apply ~ Verify Indentity</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" id="main_style" href="/static/css/index.css?m={{device_info.device_type}}">
+    <script src="/script/index.js"></script>
+    <style>
+        main.verify-indentity.aside.IN006 {
+            max-width: 680px;
+            display: block;
+            margin: auto;
+            margin-bottom: 80px;
+            font-family: system-ui, roboto;
+        }
+
+        .hdr-better-way {
+            max-width: 302px;
+        }
+
+        .f030 {
+            display: block;
+            padding: 6px 0;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .f007 p {
+            font-size: 80%;
+        }
+
+        .f007 input {
+            height: 40px;
+            margin: 10px 0;
+        }
+
+        .f007 textarea {
+            height: 90px;
+            margin: 10px 0;
+        }
+
+        .captcha-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .refresh {
+            transition: 0.3s;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .f003 .error {
+            color: #f00;
+            font-size: 80%;
+        }
+    </style>
+    <script>
+        let rotate = 90;
+        function setCaptcha(button, captcha = $("F0022")) {
+            button.css({ transform: "rotate(" + rotate + "deg)" });
+            captcha.src = "/img/captcha?go=?" + (new Date().getTime());
+            rotate = rotate + 90;
+        }
+    </script>
+</head>
+
+<body theme="{{app_context.preferences.theme}}" class="{{device_info.device_type}} {{response.page_type}}">
+
+    <!-- Header Session  -->
+    <div class='IN038 fixed'>
+        <header class='header DIS01 clear'>
+            <button class='IN040 button icon' style='position: relative;'>
+                {{svg.ic_menu | safe}}
+            </button>
+            <div class='IN041'>
+                <div class='logo'>
+                    {{svg.logo | safe}}
+                    <span class="IN042" style="display: none;">request.ipinfo()['country']</span>
+                </div>
+            </div>
+            <div class='IN043'>{% if device_info.device_type == "desktop" %}
+                <ul class='IN0104 DIS01'>
+                    <li class='list nort'><a class='list-item' href='{{request.home_url}}'
+                            title='{{function.utc("Home")}}'>{{function.utc("Home")}}</a></li>
+                    <li class='list nort'><a class='list-item' href='/trending'
+                            title='{{function.utc("Trending")}}'>{{function.utc("Trending")}}</a>
+                    </li>
+                    <li class='list nort category'><a class='list-item' href='/topic'
+                            title='{{function.utc("Topic")}}'>{{function.utc("Topic")}}</a></li>
+                    <li class='list nort questions'><a class='list-item' href='/questions'
+                            title='{{function.utc("Questions")}}'>{{function.utc("Questions")}}</a>
+                    </li>
+                    <li class='list nort jobs'><a class='list-item' href='/jobs'
+                            title='{{function.utc("Jobs")}}'>{{function.utc("Jobs")}}</a></li>
+                </ul>{%endif%}
+            </div>
+            <div class='IN020 DIS01'>
+                <form action='/search' class='search' method='get'>
+                    <input name='q' placeholder='{{function.utc("Search")}}…' type='search'
+                        value='{{request.get("q", "")}}' />
+                    <div class="IN047">
+                        <button class="IN049">{{svg.ic_search | safe}}</button>
+                    </div>
+                </form>
+
+                <a class='button icon' js-name="button" title='Sub Menu' jsname="subMenu">{{svg.menu_nine |
+                    safe}}</a>{%if response.auth_session %}
+                <a js-name="button" role='button' class='member button icon' jsname="accountWindow"
+                    aria-label="{{response.site_name  | safe}} खाता: {{response.auth_session.name}}  {{response.auth_session.email}}">
+                    <img loading='eager' height="100" width="100"
+                        src="{{response.auth_session.img or 'icon/member.png'}}?size=100x100" alt="User Profile Image">
+                </a>{% else %}
+                <a class='button login' href='/ut/accounts/login?redirect={{request.url}}' target='_self'
+                    title='Ligin'>{{function.utc('Login')}}</a>
+                {%endif%}
+            </div>
+            <div class='setting-container'></div>
+        </header>
+    </div>
+
+
+
+    {% set document_uploads %}
+    <div class="f007">
+        <label for="dname" class="f030">Enter Document Name</label>
+
+        <p>
+            Write the name of a document here for identification purposes.
+            You can add your Voter ID, Aadhaar Card, or an Education Marksheet.
+            These documents are valid.
+        </p>
+
+        {% if response.error.error_document_name %}
+        <p class="error">{{ response.error.error_document_name }}</p>
+        {% endif %}
+
+        <input type="text" class="input width" id="dname" name="document_name" placeholder=" "
+            value="{{ response.verify.document_name }}">
+    </div>
+
+    <div class="f007">
+        <label for="dfile" class="f030">Upload Document</label>
+
+        <p aria-selected="dfile">
+            Please upload the document specified above.
+            Accepted formats include PDF, JPG, or PNG.
+        </p>
+
+        {% if response.error.error_document_file %}
+        <p class="error">{{ response.error.error_document_file }}</p>
+        {% endif %}
+
+        <input type="file" class="mt-20 width" id="dfile" name="document_file" accept=".pdf,.jpg,.jpeg,.png" ,
+            value="{{document_url}}">
+    </div>
+    {% endset %}
+
+
+
+    <!-- Main Session  -->
+    <div class="IN003 clear" style="padding: 20px;max-width: 950px;">
+        {% if response.formView == True %}
+        <h1 class="hidden">Verify Indentity</h1>
+        {%if response.message %}<p class="b_message">{{response.message | safe}}</p>{%endif%}
+        <main class="verify-indentity aside IN006">
+            <div class="welcome-to">
+                <span>Welcome to</span>
+                <h2 class="hdr-better-way IN014">{{response.site_name | safe}}</h2>
+            </div>
+
+
+            <form method="post" action="" enctype="multipart/form-data">
+                <div class="f003">
+                    <div class="f004">
+                        <h3 class="f004 mb-30">Apply to Become a Teacher</h3>
+                        <p class="f013 mb-20">Please provide all the details carefully. Your information will help us
+                            evaluate your qualifications, teaching experience, and eligibility for the teacher
+                            examination.</p>
+                    </div>
+                    <div class="relative">
+                        <div class="f006">
+                            <div class="f007">
+                                <label for="username" class="f030">User ID</label>
+                                <p>This is for visual inspection only, allowing you to confirm that the account you are
+                                    applying with is correct.</p>
+                                <input id="username" type="text" disabled class="input width" name="username"
+                                    placeholder="User Name" value="{{response.auth_session.username}}">
+                            </div>
+                            <!-- {{reasons}} -->
+                            {% if reasons == "doc_clear" %} {{ document_uploads | safe }} {%elif reasons == "mobile" %}
+                            <p>Your mobile number has not been successfully verified. Please complete the mobile number
+                                verification process before submitting your educator verification request again. <a
+                                    href="/mov/ve" target="_blank" rel="noopener noreferrer">Click Hair</a></p>
+                            {%else%}
+
+                            <div class="f007">
+                                <label for="subject" class="f030">Enter Subject</label>
+                                <p>Mention your subject here. You can select multiple subjects by listing them like
+                                    this: [Maths, History, English].</p>
+                                {% if response.error.error_subject %} <p class="error">{{ response.error.error_subject
+                                    }}</p> {%endif%}
+                                <input id="subject" type="text" class="input width" name="subject" placeholder=" "
+                                    value="{{response.verify.subject}}">
+                            </div>
+                            <div class="f007">
+                                <label for="experience" class="f030">Experience</label>
+                                <p>If you have taught anywhere and have teaching experience, mention it here. Otherwise,
+                                    leave it blank.</p>
+                                {% if response.error.error_experience %} <p class="error">{{
+                                    response.error.error_experience }}</p> {%endif%}
+                                <textarea id="experience" type="text" class="input width" name="experience"
+                                    placeholder=" ">{{response.verify.experience}}</textarea>
+                            </div>
+
+                            {{ document_uploads | safe }}
+                            {%endif%}
+                        </div>
+
+                        <div class="footer">
+                            <div class="f030">Type the word above</div>
+                            {% if response.error.error_captcha %} <p class="error">{{ response.error.error_captcha }}
+                            </p> {%endif%}
+                            <div class="captcha-box f007">
+                                <img class="F0022" height="40" weight="160" style="width: 160px;"
+                                    src="/img/captcha?go=?{{response.key}}">
+                                <div class="refresh" onclick="setCaptcha(this)">{{svg.ic_refresh | safe}}</div>
+                                <input class="input captcha_input" type="text" name="captcha" spellcheck="true"
+                                    placeholder="Enter Captcha" id="captcha_input" height="40" width="670">
+                            </div>
+                            <button class="button submit">Submit</button>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+
+        </main>
+        {% elif response.verify.request_id and verify.status == 1 %}
+        <div class="DIS01" style="flex-direction: column;padding-top: 20%;">
+            <h1>{{function.utc("Your account successfully verified.")}} ✅</h1>
+            <p>{{function.utc("You now have full access to all features and services. Enjoy a secure and
+                personalized experience.")}}</p>
+            <a href="/exam/r/dashboard" class="button">{{function.utc("Dashboard")}}</a>
+        </div>
+        {% elif response.verify.request_id and verify.status > 1 %}
+        <div class="continer" style="flex-direction: column;padding-top: 20%;">
+            <h1>{{function.utc("Request Status.")}} ✅</h1>
+            {% for item in verify.reject_message %}
+            <div class="list">
+                <p>{{item.message | safe}}</p>
+                <p><b>Time</b>- {{item.timestamp}}</p>
+            </div>
+
+
+            {%endfor%}
+            <p style="margin-top: 40px;">{{function.utc("You now have full access to all features and
+                services. Enjoy a secure and personalized experience.")}}
+                <a href="/ut/accounts/teacher/verify-indentity?try={{verify.try_number}}">{{function.utc("Try
+                    Agen")}}</a>
+            </p>
+        </div>
+        {% elif response.verify.request_id %}
+        <div class="DIS01" style="flex-direction: column;padding-top: 20%;">
+
+            <!-- {{ verify.try_number}} -->
+            <h1>✅ {{function.utc("Your Request is Submitted")}}</h1>
+            <p>{{function.utc("Thank you! Your request has been successfully received.")}}</p>
+            <p class="request-number">{{function.utc("Request Id")}} : <strong>RQ_{{
+                    response.verify.request_id }}</strong></p>
+            <a href="/" class="button">{{function.utc("Home")}}</a>
+        </div>
+        {%endif%}
+    </div>
+    <style>
+        .prev {
+            display: flex;
+            height: 150px;
+            width: 128px;
+            border: dotted 1px var(--border);
+            justify-content: center;
+            margin: 8px 8px 2px;
+        }
+    </style>
+
+    <script type="text/javascript">// All PageWorker  {% include 'page_worker.js' %}</script>
+    <script type="text/javascript">// Nagivation      {% include 'navigation.js' %}</script>
+    <script type="text/javascript">// Main Script     {% include 'script.main.js' %}</script>
+    <script type="text/javascript">// Main Script     {% include 'forms.js' %}</script>
+
+    <script>
+        const a = "[type=file]", b = c => {
+            if (!c) return false;
+            const d = ["application/pdf", "image/jpeg", "image/png"];
+            return d.includes(c.type) && /\.(pdf|jpe?g|png)$/i.test(c.name)
+        }, g = (e, i, m) => {
+            const j = $.create("prev"); e.in(j, true);
+            if (!i) return j.addIcon("ic_loading");
+            j.create.img({ src: i }); return j
+        };
+        function c(d, e) {
+            if (!b(d)) return;
+            const f = new FormData(); h = g(e);
+            f.append("file", d);
+            return $.fch("/media/upload", {
+                method: "POST",
+                head: { location: "verify_indentity" },
+                body: f,
+                finish: i => {
+                    const { uri: k, icon: j, error: r } = i.data;
+                    if (j && k) g(e, j, k)
+                },
+                error: i => { $.confirm({ t: i.data.error }); this.value = null; h.remove() }
+            }).catch(i => { $.confirm({ t: i.response }); this.value = null; h.remove() })
+        }
+        $.event(a, i => {
+            const v = i.get("value"), d = i.p.replace($.create("DIS01", i.p.cloneNode(true))), e = d.create("f036");
+            d.choose(a).event.change(async function () {
+                const f = this.files[0];
+                if (!b(f)) {
+                    $.confirm({ t: $("[aria-selected=" + this.id + "]").innerText });
+                    this.value = ""; return
+                }
+                c.call(this, f, e)
+            });
+            v && g(e, v);
+        });
+
+    </script>
+</body>
+
+</html>

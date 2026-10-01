@@ -1,0 +1,113 @@
+{% extends "base.html" %}{% block head %}
+<style>
+    .DIS03 {
+        justify-content: space-between;
+        margin-bottom: 40px;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    .syllabus-container {
+        max-width: 880px;
+        margin: 0 auto;
+    }
+
+    .endpage {
+        margin-bottom: 70px;
+        margin-top: 10px;
+        border-bottom: solid 2px #0005;
+    }
+
+    * {
+        member-select: none;
+    }
+
+    .syllabus-container li.cursor,
+    .syllabus-container li.cursor p {
+        font-weight: 500;
+        color: var(--link-hover);
+    }
+
+    .syllabus-container li a {
+        font-weight: 400;
+    }
+
+    .syllabus-container li p {
+        display: inline-flex;
+    }
+
+    .syllabus-container .loading::after {
+        content: "";
+        background: url('/static/icon/loading.gif') no-repeat center center;
+        margin-left: 5px;
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        overflow: hidden;
+        background-size: contain;
+    }
+</style>
+
+{% endblock %}
+{% block body %}
+<div class="adscontainer">
+    <div class="ads_container"><ins class="adsbywseditor" style="display:inline-block;width: 728px;height:90px;"></ins>
+    </div>
+</div>
+<div class="IN003 clear print">
+    <div class="b_tween bocs m#40 center">
+        <h1 class="title">{{ response.data_querys.title}}</h1>
+        <p>({{response.data_querys.university.name}})</p>
+    </div>
+    <main class="container">
+        <div class="syllabus-container">
+            {{response.data_querys.content | safe}}
+        </div>
+    </main>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+
+    var str = [];
+    var list = $("syllabus-container").weres("li", false).filter(e => e.p.previousElementSibling.nodeName == "H3")
+    list.for(e => (str.push(e.innerText), e.add("loading")));
+
+
+    let ars = $.apirequest("/search");
+    ars.finish = (a, b) => {
+        list.for(e => e.removed("loading"));
+        let searchs = a.is("searchs");
+        for (const item of searchs) {
+            let isterm = item[0];
+            let ruselt = item[1];
+            list.for(function (el) {
+                if (isterm == el.innerText && ruselt.length > 0) {
+                    let ul = el.create("ul", "result");
+                    let to = function (e, h = "hidden") {
+                        return e.nodeName !== "A" ? ul.isclass(h)
+                            ? ul.removed(h)
+                            : ul.add(h) : null;
+                    }
+                    for (const items of ruselt) {
+                        ul.create("li", "list").create({
+                            tagName: "a",
+                            href: items.uri,
+                            target: "_blank",
+                            inner: items.title
+                        })
+                    }
+                    to(el);
+                    el.add("cursor")
+                    el.event.on(e => to(e.target));
+                }
+            })
+        }
+
+    };
+    ars.send({ q: str });
+
+</script>
+{% endblock %}

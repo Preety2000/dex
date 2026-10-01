@@ -1,0 +1,45 @@
+{% extends "base.html" %}{% block head %}
+<style>
+    .book-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        grid-gap: 26px;
+        margin: 20px 0;
+    }
+
+    .index-book {
+        max-width: 200px;
+        margin: 0 auto;
+        list-style: none;
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: -1px 7px 8px 0 rgb(0 0 0 / 10%);
+    }
+</style>
+{% endblock %}
+{% block body %}
+<div class="adscontainer">
+    <div class="ads_container"><ins class="adsbywseditor" style="display:inline-block;width: 728px;height:90px;"></ins>
+    </div>
+</div>
+<div class="IN003 clear">
+    <div class="b_tween bocs m#40">
+        <h1 class="title center IN014">{{function.utc('Books')}}</h1>
+    </div>
+    <main class="container">
+        <div class='IN0104 book-container'>
+            {%for book in data_querys %}
+            <div class='index-book boc'>
+
+                <a title="{{book.name}}" class='image relative' href='{{book.url}}?action=image'>
+                    {{book.cover | safe}}
+                </a>
+            </div>
+            {%endfor%}
+        </div>
+    </main>
+</div>
+
+{% endblock %}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW (OEM Version) -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100" height="40" version="1.1"
+viewBox="0 0 29104.16 10583.32"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">
+ <defs>
+
+  <style type="text/css">
+   <![CDATA[
+    @font-face { font-family:"Haettenschweiler";font-variant:normal;font-style:normal;font-weight:normal;src:url("#FontID0") format(svg)}
+    .fil2 {fill:black}
+    .fil0 {fill:#00598C;fill-rule:nonzero}
+    .fil1 {fill:#4CAF50;fill-rule:nonzero}
+    .fit0 {font-weight:normal;font-size:6702.78px;font-family:'Haettenschweiler'}
+   ]]>
+  </style>
+ </defs>
+ <g ifill-rule="evenodd" d="Layer_x0020_1">
+  <metadata ifill-rule="evenodd" d="CorelCorpID_0Corel-Layer"/>
+   <g ifill-rule="evenodd" d="logo-canvas-group">
+    <path class="fil0" fill-rule="evenodd" d="M735.42 1948.16l2725.44 4500.08c1069.82,-1559.43 1968.36,-3191.19 3258.01,-4481.39 -1015.3,204.59 -2035.56,758.07 -2959.05,1498.33l-879.01 -1512.69 -2145.34 -4.33 -0.05 0z"/>
+    <path class="fil1" fill-rule="evenodd" d="M3974.93 7314.9l1079.86 1750.93c607.55,-1000.59 4638.44,-7371.9 4961.55,-8014.34 -3093.13,1023.36 -4414.81,3720.86 -6041.41,6263.41z"/>
+  </g>
+  <text x="9859.39" y="8823.26"  class="fil2 fit0">Institute</text>
+ </g>
+</svg>

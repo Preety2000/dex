@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vidta - Teacher Basic</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .container{
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 10px 35px rgba(0,0,0,.08);
+        }
+
+        .logo {
+            text-align: center;
+            color: #7c3aed;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .plan-info {
+            background: #f5f3ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        .row strong {
+            color: #111827;
+        }
+
+        .amount {
+            font-size: 30px;
+            font-weight: 800;
+            color: #7c3aed;
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 25px 0 12px;
+        }
+
+        .amount-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .amount-option {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .amount-option:hover {
+            border-color: #7c3aed;
+        }
+
+        .amount-option input {
+            margin-right: 8px;
+        }
+
+        .amount-option.selected {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+        }
+
+        .payment-method {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .method {
+            flex: 1;
+            min-width: 120px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .method:hover {
+            border-color: #7c3aed;
+        }
+
+        .method input {
+            margin-right: 6px;
+        }
+
+        .pay-btn {
+            display: block;
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 25px;
+
+            background: #7c3aed;
+            color: white;
+
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .pay-btn:hover {
+            background: #6d28d9;
+        }
+
+        .secure {
+            text-align: center;
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 500px) {
+            .container{
+                margin: 20px auto;
+            }
+
+            .amount-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <div class="logo">
+            VIDTA
+        </div>
+
+        <h1>
+            Teacher Basic
+        </h1>
+
+        <p class="subtitle">
+            Upgrade your teaching experience with Vidta
+        </p>
+
+
+        <!-- PLAN DETAILS -->
+
+        <div class="plan-info">
+
+            <div class="row">
+                <span>Plan</span>
+                <strong>Teacher Basic</strong>
+            </div>
+
+            <div class="row">
+                <span>Questions</span>
+                <strong>2,000</strong>
+            </div>
+
+            <div class="row">
+                <span>Exams</span>
+                <strong>10</strong>
+            </div>
+
+            <div class="row">
+                <span>Students</span>
+                <strong>100</strong>
+            </div>
+
+            <div class="row">
+                <span>Question Bank</span>
+                <strong>Basic</strong>
+            </div>
+
+            <div class="row">
+                <span>Exam Reports</span>
+                <strong>Basic</strong>
+            </div>
+
+        </div>
+
+
+        <!-- AMOUNT OPTION -->
+
+        <div class="title">
+            Select Amount
+        </div>
+
+        <div class="amount-options">
+
+            <label class="amount-option selected">
+
+                <input
+                    type="radio"
+                    name="amount"
+                    value="999"
+                    checked
+                >
+
+                ₹999 / month
+
+            </label>
+
+
+            <label class="amount-option">
+
+                <input
+                    type="radio"
+                    name="amount"
+                    value="9999"
+                >
+
+                ₹9,999 / year
+
+            </label>
+
+        </div>
+
+
+        <!-- PAYMENT METHOD -->
+
+        <div class="title">
+            Select Payment Method
+        </div>
+
+        <div class="payment-method">
+
+            <label class="method">
+
+                <input
+                    type="radio"
+                    name="payment_method"
+                    value="upi"
+                    checked
+                >
+
+                UPI
+
+            </label>
+
+
+            <label class="method">
+
+                <input
+                    type="radio"
+                    name="payment_method"
+                    value="card"
+                >
+
+                Card
+
+            </label>
+
+
+            <label class="method">
+
+                <input
+                    type="radio"
+                    name="payment_method"
+                    value="netbanking"
+                >
+
+                Net Banking
+
+            </label>
+
+        </div>
+
+
+        <!-- PAYMENT FORM -->
+
+        <form
+            action="/payment/create"
+            method="POST"
+        >
+
+            <input
+                type="hidden"
+                name="plan"
+                value="teacher-basic"
+            >
+
+            <input
+                type="hidden"
+                name="amount"
+                id="selectedAmount"
+                value="999"
+            >
+
+            <input
+                type="hidden"
+                name="payment_method"
+                id="selectedMethod"
+                value="upi"
+            >
+
+            <button
+                type="submit"
+                class="pay-btn"
+            >
+                Pay ₹999
+            </button>
+
+        </form>
+
+
+        <div class="secure">
+            🔒 Secure payment • Your payment information is protected
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const amountOptions =
+        document.querySelectorAll(".amount-option");
+
+    const amountInputs =
+        document.querySelectorAll('input[name="amount"]');
+
+    const selectedAmount =
+        document.getElementById("selectedAmount");
+
+    const payButton =
+        document.querySelector(".pay-btn");
+
+
+    amountInputs.forEach(function(input) {
+
+        input.addEventListener("change", function() {
+
+            amountOptions.forEach(function(option) {
+                option.classList.remove("selected");
+            });
+
+            input.parentElement.classList.add("selected");
+
+            selectedAmount.value = input.value;
+
+            payButton.textContent =
+                "Pay ₹" + Number(input.value).toLocaleString("en-IN");
+
+        });
+
+    });
+
+
+    const methodInputs =
+        document.querySelectorAll(
+            'input[name="payment_method"]'
+        );
+
+    const selectedMethod =
+        document.getElementById("selectedMethod");
+
+
+    methodInputs.forEach(function(input) {
+
+        input.addEventListener("change", function() {
+
+            selectedMethod.value = input.value;
+
+        });
+
+    });
+
+</script>
+
+</body>
+</html>

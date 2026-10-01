@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/article.css?m={{device_info.device_type}}">
+{% endblock %}
+
+{% block body %}
+
+<main class="container clear">
+    <!-- index Session -->
+    <article class="index section" id="IN097 ">
+        <div class="IN097 ">
+            <nav class="breadcrumb">
+                <a array-menu="true" href="/" title="{{function.utc('Home')}}">{{function.utc("Home")}}</a>{%if
+                response.type%}
+                <em class="delimiter">&gt;</em>
+                <a class="b-label" href="/search?tag={{response.type.name}}"
+                    title="">{{response.type.name}}</a>{%endif%}
+                <em class="delimiter">&gt;</em>
+                <span class="current">{{response.title}}</span>
+            </nav>
+            <div class="IN026">
+                <h1 class="article-title arya" title="{{response.title}}">{{response.title}}</h1>
+                <div class="article-info">
+                    <span class="left-side DIS01">
+                        <!-- <pre style="white-space: pre-wrap; overflow: scroll;width: 780px;">
+                                    {{response.rank}}
+                                </pre> -->
+                        {%if response.rank %}
+                        <span class="rank" title="{{function.utc('Trending')}}">#{{response.rank}},</span>{%endif%}
+                        <span class="article-view">{{ function.utc('Read {0} times').format('<strong class="view">' ~
+                                response.views ~ '</strong>') | safe }},</span>
+                        <span class="article-date" datetime="{{response.timestamp}}">{{response.date}}</span>
+                        <a href="#like" js-name="button" class="button article-like {{response.feedback}}"
+                            jsname="likes" aria-label="feedback"><span
+                                class="like-count mr-5">{{response.likes}}</span>{{function.utc('Like')}}</a>
+                        {% if response.admin_session %}<a class="update"
+                            href="/admin/content/update?item={{response.id}}&qas={{response.slug}}&action_by=view"
+                            target="_blank" title="Update">Update</a>{%endif%}
+                    </span>
+                    <span class="writer DIS01">
+                        {{svg.writer | safe}}
+                        <a class="author" href="data:post.author.url" target="_blank" title="The WsCoder">The
+                            WsCoder</a>
+                    </span>
+                    <span class="article-IN069 ">
+                        <a class="whatsapp" title="whatsapp share button"
+                            href="https://web.whatsapp.com/send?text={{response.title}} | {{response.url}}"
+                            onclick="window.open(this.href, 'windowName', 'width=900, height=550, left=24, top=24, scrollbars, resizable'); return false;"
+                            rel="nofollow">
+                            {{svg.circle_whatsapp | safe}}
+                        </a>
+                        <a class="facebook" title="facebook share button"
+                            href="https://www.facebook.com/sharer.php?u={{response.url}}"
+                            onclick="window.open(this.href, 'windowName', 'width=550, height=650, left=24, top=24, scrollbars, resizable'); return false;"
+                            rel="nofollow">
+                            {{svg.circle_facebook | safe}}
+                        </a>
+                        <a class="twitter" title="twitter share button"
+                            href="https://twitter.com/share?url={{response.url}}&text={{response.title}}"
+                            onclick="window.open(this.href, 'windowName', 'width=550, height=450, left=24, top=24, scrollbars, resizable'); return false;"
+                            rel="nofollow">
+                            {{svg.circle_twitter | safe}}
+                        </a>
+                        <a class="email" title="email share button"
+                            href="https://email.com/share?url={{response.url}}&text={{response.title}}"
+                            onclick="window.open(this.href, 'windowName', 'width=550, height=450, left=24, top=24, scrollbars, resizable'); return false;"
+                            rel="nofollow">
+                            {{svg.circle_email | safe}}
+                        </a>
+                        <a class="pinterest" href="#" title="pinterest share button" rel="nofollow">
+                            {{svg.circle_pinterest | safe}}
+                        </a>
+                        <!-- <a class="article-share"  title="more share button" href="#post-share">{{svg.share | safe}}</a> -->
+                    </span>
+                </div>
+            </div>
+            <div class="ads_container"><ins class="adsbywseditor"
+                    style="display:inline-block;width: 728px;height:90px;"></ins></div>
+            <div class="session-toc">{{response.table_of_contents or "" | safe}}</div>
+            <div class="article-content">{{response.content | safe}}</div>
+            {%if response.practice %}
+            <ol class="IN072 vesper-libre">
+                <h2>{{function.utc('MCQ')}} Question</h2>{% for query in response.practice %}
+                <li class="questions">
+                    <div class="question_list">
+                        <h3 class="IN073"> {{query.question}}</h3>
+                        <div class="options">
+                            <p class="IN074">
+                                {% set letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+                                {% for item in query.options %}
+                                <span>{{ letters[loop.index0] }}. {{item}}</span>
+                                {% endfor %}
+                            </p>
+                            <p class="correct_answer">Ans : {{query.correct_answer }}</p>
+                        </div>
+                    </div>
+                </li>{% endfor %}
+            </ol>{%endif%}{%if not response.status == "Draft" %}
+            <div class="post-footer">
+                <div class="tag-container">
+                    <!-- <span>{{function.utc('Tags')}}</span> -->
+                    <style>
+                        .tag-info {
+                            display: block;
+                            overflow: hidden;
+                        }
+
+                        .tag-info .tag-img {
+                            float: left;
+                            width: 30%;
+                            max-width: 130px;
+                            max-height: 130px;
+                            margin-right: 15px;
+                            margin-top: 11px;
+                        }
+
+                        .tag-group {
+                            user-select: none;
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 8px;
+                        }
+
+                        .i-info {
+                            width: max-content;
+                        }
+
+                        .tag-tooltip {
+                            padding: 10px;
+                        }
+
+                        .tag-tooltip img {
+                            float: left;
+                            max-width: 118px;
+                            max-height: 118px;
+                            margin-right: 8px;
+                        }
+
+                        .tag-tooltip .desc-tag {
+                            display: contents;
+                        }
+                    </style>
+                    <div class="label-head tag-group">{% for item in response.category %}
+                        <div class="i-info">
+                            <a class="label-link tag button" href="{{item.url}}" rel="tag" title="{{item.name}}"
+                                aria-label="{{ security.number_encode(item.id) }}">{{item.name}}</a>
+                            <div class="tag-info hidden MC{{security.number_encode(item.id)}}">
+                                <h2 class="title-tag">{{item.name}}</h2>
+                                <img src="{{item.img}}" alt="" class="tag-img">
+                                <p class="desc-tag">
+                                    {{item.description[0:380] | safe}}...
+                                    <a href="{{item.url}}">more</a>
+                                </p>
+                            </div>
+                        </div>
+                        {%endfor%}
+                    </div>
+                </div>
+                <div class="DIS00 block-inner next_perv">{%if response.prev_article%}
+                    <div class="post-prev">
+                        <a class="prev-post-link button" href="{{response.prev_article.url}}" rel="previous"
+                            title="{{response.prev_article.title}}">
+                            <span>{{function.utc("Previous")}}</span>
+                            <span class="hidden">{{response.prev_article.title}}</span>
+                        </a>
+                    </div>{%endif%}{%if response.next_article%}
+                    <div class="post-next">
+                        <a class="next button" href="{{response.next_article.url}}" rel="next"
+                            title="{{response.next_article.title}}">
+                            <span>{{function.utc("Next")}}</span>
+                            <span class="hidden">{{response.next_article.title}}</span>
+                        </a>
+                    </div>{%endif%}
+                </div>
+            </div>{%endif%}
+        </div>
+        <div class="IN077"></div>
+    </article>
+
+    <!-- Sidebar Session -->
+    <aside class="sidebar" id="sidebar-container">
+        <div class="ads_container">
+            <ins class="adsbywseditor" style="display:inline-block;width: auto;height:auto"></ins>
+        </div>
+        {%if response.reseant_type %}
+        <div class="section" id="sidebar-section">
+            <h2 array-menu="true" class="title">Article for : {{response.type.name}}</h2>
+            <div class="IN0104 vesper-libre">{% for item in response.reseant_type %}
+                <a class="list" href="{{item.url}}" page-id="{{item.id}}" title=" {{item.title}}"> {{item.title}}</a>
+                {%endfor%}
+            </div>
+            <div array-size="280" class="ads-session"></div>
+        </div>
+        {%endif%}
+
+        {%if response.reseant_parameter %}
+        <div class="section" id="sidebar-section2">
+            <h2 array-menu="true" class="title">{{function.utc("Latest Additions")}}</h2>
+            <div class="IN0104 vesper-libre">{% for item in response.reseant_parameter %}
+                <a class="list" href="{{item.url}}" page-id="{{item.id}}" title=" {{item.title}}"> {{item.title}}</a>
+                {%endfor%}
+            </div>
+            <div array-size="280" class="ads-session"></div>
+        </div>
+        {%endif%}
+        <div class="ads_container"><ins class="adsbywseditor"
+                style="display:inline-block;width: auto;height:auto"></ins></div>
+
+    </aside>
+</main>
+
+{% endblock %}

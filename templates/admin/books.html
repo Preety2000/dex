@@ -1,0 +1,37 @@
+{% extends "admin/base.html" %}
+{% block head %}{% endblock %}
+{% block leftSide %}<a href="/admin/books/insert" class="button">Add New</a>{% endblock %}
+{% block rightSide %}
+{% endblock %}
+{% block body %}
+<table>
+    <thead>
+        <tr>
+            <th class="manage-column check-column">No.</th>
+            <th class="manage-column column-name">Title & Action</th>
+            <th class="manage-column column-writer">Writer</th>
+            <th class="manage-column column-subject">Subject</th>
+            <th class="manage-column column-category">Categories</th>
+        </tr>
+    </thead>
+    <tbody>
+        {%for item in data_querys %}
+        <tr>
+            <th class="manage-column check-column">{{loop.index}}</th>
+            <th class="manage-column column-name">
+                <div class="query-title">{{item.name}}</div>
+                <div class="row-actions">
+                    <span class="edit"><a href="/admin/books/update?item={{item.id}}&qas={{item.slug}}">Edit</a> | </span>
+                    <span class="inline"><a type="button" class="button-link editinline" aria_data="{{item.id}}"  aria-expanded="false" href="javascript:void(0)">Quick Edit</a> | </span>
+                    <span class="trash"><a href="/admin/books/delete?item={{item.id}}&action=delete&qas={{item.slug}}" class="submitdelete" >Bin</a> | </span>
+                    <span class="view"><a href="/{{item.uri}}" rel="bookmark" target="_blank">View</a></span>
+                </div>
+            </th>
+            <th class="manage-column column-writer">{{item.writer_name}}</th>
+            <th class="manage-column column-subject">{{item.subject_name}}</th>
+            <th class="manage-column column-category">{{item.category}}</th>
+        </tr>
+        {%endfor%}
+    </tbody>
+</table>
+{% endblock %}

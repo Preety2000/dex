@@ -1,0 +1,120 @@
+{% extends "admin/base.html" %}
+
+{% block head %}
+<style>
+    .column-category,
+    .column-date {
+        width: 20%;
+    }
+</style>
+{% endblock %}
+{% block leftSide %}
+<a href="/admin/practice/insert" class="button">Add New</a>
+{% endblock %}
+{% block body %}
+{{index_header | safe}}
+
+<div id="quiz" class="content-query striped">
+    <table>
+        <thead>
+            <tr>
+                <th class="manage-column check-column">
+                    <label class="screen-F0019" for="cb-select-all">Select all</label>
+                    <input id="cb-select-all" type="checkbox">
+                </th>
+                <th class="manage-column column-name"><a href="" class="query-title">Title</a></th>
+                <th class="manage-column column-category">Correct Answer</th>
+                <th class="manage-column column-category">Categories</th>
+                <th class="manage-column column-views">Views</th>
+                <th class="manage-column column-date">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for content in data_querys %}
+            <tr {% if content.status=="Draft" %}class="trash-list" {%endif%}>
+                <th class="manage-column check-column">
+                    <div class="hidden query-{{content.id}}" style="display: none;">
+                        <div id="{{content.id}}" class="quick-editesDIS00width">
+                            <div class="input-box">
+                                <input type="text" name="title" value="{{content.title}}">
+                                <label for="title">Article Title</label>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea style="display: none;" class="query-data hidden">{{content}} </textarea>
+                    <label class="screen-F0019" for="cb-select-{{content.id}}">Select</label>
+                    <input class="cb-select" id="cb-select-{{content.id}}" type="checkbox">
+                </th>
+                <th class="manage-column column-name">
+                    <strong><a href="/admin/practice/update?item={{content.id}}"
+                            class="query-title">{{content.question}}</a></strong>
+                    <div class="row-actions">
+                        <span class="edit"><a
+                                href="/admin/practice/update?{{getallsearch}}&item={{content.id}}">Edit</a> | </span>
+                        <span class="inline"><a type="button" class="button-link editinline" aria_data="{{content.id}}"
+                                aria-expanded="false" href="javascript:void(0)">Quick Edit</a> | </span>
+                        {%if content.status == 'Draft' %}<span class="publish"><a
+                                href="/admin/practice/delete?{{getallsearch}}&item={{content.id}}&action=publish"
+                                class="submitdelete">Publish</a> | </span>{%endif%}
+                        <span class="trash"><a
+                                href="/admin/practice/delete?{{getallsearch}}&item={{content.id}}&action={{'delete' if content.status == 'Draft' else 'trash' }}"
+                                class="submitdelete">{{'Delete' if content.status == 'Draft' else 'Bin' }}</a> | </span>
+                        <span class="view"><a href="{{content.url}}" rel="bookmark" target="_blank">View</a></span>
+                    </div>
+                </th>
+                <th class="manage-column column-category">{{content.correct_answer}}</th>
+                <th class="manage-column column-category">
+                    <a href="javascript:void(0)" class="sowing-data" title="{{content.category}}"
+                        aria-label="{{content.category}}">{{content.category | length}}</a>
+                </th>
+                <th class="manage-column column-views">{{content.views}}</th>
+                <th class="manage-column column-date">{{content.timestamp}}</th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <input class="query" type="hidden" name="query" value="{{data_querys}}">
+
+    <div class="hidden">
+        <div id="categorydiv" class="postbox ">
+            <div class="F0006">
+                <h2 class="hndle">Categories</h2>
+                <div class="handle-actions hide-if-no-js"></div>
+            </div>
+            <div class="inside">
+                <div id="taxonomy-category" class="categorydiv">
+                    <ul id="category-tabs" class="category-tabs">
+                        <li class="tabs"><a class="category-type-button" aria-label="category-all"
+                                href="javascript:void(0)">All Categories</a></li>
+                        <li><a class="category-type-button" aria-label="category-pop" href="javascript:void(0)">Selector
+                                Categories</a></li>
+                        <li><a id="category-add-toggle" href="javascript:void(0)" class="add-new-category">+ Add New
+                                Category </a></li>
+                    </ul>
+
+                    <div id="category-all" class="tabs-panel category-all">
+                        <ul id="categorychecklist" data-lists="list:category"
+                            class="categorychecklist form-no-clear grid">{% for term in all_category %}
+                            <li id="term{{term.id}}" class="popular-category">
+                                <label class="F0009">
+                                    <input value="{{term.id}}" {% if term.checked %} checked
+                                        {%endif%}class="category-input category-{{term.id}}"
+                                        aria-label="category-{{term.id}}" type="checkbox" name="terms[]">
+                                    {{term.name}}
+                                </label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div id="category-pop" class="tabs-panel category-pop" style="display: none;">
+                        <ul id="categorychecklist-pop" class="selected-category-list form-no-clear">
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

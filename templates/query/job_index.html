@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/css/job.css?m={{device_info.device_type}}">
+{% endblock %}
+
+{% block body %}
+<div class="IN003 tagged clear">
+    <div class="IN017">
+        <!-- <div class="session"></div> -->
+        <div class='adscontainer clear'>
+            <div class='ads_container'><ins class='adsbywseditor'
+                    style='width: 728px; height: 90px; margin: auto; display: block;'></ins>
+            </div>
+        </div>
+        <h1 class="center" style="margin: 15px auto;">{{function.utc('Jobs')}} Update!</h1>
+    </div>
+    <nav class="navebar-session">
+        <ul class="navbar">
+            <li class="button"><a href="/jobs/syllabus">{{function.utc('Syllabus')}}</a></li>
+            <li class="button"><a href="/jobs/answerkey">{{function.utc('Answer Key')}}</a></li>
+            <li class="button"><a href="/jobs/latest">{{function.utc('Latest Jobs')}}</a></li>
+            <li class="button"><a href="/jobs/admitcard">{{function.utc('Admit Card')}}</a></li>
+            <li class="button"><a href="/jobs/result">{{function.utc('Results')}}</a></li>
+        </ul>
+    </nav>
+    <main class="jobs-containermath">
+        <div class="IN0104-for-list group IN024 ">
+            <div class="gropu-number IN025 boc">
+                <h2 class="title-session">{{function.utc('Results')}}</h2>
+                <ul class="container-session">{% for item in response.query_response.result %}
+                    <li><a href="{{item.url}}" target="_blank" rel="noopener noreferrer"
+                            title="{{item.title}}">{{item.title}}</a></li>{%endfor%}
+                </ul>
+                <div class="view-more"><a href="/jobs/result" target="_blank" rel="noopener noreferrer">View More</a>
+                </div>
+            </div>
+            <div class="gropu-number IN025 boc">
+                <h2 class="title-session">{{function.utc('Admit Card')}}</h2>
+                <ul class="container-session">{% for item in response.query_response.admitcard %}
+                    <li><a href="{{item.url}}" target="_blank" rel="noopener noreferrer"
+                            title="{{item.title}}">{{item.title}}</a></li>{%endfor%}
+                </ul>
+                <div class="view-more"><a href="/jobs/admitcard" target="_blank" rel="noopener noreferrer">View More</a>
+                </div>
+            </div>
+            <div class="gropu-number IN025 boc">
+                <h2 class="title-session">{{function.utc('Latest Jobs')}}</h2>
+                <ul class="container-session">{% for item in response.query_response.latest %}
+                    <li><a href="{{item.url}}" target="_blank" rel="noopener noreferrer"
+                            title="{{item.title}}">{{item.title}}</a></li>{%endfor%}
+                </ul>
+                <div class="view-more"><a href="/jobs/latest" target="_blank" rel="noopener noreferrer">View More</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+
+
+{% endblock %}

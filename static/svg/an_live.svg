@@ -1,0 +1,17 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="200" height="200" preserveAspectRatio="xMidYMid">
+  <g>
+    <circle class="l1" stroke-width="2" stroke="#ff025bff" fill="none" cy="50" cx="50"></circle>
+    <circle class="l2" stroke-width="2" stroke="#e90c59ff" fill="none" cy="50" cx="50"></circle>
+    <circle stroke-width="8" stroke="#ff0059ff" fill="none" r="4" cy="50" cx="50"></circle>
+  </g>
+  <script>
+  const c=(e,r)=> e.animate(
+    [{r:0,opacity:1},{r,opacity:0,offset:.4},{r,opacity:0}],
+    {duration:3e3,iterations:1,easing:"linear",fill:"forwards"}
+  ), qs = (s) => {return document.querySelector(s);};
+
+  c(l1=qs(".l1"), 50);
+  setTimeout(()=>c(qs(".l2"),40),280);
+  </script>
+</svg>

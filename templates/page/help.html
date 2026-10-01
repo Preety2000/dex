@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/css/page.css?m={{device_info.device_type}}">
+<style>
+  .index-page {
+    background: url("/media/img/header-light.png");
+    background-position: center;
+    background-size: cover;
+    text-align: center;
+    padding: 50px 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .basic-addon {
+    margin: 0 auto;
+    margin-top: 30px;
+    max-width: 600px;
+  }
+
+  .basic-addon {
+    margin: 0 auto;
+    margin-top: 30px;
+    max-width: 600px;
+  }
+</style>
+{% endblock %}
+{% block body %}
+<div class="page-session">
+  <main class="container">
+    <div class="index-page">
+      <h1 class="hidden">Help</h1>
+      <h2> Hello, how can we help? </h2>
+      <p>or choose a category to quickly find the help you need</p>
+      <div class="basic-addon">
+        <span id="basic-addon"><i></i></span>
+        <input type="text" name="help" placeholder="Ask a question...." aria-label="Search"
+          aria-describedby="basic-addon1">
+      </div>
+    </div>
+    <p>नमस्ते! {{sitename}} पर आपका स्वागत है। यदि आपको हमारी सेवाओं के उपयोग में किसी भी प्रकार की समस्या आ रही है, तो
+      नीचे दिए गए सेक्शन आपकी मदद कर सकते हैं।</p>
+
+    <hr />
+
+    <h2>1. अकाउंट से जुड़ी समस्याएं</h2>
+    <ul>
+      <li><strong>लॉगिन नहीं हो रहा?</strong> कृपया सुनिश्चित करें कि आपने सही ईमेल और पासवर्ड डाला है।</li>
+      <li><strong>पासवर्ड भूल गए?</strong> लॉगिन पेज पर "पासवर्ड भूल गए?" लिंक पर क्लिक करें और निर्देशों का पालन करें।
+      </li>
+      <li><strong>रजिस्ट्रेशन में दिक्कत?</strong> सुनिश्चित करें कि सभी आवश्यक जानकारी सही ढंग से भरी गई है।</li>
+    </ul>
+
+    <h2>2. परीक्षा (Online Exam) संबंधित सहायता</h2>
+    <ul>
+      <li>परीक्षा शुरू करने से पहले सुनिश्चित करें कि आपका इंटरनेट कनेक्शन स्थिर है।</li>
+      <li>यदि परीक्षा के दौरान तकनीकी समस्या आती है, तो कृपया उसी समय स्क्रीनशॉट लेकर हमें भेजें।</li>
+      <li>परीक्षा का समय समाप्त होते ही उत्तर सबमिट हो जाएंगे, कृपया समय रहते पूरा करें।</li>
+    </ul>
+
+    <h2>3. प्रश्न/उत्तर, लेख या सामग्री अपलोड करना</h2>
+    <ul>
+      <li>आप अपना कंटेंट (जैसे PDF, DOC, Images) {{sitename}} पर अपलोड कर सकते हैं।</li>
+      <li>हम अपलोड की गई सामग्री को समीक्षा के बाद पब्लिश करते हैं।</li>
+      <li>अगर किसी अपलोड में समस्या है, तो कृपया हमसे ईमेल द्वारा संपर्क करें।</li>
+    </ul>
+
+    <h2>4. तकनीकी समस्याएं</h2>
+    <ul>
+      <li>साइट या ऐप लोड नहीं हो रही? एक बार ब्राउज़र का cache क्लियर करें और दोबारा प्रयास करें।</li>
+      <li>कोई बटन काम नहीं कर रहा? कृपया अपडेटेड ब्राउज़र या ऐप वर्जन का उपयोग करें।</li>
+    </ul>
+
+    <h2>5. संपर्क करें</h2>
+    <p>यदि ऊपर दी गई जानकारी आपकी समस्या का समाधान नहीं करती, तो आप हमसे सीधे संपर्क कर सकते हैं:</p>
+    <ul>
+      <li>ईमेल: <a href="">help@{{sitename}}.com</a></li>
+      <li>संपर्क फ़ॉर्म: <a href="/help/contact">यहाँ क्लिक करें</a></li>
+    </ul>
+
+    <p>हम आपकी सहायता के लिए हमेशा तत्पर हैं। धन्यवाद!</p>
+
+  </main>
+  {%if response.page_list %}
+  <aside class="sidebar" id="sidebar-container">
+    <div class="section" id="sidebar-section2">
+      <h2 array-menu="true" class="title">{{function.utc("Links")}}</h2>
+      <ul class="IN0104 vesper-libre">{% for item in response.page_list %}
+        <li><a class="list" href="{{item.url}}" page-id="{{item.id}}" title=" {{item.title}}"> {{item.title}}</a></li>
+        {%endfor%}
+      </ul>
+      <div array-size="280" class="ads-session"></div>
+    </div>
+  </aside>
+  {%endif%}
+</div>
+<script>
+  (function (safe) {
+    safe.for(a => a.event.on(function (e) {
+      e.preventDefault();
+      $.fetch('/api/v1/help/' + a.id)
+      window.open(
+        a.href,
+        '_blank',
+        `width=600,height=640,top=0,left=0,scrollbars=yes,resizable=yes`
+      );
+      return false;
+    }))
+  }($.weres("safe")))
+</script>
+{% endblock %}

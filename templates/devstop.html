@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+{% block head %}<style>
+</style>{% endblock %}
+{% block body %}
+
+<style>
+    body {
+
+        font-family: Arial, "Noto Sans Devanagari", sans-serif;
+        background:
+            radial-gradient(circle at top left, #334155 0%, transparent 35%),
+            radial-gradient(circle at bottom right, #1e3a8a 0%, transparent 35%),
+            #020617;
+        color: #ffffff;
+        min-height: 100vh;
+    }
+
+    .button-navigation .IN0104,
+    .IN038,
+    .scroll .IN038 {
+        background: #1b2235 !important;
+        border-color: #2e3445;
+    }
+
+    .IN038 svg {
+        fill: #fff;
+    }
+
+    .__root {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        margin: 0 !important;
+        padding: 0 !important;
+        margin-top: 20px !important;
+        max-width: 850px;
+    }
+
+    .card {
+        position: relative;
+        overflow: hidden;
+        background: rgba(15, 23, 42, 0.88);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 28px;
+        padding: 50px 40px;
+        text-align: center;
+        box-shadow:
+            0 25px 70px rgba(0, 0, 0, 0.45),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(14px);
+    }
+
+    .card::before {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        background: #3b82f6;
+        filter: blur(100px);
+        opacity: 0.18;
+        top: -100px;
+        left: -80px;
+    }
+
+    .card::after {
+        content: "";
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background: #8b5cf6;
+        filter: blur(100px);
+        opacity: 0.15;
+        bottom: -100px;
+        right: -80px;
+    }
+
+    .content {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Developer Photo */
+    .developer-photo {
+        margin-right: 25px;
+        width: 80px;
+        height: 80px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+    }
+
+    .developer-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 30px;
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #ef4444;
+        border-radius: 50%;
+        box-shadow: 0 0 12px #ef4444;
+    }
+
+    h1 {
+        /* font-size: clamp(28px, 5vw, 48px); */
+        /* line-height: 1.2; */
+        margin-bottom: 20px;
+        background: linear-gradient(90deg, #ffffff, #93c5fd, #c4b5fd);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .message {
+        max-width: 650px;
+        margin: auto;
+        color: #cbd5e1;
+        /* font-size: clamp(16px, 2vw, 19px); */
+        line-height: 1.8;
+    }
+
+    .developer {
+        margin-top: 28px;
+        padding: 4px 6px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        text-align: left;
+    }
+
+    .developer-label {
+        color: #94a3b8;
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    .developer-name {
+        font-size: 22px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .contact-button {
+        display: inline-block;
+        margin-top: 28px;
+        padding: 14px 28px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: white;
+        font-weight: 700;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        transition: 0.25s ease;
+    }
+
+    .contact-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4);
+    }
+
+    .footer {
+        margin-top: 30px;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+        .__root {
+            padding: 14px;
+        }
+
+        .card {
+            padding: 38px 20px;
+            border-radius: 22px;
+        }
+
+
+        .message {
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .developer-name {
+            font-size: 20px;
+        }
+
+        .contact-button {
+            width: 100%;
+            padding: 14px 20px;
+        }
+    }
+</style>
+
+<div class="__root">
+
+    <main class="container">
+        <section class="card">
+
+            <div class="content">
+                <div class="status">
+                    <span class="status-dot"></span>
+                    Page Temporarily Disabled
+                </div>
+
+                <h1>
+                    यह पेज बंद कर दिया गया है
+                </h1>
+
+                <p class="message">
+                    यह पेज वर्तमान में <strong>Developer Mr. Rajkamal</strong> द्वारा अस्थायी रूप से बंद किया गया है।
+                    पेज को बंद करने का कारण आवश्यक तकनीकी कार्य, अपडेट या रखरखाव हो सकता है।
+
+                    यदि आपको इस पेज से संबंधित किसी भी प्रकार की जानकारी चाहिए,
+                    तो कृपया हमारे <strong>Developer Mr. Rajkamal</strong> से संपर्क करें।
+                    आपके सहयोग और समझ के लिए धन्यवाद।
+
+                </p>
+
+                <div class="developer DIS01">
+                    <div class="developer-photo">
+                        <img src="/media/img/ceo.png" alt="Developer Rajkamal" onerror="this.style.display='none';">
+                    </div>
+                    <div>
+
+                        <div class="developer-label">
+                            Developer
+                        </div>
+
+                        <div class="developer-name">
+                            Mr. Rajkamal
+                        </div>
+                    </div>
+                </div>
+
+                <!-- अपना contact link यहाँ लगाएँ -->
+                <a href="#" class="contact-button">
+                    Developer से संपर्क करें
+                </a>
+
+                <div class="footer">
+                    © 2026 Mr. Rajkamal • All Rights Reserved
+                </div>
+
+            </div>
+
+        </section>
+    </main>
+
+</div>
+
+{% endblock %}

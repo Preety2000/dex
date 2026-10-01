@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/page.css?m={{device_info.device_type}}">
+{% endblock %}
+
+{% block body %}
+<div class="page-session">
+
+    <main class="container">
+        <h1 class="article-title" title="{{response.data_querys.title}}">{{response.data_querys.title}}</h1>
+        <div class="page-content" style="text-align: justify;">{{response.data_querys.content | safe}}</div>
+    </main>
+    <aside class="sidebar" id="sidebar-container">
+        {%if response.page_list %}
+        <div class="section" id="sidebar-section2">
+            <h2 array-menu="true" class="title">{{function.utc("Links")}}</h2>
+            <ul class="IN0104 vesper-libre">{% for item in response.page_list %}
+                <li><a class="list" href="{{item.url}}" page-id="{{item.id}}" title=" {{item.title}}">
+                        {{item.title}}</a></li> {%endfor%}
+            </ul>
+            <div array-size="280" class="ads-session"></div>
+        </div>
+        {%endif%}
+    </aside>
+</div>
+{% endblock %}

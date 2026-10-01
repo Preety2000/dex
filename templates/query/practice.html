@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/search.css?m={{device_info.device_type}}">
+<link rel="stylesheet" href="/static/css/article.css?m={{device_info.device_type}}">
+<style>
+    .sb_count {
+        flex: 1;
+        margin-bottom: 0 !important;
+        font-size: 130%;
+    }
+
+    .IN016 .container {
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 18px;
+    }
+
+    .sidebar {
+        border-right: solid 1px var(--border);
+    }
+
+    .IN016 .questions {
+        margin-bottom: 15px;
+    }
+
+    .mobile .b_results {
+        padding: 5px 10px;
+    }
+
+    .subject-title {
+        margin-left: 10px;
+    }
+
+    li.category {
+        min-height: 30px;
+    }
+
+    .IN073 {
+        position: relative;
+    }
+
+    .IN073 .button {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        padding: 2px;
+        background: var(--bg-soft);
+        color: inherit;
+        outline: none;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 80%;
+        margin-left: 5px;
+        position: absolute;
+    }
+
+    .article-content .link.get-ans {
+        text-decoration-line: underline;
+        font-weight: 400;
+        font-size: 90%;
+        color: var(--btn-dark-hover);
+        cursor: pointer;
+    }
+
+    .article-content .get-ans {
+        display: flex;
+        gap: 8px;
+        font-weight: 600;
+    }
+
+    .IN031 header {
+        position: relative;
+        border-bottom: solid 1px var(--border);
+    }
+
+    .excerpt-title {
+        font-size: 120%;
+        font-weight: 600;
+        margin-left: 8px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        overflow: hidden;
+    }
+
+    .excerpt-info {
+        position: relative;
+        z-index: 1;
+        padding: 8px 16px;
+        overflow: scroll;
+        max-height: 450px;
+        height: auto;
+        width: -webkit-fill-available;
+    }
+
+    .mobile .IN031 .IN034,
+    .mobile .excerpt-info {
+        height: 100%;
+        max-height: 100%;
+    }
+
+    .excerpt-info .tab {
+        padding-left: 54px;
+        position: relative;
+    }
+
+    .excerpt-info .tab::before {
+        content: "~";
+        height: auto;
+        position: absolute;
+        left: 20px;
+        top: 0;
+    }
+
+    .excerpt-info .ans {
+        color: #218900;
+        margin: 0 6px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<script src="/script/cdn/math.js"></script>
+<div class="IN016">
+    <main class="container clear">
+        <div class="index section">
+            <div class="IN097 ">
+                <div class="IN026">
+                    <h1 class="article-title arya"
+                        title="{{response.result_type}} : {{response.results}} {{function.utc('Questions')}}">
+                        {{response.result_type}} : {{response.results}} {{function.utc('Questions')}}</h1>
+                </div>
+                <div class="adscontainer">
+                    <div class="ads_container"><ins class="adsbywseditor"
+                            style="display:inline-block;width: 728px;height:90px;"></ins></div>
+                </div>
+                <div class="article-content">
+                    <ol class="b_results">{% for query in response.quiz_query %}
+                        <li class="IN079 boc questions">
+                            <div class="nomber_of_list"><span class="IN073 h2">{{query.sno}}.</span></div>
+                            <div class="question_list">
+                                <h2 class="IN073 relative" title="{{query.question}}">{{query.question}} {% if
+                                    query.excerpt %}<span id="F{{query.id}}" class="excerpt button"
+                                        title="Summary">{{svg.ice_circle_info | safe}}</span>{%endif%}</h2>
+                                <div class="options">
+                                    <p class="IN074">{% set letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}{% for item in
+                                        query.options %}
+                                        <span class="option {% if item == query.correct_answer %} FxtMrq{% endif %}">{{
+                                            letters[loop.index0] }}. {{item}}</span>{% endfor %}
+                                    </p>{% if query.show_ans %}
+                                    <p class="correct_answer">Ans : {{query.correct_answer }}</p>{% else %}
+                                    <p class="link get-ans">Get ans</p>{% endif %}
+                                    {% if response.admin_session %}<a class="update"
+                                        href="/admin/practice/update?item={{query.id}}&action_by=view" target="_blank"
+                                        title="Update">Update</a>{%endif%}
+                                </div>
+                            </div>
+                        </li>{% endfor %}
+                    </ol>
+                    <div class='paginator' id='paginator'>{%for insex in response.paginator or []%}
+                        <a class='button {{insex.clas}}' href='{{insex.slug}}'
+                            title='Page {{insex.name}}'>{{insex.name}}</a>{%endfor%}
+                    </div>
+                </div>
+                <div class="adscontainer">
+                    <div class="ads_container"><ins class="adsbywseditor"
+                            style="display:inline-block;width: 728px;height:90px;"></ins></div>
+                </div>
+            </div>
+        </div>
+        <aside class="sidebar" id="sidebar-container">
+            <div class="section">
+                <h2 class="title hidden">Category</h2>{% for item in response.mcq_categorys if item.terms and
+                (item.terms | selectattr('mcq_count', 'gt', 0) | list | length > 0)%}
+                <h3 class="subject-title">{{item.name}}</h2>
+                    <ul class="category_group">{% for query in item.terms if query.mcq_count %}
+                        <li class="category{% if query.slug in request.path %} active{% endif %}">
+                            <a class="link" title="{{query.name}}" href="/practice/tagged/{{query.slug}}">{{query.name}}
+                                {{query.mcq_count}}</a>
+                        </li>{% endfor %}
+                    </ul>{% endfor %}
+            </div>
+        </aside>
+    </main>
+</div>
+
+
+{% endblock %}
+{% block script %}
+<script>
+    $.isfor("get-ans", function () {
+        let option = this.p.weres("option");
+        for (const element of option) {
+            if (element.isclass("FxtMrq")) {
+                option = element;
+                break;
+            }
+        }
+        this.removed("link");
+        this.in("Ans — ")
+        this.create.span("ans", option.innerHTML)
+    })
+
+    $.isfor("excerpt", function () {
+        let ars = $.apirequest("/practice/excerpt");
+        ars.progress = (a, b) => {
+            this.loader(true)
+        };
+        ars.finish = (a, b) => {
+            this.loader(false);
+            let popup = $.popup();
+            let title = a.is("title");
+            let excerpt = a.is("excerpt");
+            console.log(popup.header);
+
+            popup.header.create("excerpt-title", title);
+            popup.create("excerpt-info", excerpt);
+            popup.create("IN008").addIcon("ic_logo")
+
+            try { MathJax.typeset() }
+            catch (error) { }
+
+        };
+        ars.error = (a, b) => {
+            this.loader(false)
+        };
+        ars.send({ id: this.id })
+    })
+</script>
+
+{% endblock %}

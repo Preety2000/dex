@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+    .T001 .loader {
+        min-width: 85px;
+        min-height: 80vh;
+    }
+</style>
+
+<style>
+    .navigation-session {
+        position: relative;
+        flex: none;
+        height: auto;
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        transition: 0.3s;
+        border-right: solid 1px var(--border);
+    }
+
+    .navigation-session .list {
+        width: -webkit-fill-available;
+        overflow: hidden;
+        transition: all 0.5s;
+        position: relative;
+        border-radius: 5px;
+        font-weight: 500;
+        member-select: none;
+        z-index: 1;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+    }
+
+    .T001 {
+        display: flex;
+        position: relative;
+        height: 100%;
+        width: -webkit-fill-available;
+        min-height: 85vh;
+    }
+</style>
+
+{% endblock %}
+
+{% block body %}
+<script type="application/json" data-sjs data-content-len="4">
+    {"require":["usepass", [
+        ["selectQuestion", "Select Question"],
+        ["startTest", "Start Test"],
+        ["buttonCreateRoom", "Create Test Room"],
+        ["descCreateRoom", "A temporary environment designed for running experiments, simulations, or validating features in isolation before production deployment."],
+        ["buttonPracticeTest", "Self Test"],
+        ["descPracticeTest", "A temporary environment designed for running experiments, simulations, or validating features in isolation before production deployment."]
+    ], null, ["4582575854750", "{{'soHxf' if auth_session.eduAuth == True else 'soHxg'}}"]]}
+</script>
+<!-- {{auth_session}} -->
+<div class='IN016'>
+    <div class="T001">
+
+        <nav class="navigation-session">
+            <div class="IN0104">
+                <a href="/exam/r/dashboad" jsname="testDashboard" class="list button">Dashboard</a>
+                <a href="/exam/r/testlist" jsname="testList" class="list button">Test Lists</a>
+                <a jsname="testAcount" class="list button">Account Information</a>
+            </div>
+        </nav>
+        <section class="main-container">
+
+        </section>
+
+        <!-- <script>
+            const Ns = "{{response.forty}}"
+                , Eq = "{{response.key}}"
+                , subjects = {{ response.subjects | safe}}
+        , category = {{ response.category | safe }};
+        </script>
+        <style>
+            @media screen and (max-width:880px) {
+                body {
+                    background: var(--bg-muted);
+                }
+            }
+        </style> -->
+    </div>
+</div>
+<script type="text/javascript">// Test Script     {% include 'exam.js' %}</script>
+{% endblock %}

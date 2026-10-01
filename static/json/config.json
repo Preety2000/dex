@@ -1,0 +1,49 @@
+{
+    "setting": {
+        "postDescriptionTextLenght": 150
+    },
+    "title": "",
+    "excerpt": "MyApplication The World’s Largest Online Community for Study",
+    "tags":[],
+    "keywords": [
+        "MyApplication",
+        "Online Community",
+        "Study Resources",
+        "Largest Study Platform",
+        "Student Support",
+        "Learning Community",
+        "Educational Networking",
+        "Collaborative Learning",
+        "Knowledge Sharing",
+        "Peer Support",
+        "Interactive Education",
+        "Online Courses",
+        "Academic Resources",
+        "Study Groups",
+        "Global Learning Network"
+    ],
+    "site_domain": "www.wscoder.com",
+    "follow_link": {
+        "facebook": {
+            "icon": "",
+            "name": "Facebook",
+            "uri": "facebook.com/wscoder"
+        },
+        "youtube": {
+            "icon": "",
+            "name": "Youtube",
+            "uri": "youtube.com/wscoder"
+        },
+        "twitter": {
+            "icon": "",
+            "name": "Twitter",
+            "uri": "twitter.com/wscoder"
+        },
+        "instagram": {
+            "icon": "",
+            "name": "Instagram",
+            "uri": "instagram.com/wscoder"
+        }
+    }
+
+}

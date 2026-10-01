@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+
+{% block head %}
+
+
+{% endblock %}
+
+
+{% block leftSide %}{% endblock %}
+
+{% block rightSide %}
+
+<list class="list nort">
+    <a class="list-item" href="/" title="Home">Home</a>
+</list>
+<list class="list nort">
+    <a class="list-item" href="/trending" title="Trending">Trending</a>
+</list>
+<list class="list nort category">
+    <a class="list-item" href="/category" title="Questions">Categorys</a>
+</list>
+<list class="list nort questions">
+    <a class="list-item" href="/questions" title="Questions">Questions</a>
+</list>
+
+{% endblock %}
+
+{% block body %}
+{{params.parameter}}
+<p>Analytics</p>
+{% endblock %}

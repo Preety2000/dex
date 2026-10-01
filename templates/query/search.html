@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{function.utc("Search")}} - {{response.site_name | safe}}</title>
+    <link rel="stylesheet" href="/static/css/index.css?m={{device_info.device_type}}">
+    <link rel="stylesheet" href="/static/css/search.css?m={{device_info.device_type}}">
+    <style>
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .IN038 {
+            background: transparent;
+            border: none;
+        }
+
+        .IN091 {
+            width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .IN034 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .IN051 {
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+    <script src="/script/index.js"></script>
+
+</head>
+
+<body theme="{{app_context.preferences.theme}}" class="{{device_info.device_type}}">
+    <div class='IN038 fixed'>
+        <header class='header DIS01'>
+            <button class='IN040 button icon' style='position: relative;'>
+                {{svg.ic_menu | safe}}
+            </button>
+            <div class='IN041'>
+                <div class='logo'>
+                    {{svg.logo | safe}}
+                </div>
+            </div>
+            <div class='IN043'>{% if device_info.device_type == "desktop" %}
+                <ul class='IN0104 DIS01'>
+                    <li class='list nort'><a class='list-item' href='{{request.home_url}}' title='Home'>Home</a>
+                    </li>
+                    <li class='list nort'><a class='list-item' href='/trending' title='{{function.utc('
+                            Trending')}}'>{{function.utc('Trending')}}</a></li>
+                    <li class='list nort category'><a class='list-item' href='/category' title='{{function.utc('
+                            Questions')}}'>Categorys</a></li>
+                    <li class='list nort questions'><a class='list-item' href='/questions' title='{{function.utc('
+                            Questions')}}'>{{function.utc('Questions')}}</a></li>
+                </ul>{%endif%}
+            </div>
+            <div class='IN020 DIS01'>
+                <a class='button icon' js-name="button" title='Sub Menu' jsname="subMenu">{{svg.menu_nine |
+                    safe}}</a>{%if auth_session%}
+                <a js-name="button" role='button' class='member button icon' jsname="accountWindow"
+                    aria-label="{{response.site_name  | safe}} खाता: {{auth_session.name}}  {{auth_session.email}}">
+                    <img height="34" width="34" src="{{auth_session.img or 'icon/member.png'}}?size=100x100" alt="User">
+                </a>{% else %}
+                <a class='button login' href='/ut/accounts/login?redirect={{request.url}}' target='_self'
+                    title='Ligin'>{{function.utc('Login')}}</a>
+                {%endif%}
+            </div>
+            <div class='setting-container'></div>
+        </header>
+    </div>
+    <div class="main">
+        <div class="search-IN018">
+            <div class="session">
+                <div class="contenar-inp">
+                    <form action="{{request.base_url}}search" class="form ">
+                        <div class="input-box">
+                            <input type="search" class="sinput" placeholder="{{function.utc('Search')}}" name="q">
+                        </div>
+                        <div class="clear-value"><svg focusable="false" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z">
+                                </path>
+                            </svg></div>
+                        <span class="boder-line"></span>
+                        <div class="DIS00">
+                            <button class="button IN049">
+                                <icon class="search">
+                                    <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path
+                                            d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                                        </path>
+                                    </svg>
+                                </icon>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class='session' style="padding-top: 46px;">
+                <div class="IN0104 IN075">
+                    <a href="/exam" class="list button" role="button">
+                        <div class="IN091">
+                            <span class="IN065">{{svg.evaluation | safe}}</span>
+                            <span class="IN040-title">{{function.utc('Exam')}}</span>
+                        </div>
+                    </a>
+                    <a href="/practice" class="list button">
+                        <div class="IN091">
+                            <span class="IN065">{{svg.bulb | safe}}</span>
+                            <span class="IN040-title">{{function.utc('MCQ')}}</span>
+                        </div>
+                    </a>
+                    <a href="courses" class="list button">
+                        <div class="IN091">
+                            <span class="IN065">{{svg.elearning | safe}}</span>
+                            <span class="IN040-title">{{function.utc("Courses")}}</span>
+                        </div>
+                    </a>
+                    <a href="/syllabus" class="list button">
+                        <div class="IN091">
+                            <span class="IN065">{{svg.syllabus | safe}}</span>
+                            <span class="IN040-title">{{function.utc('Syllabus')}}</span>
+                        </div>
+                    </a>
+                    <a href="/questions" class="list button">
+                        <div class="IN091">
+                            <span class="IN065">{{svg.question_mark1 | safe}}</span>
+                            <span class="IN040-title">{{function.utc("Questions")}}</span>
+                        </div>
+                    </a>
+                    <a href="/topic" class="list button">
+                        <div class="IN091">
+                            <span class="IN065">{{svg.trending_topic | safe}}</span>
+                            <span class="IN040-title">{{function.utc('Topic')}}</span>
+                        </div>
+                    </a>
+                    <a href="/shopping" class="list button">
+                        <div class="IN091">
+                            <span class="IN065">{{svg.online_shopping | safe}}</span>
+                            <span class="IN040-title">{{function.utc("Shopping")}}</span>
+                        </div>
+                    </a>
+                    <a href="/trending" class="list button">
+                        <div class="IN091">
+                            <span class="IN065">{{svg.market_analysis | safe}}</span>
+                            <span class="IN040-title">{{function.utc('Trending')}}</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">// All PageWorker  {% include 'page_worker.js' %}</script>
+    <script type="text/javascript">// Nagivation      {% include 'navigation.js' %}</script>
+    <script type="text/javascript">// Main Script     {% include 'script.main.js' %}</script>
+
+    <!-- <script src="/script/cGFnZV93b3JrZXIuanM?lsc={{lsc}}&lt={{lt}}"></script> -->
+    <script src="/script/search.main.js"></script>
+
+
+</body>
+
+</html>

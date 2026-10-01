@@ -1,0 +1,174 @@
+{% extends "admin/base.html" %}
+
+{% block head %}
+<!-- <link rel="stylesheet" href="{{ url_for('static' , filename='css/admin/article.css')}}"> -->
+{% endblock %}
+
+
+{% block body %}
+
+
+{% if params.data_querys %}
+<form class="form as-action-form" id="form" action="" method="post">
+    <div id="post-body" class="metabox-holder columns-2">
+        <div id="post-body-content">
+            <div id="titlediv">
+                <div id="titlewrap">
+                    <label class="screen-F0019" id="title-prompt-text" for="title">Add title</label>
+                    <input type="text" name="title" size="30" value="{{params.data_querys.title}}" id="title"
+                        spellcheck="true" autocomplete="off">
+                </div>
+                <div class="inside">
+                    <div id="edit-slug-box"></div>
+                </div>
+            </div>
+            <!-- /titlediv -->
+             
+
+<table>
+    <thead>
+        <tr>
+            <th class="manage-column check-column">
+                <label class="screen-F0019" for="cb-select-all">Select all</label>
+                <input id="cb-select-all" type="checkbox">
+            </th>
+            <th class="manage-column"><a href="" class="query-title">Title</a></th>
+            <th class="manage-column">Date</th>
+        </tr>
+    </thead>
+   
+    <tbody>
+        {% for syllabu in params.syllabus %}
+        <tr>
+            <th class="manage-column check-column">
+                <div class="hidden query-{{syllabu.id}}" style="display: none;">
+                    <div id="{{syllabu.id}}" class="quick-editesDIS00width">
+                        <div class="input-box">
+                            <input type="text" name="name" value="{{syllabu.title}}">
+                            <label for="title">Article Title</label>
+                        </div>
+                    </div>
+                </div>
+                <textarea style="display: none;" class="query-data hidden">{{content}} </textarea>
+                <label class="screen-F0019" for="cb-select-{{syllabu.id}}">Select</label>
+                <input class="cb-select" id="cb-select-{{syllabu.id}}" name="syllabus[]" type="checkbox" value="{{syllabu.id}}">
+            </th>
+            <th class="manage-column"><strong><a href="#" class="query-title">{{syllabu.title}}</a></strong></th>
+            <th class="manage-column">{{syllabu.timestamp}}</th>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="postbox">
+    <div class="container-select-syllabus">
+        <div class="checkbox"></div>
+    </div>
+</div>
+
+<br>
+
+        </div>
+        
+        <!-- /post-body-content -->
+        <div id="postbox-container-1" class="postbox-container">
+            <div id="side-sortables" class="meta-box-sortables">
+                <div id="submitdiv" class="postbox ">
+                    <div class="F0006">
+                        <h2 class="hndle">Publish</h2>
+                        <div class="handle-actions hide-if-no-js"></div>
+                    </div>
+
+                    <div class="inside">
+
+                        <div class="misc-pub-section misc-pub-subject" id="visibility">
+                            
+                            Subject: <b><span id="subject-display">{{params.data_querys.subject or 'Select'}} </span></b>
+
+                            <a href="javascript:void(0)" class="edit-subject edit" aria-label="subject-select"
+                                role="button">
+                                <span class="span" aria-hidden="true">Edit</span><span class="screen-F0019">Edit
+                                    subject </span>
+                            </a>
+                            <div id="subject-select" class="subject-select hidden hide-if-js">
+                                <div class="grid insides border-bottom">
+                                    {% for subject in params.all_subject %}
+                                    <label class="subject" for="subject-{{subject.id}}">
+                                        <input onclick="title_set(this)" type="radio" {{subject.select}} title="{{subject.name}}" name="subject" id="subject-{{subject.id}}" value="{{subject.id}}">
+                                        {{subject.name}}
+                                    </label>
+                                    {%endfor%}
+                                    <a href="javascript:void(0)" jsname="ACANS" class="add-new-subject" role="button">
+                                        <span aria-hidden="true">Add a New Subject</span>
+                                        <span class="screen-F0019">Add a new Subject List</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="misc-pub-section misc-pub-university" id="visibility">
+                            University: <b><span id="university-display">{{params.data_querys.university or 'Select'}}</span></b>
+
+                            <a href="javascript:void(0)" class="edit-university edit" aria-label="university-select" role="button">
+                                <span class="span" aria-hidden="true">Edit</span>
+                                <span class="screen-F0019">Edit University </span>
+                            </a>
+                            <div id="university-select" class="university-select hidden hide-if-js">
+                                <div class="grid insides border-bottom">{% for university in params.all_university %}
+                                    <label class="university" for="university-{{university.id}}">
+                                        <input onclick="title_set(this)" title="{{university.name}}" type="radio" {{university.select}} name="university" id="university-{{university.id}}" value="{{university.id}}">
+                                        {{university.name}}
+                                    </label>{%endfor%}
+                                    <a href="javascript:void(0)" jsname="addNewUniversity" class="add-new-university" role="button">
+                                        <span aria-hidden="true">Add New University</span>
+                                        <span class="screen-F0019">Add New University List</span>
+                                    </a>
+                                </div>
+                                <script>
+                                    function title_set(input, display) {
+                                        display = $(input.name + "-display", true);
+                                        display.in(input.title);
+                                    }
+                                </script>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="insides">
+                        <div class="submitbox" id="submitpost">
+                            <div id="major-publishing-actions">
+                                <div id="publishing-action">
+                                    <input type="submit" name="action" id="publish"
+                                        class="button button-primary button-large" value="Publish">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="slugdiv" class="postbox  hide-if-js">
+                    <div class="F0006">
+                        <h2 class="hndle">Slug</h2>
+                        <div class="handle-actions hide-if-no-js"></div>
+                    </div>
+                    <div class="inside">
+                        <label class="screen-F0019" for="slug">Slug</label>
+                        <input name="slug" type="text" class="large-text width" id="slug"
+                            value="{{params.data_querys.slug}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="postbox-container-2" class="postbox-container">
+            <div id="normal-sortables" class="meta-box-sortables">
+
+            </div>
+            <div id="advanced-sortables" class="meta-box-sortables"></div>
+        </div>
+    </div>
+</form>
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+<script src="/script/dm/article.js"></script>
+{% endblock %}

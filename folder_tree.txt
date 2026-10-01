@@ -1,0 +1,882 @@
+Directory: C:\Users\DELL\Desktop\app
+
+├── database
+│   ├── db_console
+│   ├── db_media
+│   │   └── DB_FILES
+│   ├── educore
+│   │   └── TH_00000003.msg
+│   ├── ex_context
+│   │   └── c690b330-f332-46fd-8617-f5e8d0a8f0cc
+│   ├── exnr
+│   │   └── AX6RsAMg
+│   │       ├── b95f30192536.png
+│   │       └── ve_verification.jpg
+│   ├── json
+│   │   ├── mcq
+│   │   │   ├── bio.json
+│   │   │   ├── bio_gim.json
+│   │   │   ├── bio_gim2.json
+│   │   │   ├── bio_gtp.json
+│   │   │   ├── edit.html
+│   │   │   └── physics.json
+│   │   └── terms
+│   │       ├── Biology.json
+│   │       ├── Chemistry.json
+│   │       ├── Computer Science.json
+│   │       ├── Economics.json
+│   │       ├── english.json
+│   │       ├── Environmental Science.json
+│   │       ├── Geography.json
+│   │       ├── hindi.json
+│   │       ├── History.json
+│   │       ├── math.json
+│   │       ├── Physics.json
+│   │       ├── PoliticalScience.json
+│   │       ├── Religious Studies.json
+│   │       └── Science.json
+│   ├── member
+│   ├── rqh
+│   ├── capvercs.msg
+│   └── username_list.py
+├── includes
+│   ├── admin
+│   │   ├── api
+│   │   │   ├── schemas
+│   │   │   │   ├── category.py
+│   │   │   │   ├── insert.py
+│   │   │   │   ├── practice.py
+│   │   │   │   └── subject.py
+│   │   │   ├── actionForm.py
+│   │   │   └── api.py
+│   │   ├── schemas
+│   │   │   ├── _sub.py
+│   │   │   ├── article.py
+│   │   │   ├── backup.py
+│   │   │   ├── books.py
+│   │   │   ├── courses.py
+│   │   │   ├── media.py
+│   │   │   ├── member.py
+│   │   │   ├── old_article.py
+│   │   │   ├── practice.py
+│   │   │   ├── subject.py
+│   │   │   ├── syllabus.py
+│   │   │   └── term.py
+│   │   ├── entry.py
+│   │   ├── function.py
+│   │   └── modals.py
+│   ├── api
+│   │   ├── chat
+│   │   │   ├── socket
+│   │   │   │   └── index.py
+│   │   │   ├── index.py
+│   │   │   └── utils.py
+│   │   ├── exam
+│   │   │   ├── manager
+│   │   │   │   ├── conducted.py
+│   │   │   │   ├── manager.py
+│   │   │   │   └── practice.py
+│   │   │   ├── pages
+│   │   │   │   ├── create.py
+│   │   │   │   ├── dashboard.py
+│   │   │   │   ├── index.py
+│   │   │   │   └── student.py
+│   │   │   ├── request
+│   │   │   │   ├── exam_setting.py
+│   │   │   │   └── execute.py
+│   │   │   ├── results
+│   │   │   │   ├── results_conducted.py
+│   │   │   │   ├── results_manager.py
+│   │   │   │   ├── results_practice.py
+│   │   │   │   └── utils.py
+│   │   │   ├── session
+│   │   │   │   ├── ch.py
+│   │   │   │   ├── es.py
+│   │   │   │   └── ev.py
+│   │   │   ├── socket
+│   │   │   │   ├── index.py
+│   │   │   │   ├── student_req.py
+│   │   │   │   └── teacher.py
+│   │   │   ├── controller.py
+│   │   │   ├── index.py
+│   │   │   ├── metadata.py
+│   │   │   ├── processor.py
+│   │   │   ├── router.py
+│   │   │   ├── stlinks.py
+│   │   │   ├── student.py
+│   │   │   └── teacher.py
+│   │   ├── payment
+│   │   │   └── architecture.txt
+│   │   ├── v1
+│   │   │   ├── routes
+│   │   │   └── api.py
+│   │   ├── router.py
+│   │   └── websocket.py
+│   ├── components
+│   │   ├── layout
+│   │   │   └── index.info
+│   │   └── ui
+│   │       └── index.info
+│   ├── core
+│   │   ├── dataclass
+│   │   │   ├── entry.py
+│   │   │   └── member.py
+│   │   ├── globals
+│   │   │   ├── config_class.py
+│   │   │   ├── coreutils.py
+│   │   │   ├── entry.py
+│   │   │   ├── fun.py
+│   │   │   └── initialize.py
+│   │   ├── repo
+│   │   │   ├── schemas
+│   │   │   │   ├── json.py
+│   │   │   │   └── msg.py
+│   │   │   ├── async_db.py
+│   │   │   ├── author.py
+│   │   │   ├── db_media.py
+│   │   │   ├── dir_manager.py
+│   │   │   ├── image_processor.py
+│   │   │   ├── media.py
+│   │   │   ├── thumbnail.py
+│   │   │   └── upload.py
+│   │   ├── search
+│   │   │   ├── embedding.py
+│   │   │   └── index.txt
+│   │   ├── sqlite
+│   │   │   ├── db_exam.db
+│   │   │   ├── db_hindi.db
+│   │   │   └── db_vidya.db
+│   │   ├── cache.py
+│   │   ├── client_info.py
+│   │   ├── client_session.py
+│   │   ├── config.py
+│   │   ├── device_encoder.py
+│   │   ├── ip.py
+│   │   ├── logging.py
+│   │   ├── metadata.py
+│   │   ├── new_pagination.py
+│   │   ├── new_query_paginator.py
+│   │   ├── new_request_filter.py
+│   │   ├── pagination.py
+│   │   ├── query_paginator.py
+│   │   ├── request_filter.py
+│   │   └── security.py
+│   ├── database
+│   │   ├── base.py
+│   │   ├── chatModel.py
+│   │   ├── config.py
+│   │   ├── media_asset_model.py
+│   │   └── sql.py
+│   ├── db
+│   │   ├── models
+│   │   │   ├── db_exam.py
+│   │   │   ├── owner.py
+│   │   │   ├── payment.py
+│   │   │   ├── secondary.py
+│   │   │   └── utils.py
+│   │   ├── schemas
+│   │   │   ├── exam.py
+│   │   │   ├── owner.py
+│   │   │   └── secondary.py
+│   │   ├── connection.py
+│   │   └── dataclass.py
+│   ├── dependencies
+│   ├── middleware
+│   │   ├── auth_middleware.py
+│   │   ├── auth_websocket.py
+│   │   ├── initialize.py
+│   │   └── request_context.py
+│   ├── qs
+│   │   └── qs_index.py
+│   ├── repository
+│   ├── routes
+│   │   └── payment.py
+│   ├── schemas
+│   │   ├── cache
+│   │   │   ├── dataclass.py
+│   │   │   ├── likes.py
+│   │   │   ├── mcq_question.py
+│   │   │   ├── member.py
+│   │   │   ├── subject.py
+│   │   │   ├── suggestion.py
+│   │   │   └── terms.py
+│   │   ├── articles.py
+│   │   ├── book.py
+│   │   ├── captcha.py
+│   │   ├── conversation.py
+│   │   ├── cookie.py
+│   │   ├── download.py
+│   │   ├── exam_controller.py
+│   │   ├── help.py
+│   │   ├── objective.py
+│   │   ├── old_search.py
+│   │   ├── page_context.py
+│   │   ├── payment.py
+│   │   ├── router_schema.py
+│   │   ├── search.py
+│   │   ├── sitemap.py
+│   │   ├── subject.py
+│   │   ├── suggestion.py
+│   │   ├── syllabus.py
+│   │   ├── terms.py
+│   │   ├── trending.py
+│   │   └── university.py
+│   ├── services
+│   │   ├── exam
+│   │   │   ├── answer_sheet.py
+│   │   │   ├── exam.py
+│   │   │   └── results.py
+│   │   ├── member
+│   │   │   ├── chcuser.py
+│   │   │   ├── forgot.py
+│   │   │   ├── identity.py
+│   │   │   ├── login.py
+│   │   │   ├── login_service.py
+│   │   │   ├── logout.py
+│   │   │   ├── member.py
+│   │   │   ├── otp_service.py
+│   │   │   └── signup.py
+│   │   ├── payment_service.py
+│   │   └── phonepe.py
+│   ├── src
+│   │   ├── chat
+│   │   │   ├── index.py
+│   │   │   └── relationships.py
+│   │   ├── referer.py
+│   │   ├── request.py
+│   │   ├── setting.py
+│   │   └── string.py
+│   ├── utils
+│   │   ├── _sub.py
+│   │   ├── arti.py
+│   │   ├── exm.py
+│   │   ├── file.py
+│   │   ├── json.py
+│   │   ├── meb.py
+│   │   ├── req.py
+│   │   └── utils.py
+│   ├── dispatcher.py
+│   ├── executers.py
+│   ├── function.py
+│   ├── metrics.py
+│   └── route_handler.py
+├── pagehtml
+│   ├── account_recovery.html
+│   └── help.html
+├── remd
+│   └── URL_STRUCTURE.txt
+├── static
+│   ├── banner
+│   │   ├── card1.jpeg
+│   │   ├── card2.jpeg
+│   │   └── card3.jpeg
+│   ├── css
+│   │   ├── admin
+│   │   │   ├── article.css
+│   │   │   ├── dashicons.ttf
+│   │   │   ├── editor.min.css
+│   │   │   ├── main.styles.css
+│   │   │   ├── media.css
+│   │   │   ├── newpost-styles.css
+│   │   │   └── style.css
+│   │   ├── cdn
+│   │   ├── dark
+│   │   ├── default
+│   │   ├── font
+│   │   │   └── math
+│   │   │       ├── MathJax_AMS-Regular.woff
+│   │   │       ├── MathJax_Caligraphic-Bold.woff
+│   │   │       ├── MathJax_Caligraphic-Regular.woff
+│   │   │       ├── MathJax_Calligraphic-Bold.woff
+│   │   │       ├── MathJax_Calligraphic-Regular.woff
+│   │   │       ├── MathJax_Fraktur-Bold.woff
+│   │   │       ├── MathJax_Fraktur-Regular.woff
+│   │   │       ├── MathJax_Main-Bold.woff
+│   │   │       ├── MathJax_Main-Italic.woff
+│   │   │       ├── MathJax_Main-Regular (2).woff
+│   │   │       ├── MathJax_Main-Regular.woff
+│   │   │       ├── MathJax_Math-BoldItalic.woff
+│   │   │       ├── MathJax_Math-Italic.woff
+│   │   │       ├── MathJax_Math-Regular.woff
+│   │   │       ├── MathJax_SansSerif-Bold.woff
+│   │   │       ├── MathJax_SansSerif-Italic.woff
+│   │   │       ├── MathJax_SansSerif-Regular.woff
+│   │   │       ├── MathJax_Script-Regular.woff
+│   │   │       ├── MathJax_Size1-Regular.woff
+│   │   │       ├── MathJax_Size2-Regular.woff
+│   │   │       ├── MathJax_Size3-Regular.woff
+│   │   │       ├── MathJax_Size4-Regular.woff
+│   │   │       ├── MathJax_Typewriter-Regular.woff
+│   │   │       ├── MathJax_Vector-Bold.woff
+│   │   │       ├── MathJax_Vector-Regular.woff
+│   │   │       └── MathJax_Zero.woff
+│   │   ├── fontAwesome
+│   │   │   ├── css
+│   │   │   │   ├── all.css
+│   │   │   │   ├── all.min.css
+│   │   │   │   └── main.css
+│   │   │   └── webfonts
+│   │   │       ├── fa-brands-400.ttf
+│   │   │       ├── fa-brands-400.woff2
+│   │   │       ├── fa-duotone-900.woff2
+│   │   │       ├── fa-light-300.woff2
+│   │   │       ├── fa-regular-400.woff2
+│   │   │       ├── fa-sharp-duotone-solid-900.woff2
+│   │   │       ├── fa-sharp-light-300.woff2
+│   │   │       ├── fa-sharp-regular-400.woff2
+│   │   │       ├── fa-sharp-solid-900.woff2
+│   │   │       ├── fa-solid-900.ttf
+│   │   │       ├── fa-solid-900.woff2
+│   │   │       └── fa-thin-100.woff2
+│   │   ├── light
+│   │   ├── widgets
+│   │   │   ├── exams.css
+│   │   │   ├── forms.css
+│   │   │   ├── image_upload.css
+│   │   │   └── media.css
+│   │   ├── article.css
+│   │   ├── index.css
+│   │   ├── job.css
+│   │   ├── login.css
+│   │   ├── media.css
+│   │   ├── mobile.css
+│   │   ├── page.css
+│   │   ├── quiz.css
+│   │   ├── search.css
+│   │   ├── setting.css
+│   │   ├── video.css
+│   │   └── welcome.css
+│   ├── font
+│   │   ├── arya
+│   │   │   ├── arya-bold.ttf
+│   │   │   ├── arya-regular.ttf
+│   │   │   └── OFL.txt
+│   │   ├── Vesper_Libre
+│   │   │   ├── OFL.txt
+│   │   │   ├── VesperLibre-Black.ttf
+│   │   │   ├── VesperLibre-Bold.ttf
+│   │   │   ├── VesperLibre-Medium.ttf
+│   │   │   └── VesperLibre-Regular.ttf
+│   │   ├── captcha.ttf
+│   │   ├── icon.ttf
+│   │   └── music-Icons.ttf
+│   ├── icon
+│   │   ├── 35053338.png
+│   │   ├── account_verify.png
+│   │   ├── bulb.png
+│   │   ├── chat.png
+│   │   ├── clock.png
+│   │   ├── close.svg
+│   │   ├── elearning.png
+│   │   ├── empty_img.png
+│   │   ├── evaluation.png
+│   │   ├── inbox.png
+│   │   ├── loading.gif
+│   │   ├── market-analysis.png
+│   │   ├── online-shopping.png
+│   │   ├── question-mark (1).png
+│   │   ├── question-mark.png
+│   │   ├── server-storage.png
+│   │   ├── signature.jpg
+│   │   ├── syllabus.png
+│   │   ├── syllbus.png
+│   │   ├── test.png
+│   │   ├── trending-topic.png
+│   │   ├── trolley.png
+│   │   ├── user-icon-change.png
+│   │   └── user.png
+│   ├── img
+│   │   ├── ads_banner
+│   │   │   ├── 18885187.jpg
+│   │   │   ├── 2093754.jpg
+│   │   │   ├── 2093756.jpg
+│   │   │   ├── 2093757.jpg
+│   │   │   ├── 24775913.jpg
+│   │   │   ├── 300x250-laptop-dell-a (1).jpg
+│   │   │   ├── 300x250-laptop-dell-a.jpg
+│   │   │   ├── 300x250-laptop-dell.jpg
+│   │   │   ├── 300x250h.jpg
+│   │   │   ├── 300x250s.jpg
+│   │   │   ├── 300x250ss.jpg
+│   │   │   ├── 31900126.jpg
+│   │   │   ├── 728x90-laptop-dell.jpg
+│   │   │   ├── 728x90-mobile.png
+│   │   │   ├── 740x280-laptop-dell-a.jpg
+│   │   │   ├── 740x280-laptop-dell.jpg
+│   │   │   ├── 740x280-laptop.jpg
+│   │   │   └── 970x250-laptop-dell.jpg
+│   │   ├── blockchain-workshop.png
+│   │   ├── ceo.png
+│   │   └── concentration.png
+│   ├── json
+│   │   ├── lang
+│   │   │   ├── en.json
+│   │   │   ├── hi.json
+│   │   │   ├── sn.json
+│   │   │   ├── ta.json
+│   │   │   └── te.json
+│   │   ├── config.json
+│   │   ├── exam_context.json
+│   │   ├── kk.json
+│   │   ├── lang.json
+│   │   └── sitemap.json
+│   ├── script
+│   │   ├── cdn
+│   │   │   ├── output
+│   │   │   │   ├── chtml
+│   │   │   │   │   └── fonts
+│   │   │   │   │       ├── woff-v2
+│   │   │   │   │       │   ├── .css
+│   │   │   │   │       │   └── MathJax_Main-Regular.woff
+│   │   │   │   │       └── .indexcss
+│   │   │   │   ├── svg
+│   │   │   │   │   └── fonts
+│   │   │   │   │       ├── tex.js
+│   │   │   │   │       └── text.js
+│   │   │   │   └── svg.js
+│   │   │   ├── chart.js
+│   │   │   ├── chartjs-plugin-datalabels@2.js
+│   │   │   ├── math.js
+│   │   │   ├── maths.js
+│   │   │   ├── video.js
+│   │   │   └── video.min.js
+│   │   ├── components
+│   │   │   ├── cookie-consent.js
+│   │   │   ├── media.js
+│   │   │   └── search-filter.js
+│   │   ├── dm
+│   │   │   ├── action.js
+│   │   │   ├── article.js
+│   │   │   ├── media.js
+│   │   │   ├── script.js
+│   │   │   ├── setting.js
+│   │   │   ├── tablenav.js
+│   │   │   └── textEditor.js
+│   │   ├── exam
+│   │   │   ├── index.js
+│   │   │   └── results.js
+│   │   ├── scopes
+│   │   │   ├── chat.js
+│   │   │   └── m=ts.js
+│   │   ├── services
+│   │   │   ├── ads.js
+│   │   │   ├── analytics.js
+│   │   │   └── setting.js
+│   │   ├── widgets
+│   │   │   ├── _setting.js
+│   │   │   ├── account.js
+│   │   │   ├── edit_profiles.js
+│   │   │   ├── exams.js
+│   │   │   ├── form_backup.js
+│   │   │   ├── forms.js
+│   │   │   ├── image_upload.js
+│   │   │   ├── media.js
+│   │   │   ├── navigation.js
+│   │   │   ├── profile.js
+│   │   │   └── question.js
+│   │   ├── backup.js
+│   │   ├── index.js
+│   │   ├── ismobile.js
+│   │   ├── page_worker.js
+│   │   ├── script.main.js
+│   │   ├── search.main.js
+│   │   ├── socket.js
+│   │   └── xxx.js
+│   ├── svg
+│   │   ├── about.svg
+│   │   ├── an_live.svg
+│   │   ├── anm_voice.svg
+│   │   ├── appearance.svg
+│   │   ├── audio.svg
+│   │   ├── b_blue_bg_top.svg
+│   │   ├── b_title_bg.svg
+│   │   ├── bookcover.svg
+│   │   ├── books.svg
+│   │   ├── category.svg
+│   │   ├── chat.svg
+│   │   ├── circle_email.svg
+│   │   ├── circle_facebook.svg
+│   │   ├── circle_pinterest.svg
+│   │   ├── circle_twitter.svg
+│   │   ├── circle_whatsapp.svg
+│   │   ├── courses.svg
+│   │   ├── download.svg
+│   │   ├── help.svg
+│   │   ├── home.svg
+│   │   ├── home_active.svg
+│   │   ├── ib_analysis.svg
+│   │   ├── ib_audio.svg
+│   │   ├── ib_bulb.svg
+│   │   ├── ib_code.svg
+│   │   ├── ib_doc.svg
+│   │   ├── ib_elearning.svg
+│   │   ├── ib_evaluation.svg
+│   │   ├── ib_excel.svg
+│   │   ├── ib_google.svg
+│   │   ├── ib_home.svg
+│   │   ├── ib_image.svg
+│   │   ├── ib_inbox.svg
+│   │   ├── ib_layer.svg
+│   │   ├── ib_pdf.svg
+│   │   ├── ib_ppt.svg
+│   │   ├── ib_question.svg
+│   │   ├── ib_shopping.svg
+│   │   ├── ib_syllabus.svg
+│   │   ├── ib_text.svg
+│   │   ├── ib_trending.svg
+│   │   ├── ib_trolley.svg
+│   │   ├── ib_video.svg
+│   │   ├── ib_zip.svg
+│   │   ├── ic-left-back-arrow.svg
+│   │   ├── ic_add_profile.svg
+│   │   ├── ic_book.svg
+│   │   ├── ic_check.svg
+│   │   ├── ic_chevron_down.svg
+│   │   ├── ic_chevron_left.svg
+│   │   ├── ic_chevron_right.svg
+│   │   ├── ic_chevron_up.svg
+│   │   ├── ic_close.svg
+│   │   ├── ic_conditions.svg
+│   │   ├── ic_copy.svg
+│   │   ├── ic_course.svg
+│   │   ├── ic_courses.svg
+│   │   ├── ic_courses_think.svg
+│   │   ├── ic_dashboard.svg
+│   │   ├── ic_dashboard_active.svg
+│   │   ├── ic_delete.svg
+│   │   ├── ic_delete_profile.svg
+│   │   ├── ic_description.svg
+│   │   ├── ic_dotsmh.svg
+│   │   ├── ic_dotsmv.svg
+│   │   ├── ic_download.svg
+│   │   ├── ic_edit.svg
+│   │   ├── ic_facebook.svg
+│   │   ├── ic_hand.svg
+│   │   ├── ic_help.svg
+│   │   ├── ic_instagram.svg
+│   │   ├── ic_key.svg
+│   │   ├── ic_language.svg
+│   │   ├── ic_like.svg
+│   │   ├── ic_link.svg
+│   │   ├── ic_list.svg
+│   │   ├── ic_list_active.svg
+│   │   ├── ic_loader.svg
+│   │   ├── ic_loading.svg
+│   │   ├── ic_logo.svg
+│   │   ├── ic_logo_main.svg
+│   │   ├── ic_mcq.svg
+│   │   ├── ic_menu.svg
+│   │   ├── ic_minus.svg
+│   │   ├── ic_msg_check.svg
+│   │   ├── ic_msg_dblcheck.svg
+│   │   ├── ic_next_arrow.svg
+│   │   ├── ic_no_internet.svg
+│   │   ├── ic_plus.svg
+│   │   ├── ic_private.svg
+│   │   ├── ic_refresh.svg
+│   │   ├── ic_remove_profile.svg
+│   │   ├── ic_report.svg
+│   │   ├── ic_result.svg
+│   │   ├── ic_rotate_left.svg
+│   │   ├── ic_rotate_right.svg
+│   │   ├── ic_search.svg
+│   │   ├── ic_send.svg
+│   │   ├── ic_setting.svg
+│   │   ├── ic_share.svg
+│   │   ├── ic_shopping.svg
+│   │   ├── ic_spin.svg
+│   │   ├── ic_sun_menu.svg
+│   │   ├── ic_thick_up_arrow.svg
+│   │   ├── ic_trending.svg
+│   │   ├── ic_twitter.svg
+│   │   ├── ic_upload.svg
+│   │   ├── ic_user.svg
+│   │   ├── ic_voice.svg
+│   │   ├── ic_writer.svg
+│   │   ├── ic_youtube.svg
+│   │   ├── ice_2users.svg
+│   │   ├── ice_3users.svg
+│   │   ├── ice_alert.svg
+│   │   ├── ice_arrow_down.svg
+│   │   ├── ice_arrow_left.svg
+│   │   ├── ice_arrow_left_down.svg
+│   │   ├── ice_arrow_left_up.svg
+│   │   ├── ice_arrow_right.svg
+│   │   ├── ice_arrow_right_down.svg
+│   │   ├── ice_arrow_right_up.svg
+│   │   ├── ice_arrow_up.svg
+│   │   ├── ice_audio.svg
+│   │   ├── ice_bag.svg
+│   │   ├── ice_battery.svg
+│   │   ├── ice_bookmar-save.svg
+│   │   ├── ice_calendar.svg
+│   │   ├── ice_camera.svg
+│   │   ├── ice_chevron_down.svg
+│   │   ├── ice_chevron_left.svg
+│   │   ├── ice_chevron_right.svg
+│   │   ├── ice_chevron_up.svg
+│   │   ├── ice_circle_add.svg
+│   │   ├── ice_circle_arrow_down.svg
+│   │   ├── ice_circle_arrow_left.svg
+│   │   ├── ice_circle_arrow_right.svg
+│   │   ├── ice_circle_arrow_up.svg
+│   │   ├── ice_circle_block.svg
+│   │   ├── ice_circle_close_multiple.svg
+│   │   ├── ice_circle_emphasis.svg
+│   │   ├── ice_circle_help.svg
+│   │   ├── ice_circle_info.svg
+│   │   ├── ice_circle_more.svg
+│   │   ├── ice_circle_substract.svg
+│   │   ├── ice_close.svg
+│   │   ├── ice_components.svg
+│   │   ├── ice_computer.svg
+│   │   ├── ice_controller.svg
+│   │   ├── ice_credit-card.svg
+│   │   ├── ice_done-v.svg
+│   │   ├── ice_download.svg
+│   │   ├── ice_edit.svg
+│   │   ├── ice_folder-open.svg
+│   │   ├── ice_gear-settings.svg
+│   │   ├── ice_globe.svg
+│   │   ├── ice_grid-aspect-ratio.svg
+│   │   ├── ice_grid-even.svg
+│   │   ├── ice_heart.svg
+│   │   ├── ice_hide.svg
+│   │   ├── ice_home.svg
+│   │   ├── ice_input-field.svg
+│   │   ├── ice_laptop.svg
+│   │   ├── ice_live.svg
+│   │   ├── ice_lock.svg
+│   │   ├── ice_login.svg
+│   │   ├── ice_logout.svg
+│   │   ├── ice_mail.svg
+│   │   ├── ice_menu.svg
+│   │   ├── ice_message-round.svg
+│   │   ├── ice_microphone-mute.svg
+│   │   ├── ice_microphone.svg
+│   │   ├── ice_palette-color.svg
+│   │   ├── ice_pdf.svg
+│   │   ├── ice_picture.svg
+│   │   ├── ice_power.svg
+│   │   ├── ice_redo.svg
+│   │   ├── ice_refresh.svg
+│   │   ├── ice_reload.svg
+│   │   ├── ice_repeat.svg
+│   │   ├── ice_resume.svg
+│   │   ├── ice_root.svg
+│   │   ├── ice_scan.svg
+│   │   ├── ice_search.svg
+│   │   ├── ice_send.svg
+│   │   ├── ice_share.svg
+│   │   ├── ice_shopping-bag.svg
+│   │   ├── ice_shopping-cart.svg
+│   │   ├── ice_show.svg
+│   │   ├── ice_shuffle.svg
+│   │   ├── ice_sort.svg
+│   │   ├── ice_square-edit.svg
+│   │   ├── ice_svg.svg
+│   │   ├── ice_time-square.svg
+│   │   ├── ice_time.svg
+│   │   ├── ice_trash-delete.svg
+│   │   ├── ice_undo.svg
+│   │   ├── ice_unlock.svg
+│   │   ├── ice_upload.svg
+│   │   ├── ice_user-add.svg
+│   │   ├── ice_user-added.svg
+│   │   ├── ice_user-circle.svg
+│   │   ├── ice_user-close.svg
+│   │   ├── ice_user-happy.svg
+│   │   ├── ice_user-neutral.svg
+│   │   ├── ice_user-remove.svg
+│   │   ├── ice_user-sad.svg
+│   │   ├── ice_video.svg
+│   │   ├── ice_zoom-in.svg
+│   │   ├── ice_zoom-out.svg
+│   │   ├── image_placeholder.svg
+│   │   ├── liked.svg
+│   │   ├── loader.svg
+│   │   ├── loader_2.svg
+│   │   ├── logo.svg
+│   │   ├── logo_main.svg
+│   │   ├── menu_nine.svg
+│   │   ├── open_link.svg
+│   │   ├── settings.svg
+│   │   ├── shopping.svg
+│   │   ├── sports.svg
+│   │   ├── test.svg
+│   │   └── user_message.svg
+│   ├── apple-touch-icon.png
+│   ├── favicon.png
+│   └── logo1x1.png
+├── templates
+│   ├── admin
+│   │   ├── add_articles.html
+│   │   ├── add_books.html
+│   │   ├── add_categories.html
+│   │   ├── add_courses.html
+│   │   ├── add_mcq.html
+│   │   ├── add_syllabus.html
+│   │   ├── add_terms.html
+│   │   ├── analytics.html
+│   │   ├── articles.html
+│   │   ├── backup.html
+│   │   ├── base.html
+│   │   ├── books.html
+│   │   ├── categories.html
+│   │   ├── category.html
+│   │   ├── comments.html
+│   │   ├── content.html
+│   │   ├── courses.html
+│   │   ├── customisation.html
+│   │   ├── dashboard.html
+│   │   ├── error.html
+│   │   ├── login.html
+│   │   ├── media.html
+│   │   ├── media_container.html
+│   │   ├── member.html
+│   │   ├── practice.html
+│   │   ├── syllabus.html
+│   │   ├── teacher_verify_identity.html
+│   │   └── terms.html
+│   ├── member
+│   │   ├── forgot_password.html
+│   │   ├── index.html
+│   │   ├── liked-question.html
+│   │   ├── login.html
+│   │   ├── manage-account.html
+│   │   ├── signup_animation.html
+│   │   ├── teacher_verify_identity.html
+│   │   └── welcome_back.html
+│   ├── page
+│   │   ├── contact.html
+│   │   ├── help.html
+│   │   ├── send_email.html
+│   │   └── send_messages.html
+│   ├── payment
+│   │   ├── amount.html
+│   │   └── plans.html
+│   ├── qs
+│   │   ├── error.html
+│   │   ├── index.html
+│   │   └── result.html
+│   ├── query
+│   │   ├── aapage_e.html
+│   │   ├── chatting.html
+│   │   ├── error.html
+│   │   ├── exam.html
+│   │   ├── inbox.html
+│   │   ├── job_index.html
+│   │   ├── job_lists.html
+│   │   ├── job_pageview.html
+│   │   ├── login_required.html
+│   │   ├── mcq_view.html
+│   │   ├── page.html
+│   │   ├── parameter.html
+│   │   ├── practice.html
+│   │   ├── quiz.html
+│   │   ├── room.html
+│   │   ├── search.html
+│   │   ├── search_query.html
+│   │   ├── second_parameter.html
+│   │   ├── setting.html
+│   │   ├── syllabus_view.html
+│   │   ├── tagged.html
+│   │   ├── topic.html
+│   │   ├── trending.html
+│   │   └── working.html
+│   ├── settings
+│   │   ├── appearance.html
+│   │   ├── languages.html
+│   │   └── profiles.html
+│   ├── widget
+│   │   ├── answer_sheet.html
+│   │   ├── app_download.html
+│   │   ├── books.html
+│   │   ├── error_message.html
+│   │   ├── get_results.html
+│   │   ├── results_index.html
+│   │   ├── syllabus.html
+│   │   └── welcome.html
+│   ├── allsvg.html
+│   ├── base.html
+│   ├── devstop.html
+│   ├── error.html
+│   ├── help.html
+│   ├── index.html
+│   ├── index.mobile.html
+│   ├── list_category.html
+│   ├── redirect.html
+│   └── route_error.html
+├── uploads
+│   ├── audios
+│   │   └── Sona_Chandi_Kya_Karenge_Pyaar_Mein__Dj_Remix__Cute_Love_Story__Dj_Anupam_Tiwari128k.mp3
+│   ├── database
+│   │   ├── db_english_article.sql
+│   │   ├── db_english_article_meta_tags.sql
+│   │   ├── db_english_backup.sql
+│   │   ├── db_english_books.sql
+│   │   ├── db_english_books_relationships.sql
+│   │   ├── db_english_courses.sql
+│   │   ├── db_english_jobs.sql
+│   │   ├── db_english_pages_inside.sql
+│   │   ├── db_english_quiz_question.sql
+│   │   ├── db_english_quiz_relationships.sql
+│   │   ├── db_english_subject.sql
+│   │   ├── db_english_suggestion.sql
+│   │   ├── db_english_syllabus.sql
+│   │   ├── db_english_terms.sql
+│   │   ├── db_english_terms_relationships.sql
+│   │   ├── db_english_trending.sql
+│   │   ├── db_english_university.sql
+│   │   ├── db_english_users_relationships.sql
+│   │   ├── db_english_writers.sql
+│   │   ├── db_hindi_article.sql
+│   │   ├── db_hindi_article_meta_tags.sql
+│   │   ├── db_hindi_backup.sql
+│   │   ├── db_hindi_books.sql
+│   │   ├── db_hindi_books_relationships.sql
+│   │   ├── db_hindi_courses.sql
+│   │   ├── db_hindi_jobs.sql
+│   │   ├── db_hindi_pages_inside.sql
+│   │   ├── db_hindi_quiz_question.sql
+│   │   ├── db_hindi_quiz_relationships.sql
+│   │   ├── db_hindi_suggestion.sql
+│   │   ├── db_hindi_syllabus.sql
+│   │   ├── db_hindi_terms.sql
+│   │   ├── db_hindi_terms_relationships.sql
+│   │   ├── db_hindi_trending.sql
+│   │   ├── db_hindi_university.sql
+│   │   ├── db_hindi_users_relationships.sql
+│   │   ├── db_hindi_writers.sql
+│   │   ├── db_main_adminuser.sql
+│   │   ├── db_main_analytics.sql
+│   │   ├── db_main_analytics_query.sql
+│   │   ├── db_main_backup.sql
+│   │   ├── db_main_exam_controller.sql
+│   │   ├── db_main_member.sql
+│   │   ├── db_main_members.sql
+│   │   ├── db_main_result_tamp.sql
+│   │   ├── db_main_subject.sql
+│   │   ├── db_main_usersintent.sql
+│   │   ├── db_main_usersmeta.sql
+│   │   ├── db_main_verify_indentity.sql
+│   │   ├── vidyavistar.sql
+│   │   └── vidyavistar2.sql
+│   ├── images
+│   │   └── sin.jpeg
+│   ├── pdf
+│   │   ├── abcId.pdf
+│   │   └── Exam_Form____NPU.pdf
+│   ├── svg
+│   ├── videos
+│   ├── demo.py
+│   └── index.html
+├── .env
+├── file_name_fix.py
+├── file_structure.py
+├── folder_tree.txt
+├── jsconfig.json
+├── main.py
+├── read txt
+├── requirements.txt
+└── robots.txt

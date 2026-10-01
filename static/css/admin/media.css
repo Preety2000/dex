@@ -1,0 +1,233 @@
+.media-container{
+    position: relative;
+    height: 100%;
+    width: -webkit-fill-available;;
+    padding-left: 180px;
+    padding-top: 40px;
+}
+
+.media-container .navigation{
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding-top: 10px;
+    width: 180px;
+    height: -webkit-fill-available;
+}
+.media-container .navigation .list{
+    width: -webkit-fill-available;;
+}
+.session-container{
+    position: relative;
+    padding: 10px;
+    overflow: scroll;
+}
+
+.session-container .hidden{
+  display: none !important;
+}
+
+.IN038{
+    position: absolute;
+    padding:5px 20px;
+    height: 40px;
+    right: 0;
+    top: 0;
+    left: 180px;
+    width: -webkit-fill-available;
+    z-index: 99;
+    border-bottom: solid 1px var(--border);
+    background: var(--bg-muted);
+    display: flex;
+    justify-content: space-between;
+}
+.right-IN038{
+  display: flex;
+  align-items: center;
+}
+
+.uploader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clear: both;
+  margin: 0 auto;
+  width: -webkit-fill-available;;
+  min-height: 460px;
+  max-width: 600px;
+}
+.uploader label {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    member-select: none;
+}
+
+.uploader #start {
+  float: left;
+  clear: both;
+  width: -webkit-fill-available;;
+}
+.uploader #start.hidden {
+  display: none;
+}
+.uploader #start i.fa {
+  font-size: 50px;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+.uploader #response {
+  float: left;
+  clear: both;
+  width: -webkit-fill-available;;
+}
+.uploader #response.hidden {
+  display: none;
+}
+.uploader #response #messages {
+  margin-bottom: 0.5rem;
+}
+.uploader #file-image {
+  display: inline;
+  margin: 0 auto 0.5rem auto;
+  width: auto;
+  height: auto;
+  max-width: 180px;
+}
+.uploader #file-image.hidden {
+  display: none;
+}
+.uploader #notimage {
+  display: block;
+  float: left;
+  clear: both;
+  width: -webkit-fill-available;;
+}
+.uploader #notimage.hidden {
+  display: none;
+}
+.uploader progress,
+.uploader .progress {
+  display: inline;
+  clear: both;
+  margin: 0 auto;
+  width: -webkit-fill-available;;
+  max-width: 180px;
+  height: 8px;
+  border: 0;
+  border-radius: 6px;
+  background: #eee;
+  overflow: hidden;
+}
+.uploader .progress[value]::-webkit-progress-bar {
+  border-radius: 6px;
+  background: #eee;
+}
+.uploader .progress[value]::-webkit-progress-value {
+  background: linear-gradient(to right, #393f90 0%, #454cad 50%);
+  border-radius: 6px;
+}
+.uploader .progress[value]::-moz-progress-bar {
+  background: linear-gradient(to right, #393f90 0%, #454cad 50%);
+  border-radius: 6px;
+}
+.uploader input[type=file] {
+  display: none;
+}
+.uploader div {
+  margin: 0 0 0.5rem 0;
+  color: #5f6982;
+}
+.uploader .btn {
+  display: inline-block;
+  margin: 0.5rem 0.5rem 1rem 0.5rem;
+  clear: both;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  text-transform: initial;
+  border: none;
+  border-radius: 0.2rem;
+  outline: none;
+  padding: 0 1rem;
+  height: 36px;
+  line-height: 36px;
+  color: var(--bg-muted);
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+  background: #454cad;
+  border-color: #454cad;
+  cursor: pointer;
+}
+
+
+#preview, #data-container .library-content{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-gap: 15px;
+}
+.preview-image-container{
+    display: flex;
+    width: 160px;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-image {
+    position: relative;
+    height: auto;
+    border: 5px solid transparent;
+}
+
+.select .preview-image {
+  border: 5px var(--active-color-main) solid;
+  padding: 0;
+}
+
+
+.option-button{
+    position: absolute;
+    right: 0;
+    top: 0;
+    border-radius: 50%;
+    height: 24px;
+    width: 24px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: no-repeat;
+    color: var(--bg-muted);
+}
+.option-button:hover{
+  background: var(--background-active);
+}
+
+.image-size{
+  position: absolute;
+  left: 0;
+  right: auto;
+  bottom: 0;
+  top: auto;
+  background: var(--text-color-main);
+  color: var(--bg-muted);
+  width: auto;
+  font-size: 12px;
+  padding: 2px 6px;
+}
+
+.upload-section.uploader.hidden {
+    display: none;
+}
+.load-more-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+}
+.title{
+  display: flex;
+  align-items: center;
+}

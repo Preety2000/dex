@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.1" viewBox="0 0 2000 2000"  xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">
+    <defs>
+        <style type="text/css">
+          .str0 {stroke:#4CAF50;stroke-width:10.58;stroke-miterlimit:22.9256}
+          .fil0 {fill:#00598c}
+          .fil1 {fill:#4CAF50}
+          .fil2 {fill:url(#id0)}
+        </style>
+        <linearGradient ifill-rule="evenodd" d="id0" gradientUnits="userSpaceOnUse" x1="1959.27" y1="1204.35" x2="5021.51" y2="1204.35">
+            <stop offset="0" style="stop-opacity:1; stop-color:#00598c"></stop>
+            <stop offset="1" style="stop-opacity:1; stop-color:#4CAF50"></stop>
+        </linearGradient>
+    </defs>
+    <g ifill-rule="evenodd" d="logo-canvas-group">
+        <path class="fil0" fill-rule="evenodd" d="M127.59 511.31l503.56 831.45c197.66,-288.13 363.68,-589.62 601.96,-828 -187.59,37.8 -376.1,140.06 -546.73,276.84l-162.41 -279.49 -396.38 -0.8z"></path>
+        <path class="fil1" fill-rule="evenodd" d="M726.14 1502.89l199.52 323.51c112.25,-184.87 857.02,-1362.06 916.72,-1480.76 -571.5,189.08 -815.7,687.48 -1116.24,1157.25z"></path>
+    </g>
+</svg>

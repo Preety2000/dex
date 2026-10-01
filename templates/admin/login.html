@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login to MyApplication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: roboto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .loginForm {
+            color: #202020;
+            padding: 20px 10px;
+            border-radius: 5px;
+            border: solid 2px #fff;
+        }
+
+        .loginForm .form {
+            width: 330px;
+            display: block;
+            overflow: hidden;
+            padding: 0 20px;
+        }
+
+        p {
+            font-size: 75%;
+        }
+
+        .loginForm .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: -webkit-fill-available;
+            margin-bottom: 30px;
+        }
+
+        .loginForm input {
+            display: block;
+            width: -webkit-fill-available;
+            height: 40px;
+            padding: 0 12px;
+            outline-color: #005fa2;
+            border: solid 1px #c1c1c1;
+            margin: 10px auto 20px;
+            transition: all 0.3s;
+        }
+
+        .loginForm .show-password {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            margin-top: 30px;
+        }
+
+        .loginForm .show-password .show {
+            width: 18px;
+            height: 18px;
+            border: solid 2px #0003ff;
+            position: relative;
+            border-radius: 6px;
+            margin-right: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loginForm .show-password .show[array="true"]::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #0003ff;
+            border-radius: 2px;
+        }
+
+        .loginForm .button {
+            display: block;
+            padding: 8px 16px;
+            background: #005fa2;
+            border: none;
+            float: right;
+            color: #ebebeb;
+            margin-top: 50px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .loginForm .button:hover {
+            box-shadow: 0 4px 8px #0006;
+            background: rgb(0, 3, 183);
+        }
+
+        .error {
+            width: fit-content;
+            text-align: center;
+            position: fixed;
+            left: auto;
+            right: auto;
+            top: 0;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+        }
+
+        .error p {
+
+            padding: 3px 10px;
+            background: red;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    {% if error %} <div class="error">
+        <p>{{error}}</p>
+    </div> {%endif%}
+    <div class="loginForm">
+        <div class='logo'>
+            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.1"
+                viewBox="0 0 2000 2000" xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">
+                <defs>
+                    <style type="text/css">
+                        .str0 {
+                            stroke: #4CAF50;
+                            stroke-width: 10.58;
+                            stroke-miterlimit: 22.9256
+                        }
+
+                        .fil0 {
+                            fill: #00598c
+                        }
+
+                        .fil1 {
+                            fill: #4CAF50
+                        }
+
+                        .fil2 {
+                            fill: url(#id0)
+                        }
+                    </style>
+                    <linearGradient id="id0" gradientUnits="userSpaceOnUse" x1="1959.27" y1="1204.35" x2="5021.51"
+                        y2="1204.35">
+                        <stop offset="0" style="stop-opacity:1; stop-color:#00598c"></stop>
+                        <stop offset="1" style="stop-opacity:1; stop-color:#4CAF50"></stop>
+                    </linearGradient>
+                </defs>
+                <g id="logo-canvas-group">
+                    <path class="fil0"
+                        d="M127.59 511.31l503.56 831.45c197.66,-288.13 363.68,-589.62 601.96,-828 -187.59,37.8 -376.1,140.06 -546.73,276.84l-162.41 -279.49 -396.38 -0.8z">
+                    </path>
+                    <path class="fil1"
+                        d="M726.14 1502.89l199.52 323.51c112.25,-184.87 857.02,-1362.06 916.72,-1480.76 -571.5,189.08 -815.7,687.48 -1116.24,1157.25z">
+                    </path>
+                </g>
+            </svg>
+        </div>
+        <form action="" class="form" method="post">
+            <label for="username">Password</label>
+            <input type="Password" class="password" name="password" placeholder="Enter Password">
+            <label for="otp">OTP</label>
+            <input type="text" class="otp" name="otp" placeholder="Enter OTP">
+            <p>Your OTP has been sent to your engine.</p>
+            <div class="show-password"><span class="show"></span>Show Password</div>
+            <button type="submit" class="button">Log In</button>
+        </form>
+    </div>
+    <script>
+        document.querySelector('.show').addEventListener('click', function () {
+            var password = document.querySelector('.password');
+            this.getAttribute('array') == 'true'
+                ? (this.setAttribute('array', false), password.setAttribute('type', 'password'))
+                : (this.setAttribute('array', true), password.setAttribute('type', 'text'));
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+
+{% block head %}{% endblock %}
+{% block leftSide %}{% endblock %}
+
+{% block rightSide %}
+
+
+{% endblock %}
+
+{% block body %}
+<table>
+    <thead>
+        <tr>
+            <th class="manage-column check-column">No.</th>
+            <th class="manage-column column-name">Title & Action</th>
+            <th class="manage-column column-views">Types</th>
+            <th class="manage-column column-date">Bin Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {%for item in data_querys %}
+        <tr>
+            <th class="manage-column check-column">{{loop.index}}</th>
+            <th class="manage-column column-name">
+                <div class="query-title">{{item.title}}</div>
+                <div class="row-actions">
+                    <span class="edit"><a href="/admin/backup?path=restor&item={{item.id}}">Restor</a> | </span>
+                    <span class="trash"><a href="/admin/backup?path=trash&item={{item.id}}"
+                            class="submitdelete">Delete</a> | </span>
+                    <span class="view"><a href="/admin/backup?path=view&item={{item.id}}&types={{item.types}}"
+                            rel="bookmark" target="_blank">View</a></span>
+                </div>
+            </th>
+            <th class="manage-column column-views">{{item.types}}</th>
+            <th class="manage-column column-date">{{item.date}}</th>
+        </tr>
+        {%endfor%}
+    </tbody>
+</table>
+
+{% endblock %}

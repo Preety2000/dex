@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block head %}
+<!-- <link rel="stylesheet" href="/static/css/{{response.themes}}/search.css"> -->
+{% endblock %}
+
+{% block body %}
+<div class="adscontainer">
+    <div class="ads_container"><ins class="adsbywseditor" style="display:inline-block;width: 728px;height:90px;"></ins>
+    </div>
+</div>
+<div class="IN003 clear">
+    <div class="b_tween bocs m#40">
+        <h2 class="title center IN014">{{function.utc('See all Topic')}}</h2>
+    </div>
+    <main class="search-result-container">{% for item in response.category if item.terms and (item.terms |
+        selectattr('article_count', 'gt', 0) | list | length > 0) %}
+        <h3 class="subject-name" style="padding:0 10px;margin: auto;">{{item.name}}</h3>
+        <ol class="b_results IN080">{% for query in item.terms %}
+            {%if query.article_count > 0 %}
+            <li class="IN079 boc category">
+                <a class="button" href="{{query.url}}" aria-label="[{{query.article_count}},{{query.mcq_count}}]"
+                    title="{{query.name}}">{{query.name}} {{ query.article_count}}</a>
+            </li>{%endif%}{% endfor %}
+        </ol>{% endfor %}
+    </main>
+</div>
+{% endblock %}

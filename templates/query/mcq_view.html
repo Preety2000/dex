@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/search.css?m={{device_info.device_type}}">
+<link rel="stylesheet" href="/static/css/article.css?m={{device_info.device_type}}">
+<style>
+    .sb_count {
+        flex: 1;
+        margin-bottom: 0 !important;
+        font-size: 130%;
+    }
+
+    .IN016 .container {
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 18px;
+    }
+
+    .sidebar {
+        border-right: solid 1px var(--border);
+    }
+
+    .IN016 .questions {
+        margin-bottom: 15px;
+    }
+
+    .mobile .b_results {
+        padding: 5px 10px;
+    }
+
+    .subject-title {
+        margin-left: 10px;
+    }
+
+    li.category {
+        min-height: 30px;
+    }
+
+    .post-footer .DIS00 {
+        justify-content: space-between;
+        padding: 10px;
+        border: solid 1px var(--border);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<script src="/script/cdn/math.js"></script>
+
+<div class="IN016">
+    <main class="container clear">
+        <div class="index section">
+            <div class="IN097 ">
+                <div class="IN026">
+                    <h1 class="article-title arya" title="{{response.data_querys.question}}">
+                        {{response.data_querys.question}}</h1>
+
+                    <div class="article-info">
+                        <span class="left-side DIS01">
+                            <span class="article-view">{{ function.utc('Read {0} times').format('<strong class="view">'
+                                    ~ response.views ~ '</strong>') | safe }},</span>
+                            <span class="article-date"
+                                datetime="{{response.data_querys.timestamp}}">{{response.data_querys.date}}</span>
+                        </span>
+                        <span class="writer DIS01">
+                            {{svg.writer | safe}}
+                            <a class="author" href="data:post.author.url" target="_blank" title="The WsCoder">The
+                                WsCoder</a>
+                        </span>
+                        <span class="article-IN069 ">
+                            <a class="whatsapp" title="whatsapp share button"
+                                href="https://web.whatsapp.com/send?text={{response.data_querys.question}} | {{response.data_querys.url}}"
+                                onclick="window.open(this.href, 'windowName', 'width=900, height=550, left=24, top=24, scrollbars, resizable'); return false;"
+                                rel="nofollow">
+                                {{svg.circle_whatsapp | safe}}
+                            </a>
+                            <a class="facebook" title="facebook share button"
+                                href="https://www.facebook.com/sharer.php?u={{response.data_querys.url}}"
+                                onclick="window.open(this.href, 'windowName', 'width=550, height=650, left=24, top=24, scrollbars, resizable'); return false;"
+                                rel="nofollow">
+                                {{svg.circle_facebook | safe}}
+                            </a>
+                            <a class="twitter" title="twitter share button"
+                                href="https://twitter.com/share?url={{response.data_querys.url}}&text={{response.data_querys.question}}"
+                                onclick="window.open(this.href, 'windowName', 'width=550, height=450, left=24, top=24, scrollbars, resizable'); return false;"
+                                rel="nofollow">
+                                {{svg.circle_twitter | safe}}
+                            </a>
+                            <a class="email" title="email share button"
+                                href="https://email.com/share?url={{response.data_querys.url}}&text={{response.data_querys.question}}"
+                                onclick="window.open(this.href, 'windowName', 'width=550, height=450, left=24, top=24, scrollbars, resizable'); return false;"
+                                rel="nofollow">
+                                {{svg.circle_email | safe}}
+                            </a>
+                            <a class="pinterest" href="#" title="pinterest share button" rel="nofollow">
+                                {{svg.circle_pinterest | safe}}
+                            </a>
+                            <!-- <a class="article-share"  title="more share button" href="#post-share">{{svg.share | safe}}</a> -->
+                        </span>
+                    </div>
+                </div>
+                <div class="adscontainer">
+                    <div class="ads_container">
+                        <ins class="adsbywseditor" style="display:inline-block; width: 728px; height:90px;"></ins>
+                    </div>
+                </div>
+                <div class="article-content IN079">
+                    <!-- <div class="IN074">{% set letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}{% for item in
+                        response.data_querys.options %}
+                        <p class="option">{{ letters[loop.index0] }}. {{item}}</p>{%endfor%}
+                    </div> -->
+                    <div class="excerpt">{{response.data_querys.excerpt | safe}}</div>
+                    <p class="correct_answer">Ans : {{response.data_querys.correct_answer }}</p>
+                    <div class="tag-container">
+                        <style>
+                            .tag-info {
+                                display: block;
+                                overflow: hidden;
+                            }
+
+                            .tag-info .tag-img {
+                                float: left;
+                                width: 30%;
+                                max-width: 130px;
+                                max-height: 130px;
+                                margin-right: 15px;
+                                margin-top: 11px;
+                            }
+
+                            .tag-group {
+                                user-select: none;
+                                display: flex;
+                                flex-wrap: wrap;
+                                gap: 8px;
+                            }
+
+                            .i-info {
+                                width: max-content;
+                            }
+
+                            .tag-tooltip {
+                                padding: 10px;
+                            }
+
+                            .tag-tooltip img {
+                                float: left;
+                                max-width: 118px;
+                                max-height: 118px;
+                                margin-right: 8px;
+                            }
+
+                            .tag-tooltip .desc-tag {
+                                display: contents;
+                            }
+                        </style>
+                        <div class="label-head tag-group">
+                            {% for category in response.data_querys.category%}
+                            <div class="i-info">
+                                <a class="label-link tag button" href="{{category.url}}" rel="tag"
+                                    title="{{category.name}}">{{category.name}}</a>
+                                <div class="tag-info hidden MCCQ">
+                                    <h2 class="title-tag">{{category.name}}</h2>
+                                    <img src="{{category.img}}" alt="{{category.name}}" class="tag-img">
+                                    <p class="desc-tag">
+                                        {{category.description[0:380] | safe}}...
+                                        <a href="{{category.url}}">more</a>
+                                    </p>
+                                </div>
+                            </div>
+                            {%endfor%}
+                        </div>
+                    </div>
+                </div>
+                <div class="post-footer">
+                    <div class="DIS00">{% if response.data_querys.prev%}
+                        <div class="post-prev">
+                            <a class="prev-post-link button" href="{{response.data_querys.prev.url}}" rel="
+                                previous" title="{{response.data_querys.prev.question}}">
+                                <span>{{function.utc("Previous")}}</span>
+                            </a>
+                        </div>{% endif %}{% if response.data_querys.next%}
+                        <div class="post-next">
+                            <a class="next button button-secondary" href="{{response.data_querys.next.url}}" rel="next"
+                                title="{{response.data_querys.next.question}}">
+                                <span>{{function.utc("Next")}}</span>
+                            </a>
+                        </div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <aside class="sidebar" id="sidebar-container">
+            <div class="section">
+                <h2 class="title">Category</h2>{% for item in response.mcq_categorys if item.terms and (item.terms |
+                selectattr('mcq_count', 'gt', 0) | list | length > 0)%}
+                <h3 class="subject-title">{{item.name}}</h2>
+                    <ul class="category_group">{% for query in item.terms if query.mcq_count %}
+                        <li class="category{% if query.slug in request.path %} active{% endif %}">
+                            <a class="link" title="{{query.name}}"
+                                href="/practice/{{query.slug}}/{{query.first_mcq.id}}">{{query.name}}
+                                {{query.mcq_count}}</a>
+                        </li>{% endfor %}
+                    </ul>{% endfor %}
+            </div>
+        </aside>
+    </main>
+</div>
+
+
+{% endblock %}

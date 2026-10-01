@@ -1,0 +1,31 @@
+<style>
+    svg {
+        width: 50px !important;
+        height: 50px !important;
+        fill: black;
+        background: #e0e0e0;
+    }
+
+    .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(174px, 1fr));
+        gap: 16px;
+        padding: 5px;
+    }
+
+    .list {
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
+
+
+<div class="container">
+    {% for svg_icon in svg%}
+
+    <div class="list">
+        <span>{{svg_icon}}</span>
+        <span>{{svg[svg_icon] | safe}}</span>
+    </div>
+    {%endfor%}
+</div>

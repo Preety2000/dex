@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+    .IN016 {
+        padding: 40px;
+        margin-top: 60px;
+    }
+
+    .IN016 {
+        /* background-image: url("/media/img/educational-app.png"); */
+        background-position: center;
+        background-size: cover;
+    }
+
+    .IN016 .container {
+        overflow: hidden;
+        margin-bottom: 26px;
+        font-family: sans-serif, Roboto;
+    }
+
+    .container .left {
+        float: left;
+        margin-right: 15px;
+    }
+
+    .container .appinfo h2 {
+        font-size: medium;
+        color: #00a173;
+    }
+
+    .applogo {
+        width: 110px;
+        height: 110px;
+        padding: 8px;
+        border-radius: 6px;
+        background: azure;
+    }
+
+    .applogo svg {
+        width: 100px;
+        height: 100px;
+    }
+
+    .reviews {
+        margin-right: 20px;
+    }
+
+    .reviews .s-title {
+        font-weight: 600;
+    }
+
+    .container .s-desc {
+        margin-top: 6px;
+        font-size: 80%;
+    }
+
+    .D001 .DIS01 {
+        gap: 5px;
+    }
+
+    .D001 .button {
+        font-family: roboto;
+        font-size: 90%;
+        height: 40px;
+        padding: 6px 16px;
+    }
+    .D001 .button:hover::before{
+        content: "";
+        left: 0;
+        top: 0;
+        background: #2f893317;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+    }
+
+    .button.download {
+        background: #00a173;
+        border: solid 1px #00a173;
+    }
+
+    .button.share {
+        background: transparent;
+        color: #00a173;
+        border: solid 1px #00a173;
+    }
+
+    .share svg {
+        fill: #00a173;
+        margin-right: 8px;
+    }
+</style>
+{% endblock %}
+{% block body %}
+<div class="session">
+    <!-- <iframe width="1080px" height="608px" src="https://play.google.com/video/lava/web/player/yt:movie:HscrSwilshM?autoplay=1&embed=play" frameborder="0"></iframe> -->
+    <div class="container">
+        <div class="left">
+            <div class="applogo">{{svg.ic_logo | safe }}</div>
+        </div>
+        <div class="left">
+            <div class="appinfo">
+                <h1>{{response.site_name }}</h1>
+                <h2>{{response.site_name }}: Exam Preparation App</h2>
+                <p class="s-desc"> Contains ads . In-app purchases</p>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="DIS01">
+            <div class="reviews">
+                <div class="s-title">4.5</div>
+                <div class="s-desc">35K reviews</div>
+            </div>
+            <div class="reviews">
+                <div class="s-title">50K+</div>
+                <div class="s-desc">Downloads</div>
+            </div>
+            <div class="reviews">
+                <div class="s-title">Content rating</div>
+                <div class="s-desc">Rated for 4+</div>
+            </div>
+        </div>
+    </div>
+    <div class="D001">
+        <div class="DIS01">
+            <div class="button download">Download</div>
+            <div class="button share">{{svg.share | safe }} <span>Share</span></div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

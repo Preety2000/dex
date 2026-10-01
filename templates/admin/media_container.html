@@ -1,0 +1,89 @@
+<link rel="stylesheet" href="/static/css/fontAwesome/css/all.min.css">
+<link rel="stylesheet" href="/static/css/index.css">
+<link rel="stylesheet" href="/static/css/admin/style.css">
+<link rel="stylesheet" href="/static/css/admin/main.styles.css">
+<link rel="stylesheet" href="/static/css/admin/article.css">
+
+<link rel="stylesheet" href="/static/css/media.css">
+<link rel="stylesheet" href="/static/css/video.css"  />
+<script src="/script/index.js"></script>
+<div class="IN001"><div class="progress"><span class="IN002"></span></div></div>
+<div class="media-container border">
+    <div class="navigation">
+        <div class="nv-body">
+            <div class="IN0104" id="media-group">
+                <a href="" class="indector"></a>
+                <a href="javascript:void(0)" class="list flexCenter" aria-label="all_media">
+                    <div class="icon"><i class="fa-regular fa-list-tree"></i></div>
+                    <div class="menu-title">All Media</div>
+                </a>
+                <a href="javascript:void(0)" class="list flexCenter" aria-label="images">
+                    <div class="icon"><i class="fa-regular fa-image"></i></div>
+                    <div class="menu-title">Images</div>
+                </a>
+                <a href="javascript:void(0)" class="list flexCenter" aria-label="videos">
+                    <div class="icon"><i class="fa-duotone fa-video"></i></div>
+                    <div class="menu-title">Video</div>
+                </a>
+                <a href="javascript:void(0)" class="list flexCenter" aria-label="audios">
+                    <div class="icon"><i class="fa-duotone fa-audio-description"></i></div>
+                    <div class="menu-title">Adios</div>
+                </a>
+                <a href="javascript:void(0)" class="list flexCenter" aria-label="pdf">
+                    <div class="icon"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="menu-title">PDF</div>
+                </a>
+                <a href="javascript:void(0)" class="list flexCenter" aria-label="svg">
+                    <div class="icon"><i class="fa-solid fa-file-svg"></i></div>
+                    <div class="menu-title">SVG</div>
+                </a>
+            </div>
+        </div>
+        <div class="nv-footer">
+            <ul class="IN0104">
+                <a href="javascript:void(0)" class="list flexCenter" aria-label="upload">
+                    <div class="icon"><i class="fa-solid fa-folder-arrow-up"></i></div>
+                    <div class="menu-title">Uplode</div>
+                </a>
+            </ul>
+        </div>
+    </div>
+    <div class="IN038">
+        <div class="title">Media</div>
+        <div class="right-IN038">
+            <form action="" class="form search-box">
+                <input type="text" placeholder="Search file name" name="gs" id="search">
+                <label for="search" class="icon">{{svg.ic_search | safe}}</label>
+            </form>
+        </div>
+    </div>
+    <div class="session-container">
+        <div class="upload-section hidden" data-type="upload">
+            <div class="uploader">
+                <input type="file" id="file-upload" multiple>
+                <label for="file-upload" id="file-drag" class="modal-body file-upload">
+                    <div class="icon-ic_upload">{{svg.ic_upload | safe}}</div>
+                    <div>Select a file or drag here</div>
+                    <span id="file-upload-btn" class="btn button">Select a file</span>
+                </label>
+                <div id="response" class="hidden">
+                  <div id="messages"><strong>next-right-arrow-svgrepo-com.svg</strong></div>
+                  <progress class="progress" id="file-progress" value="1051" max="4294967295" style="display: inline;">
+                    <span>0</span>%
+                  </progress>
+                </div>
+            </div>
+            <div class="url-section hidden">
+                <input type="text" id="image-url" placeholder="Insert image URL">
+                <button id="insert-url-btn">Insert from URL</button>
+            </div>
+            <div id="preview"></div>
+        </div>
+    
+
+    
+        <div id="data-container"></div>
+
+    </div>
+</div>
+<script src="/script/dm/media.js"></script>

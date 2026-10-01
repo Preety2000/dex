@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% if response.title %}{{response.title}}{% else %}Error {{ response.status_code or 404}} - Page not found.
+        {%endif
+        %}</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" id="main_style" href="/static/css/index.css?m={{device_info.device_type}}s">
+    <link rel="stylesheet" href="/static/css/login.css?m={{device_info.device_type}}">
+    <script src="/script/index.js"></script>
+    <style>
+        @media screen and (max-width:880px) {
+            body {
+                padding-top: 0;
+            }
+
+            .table-striped {
+                display: none !important;
+            }
+        }
+    </style>
+    <script>
+        let rotate = 90;
+        function setCaptcha(button, captcha = $("F0022")) {
+            button.css({ transform: "rotate(" + rotate + "deg)" });
+            captcha.src = "/img/captcha?go=?" + (new Date().getTime());
+            rotate = rotate + 90;
+        }
+    </script>
+    <style>
+        .captcha-box {
+            display: flex;
+            /* flex-wrap: wrap; */
+            align-items: center;
+            gap: 16px;
+            margin: 20px auto 5px;
+        }
+
+
+        .refresh {
+            transition: 0.3s;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            opacity: 0.4;
+        }
+
+        .refresh:hover {
+            opacity: 1;
+        }
+
+        #captcha_input {
+            margin: 0;
+            width: 100%;
+            min-width: auto;
+        }
+
+        .loginForm {
+            grid-area: content;
+            min-width: 430px;
+        }
+
+        .conter {
+            display: flex;
+            gap: 8px;
+        }
+
+        @media screen and (max-width:460px) {
+            .loginForm {
+                min-width: 200px;
+            }
+
+            .conter {
+                display: block;
+            }
+        }
+
+        @media screen and (max-width:780px) {
+            aside {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body theme="{{app_context.preferences.theme}}" class="{{device_info.device_type}} {{response.page_type}}">
+    <div class='IN038'>
+        <header class='header DIS01 clear'>
+            <button class='IN040 button icon' style='position: relative;' title="Menu">
+                {{svg.ic_menu | safe}}
+            </button>
+            <div class='IN041'>
+                <div class='logo site-logo'>
+                    {{svg.logo_main | safe}}
+                    <span class="IN042" style="display: none;">request.ipinfo()['country']</span>
+                </div>
+            </div>
+
+            <div class='IN043'>{% if device_info.device_type == "desktop" %}
+                <ul class='IN0104 DIS01'>
+                    <li class='list nort'><a class='list-item' href='/'
+                            title='{{function.utc("Home")}}'>{{function.utc("Home")}}</a></li>
+                    <li class='list nort'><a class='list-item' href='{{request.base_url}}trending'
+                            title='{{function.utc("Trending")}}'>{{function.utc("Trending")}}</a>
+                    </li>
+                    <li class='list nort category'><a class='list-item' href='{{request.base_url}}topic'
+                            title='{{function.utc("Topic")}}'>{{function.utc("Topic")}}</a></li>
+                    <li class='list nort questions'><a class='list-item' href='{{request.base_url}}questions'
+                            title='{{function.utc("Questions")}}'>{{function.utc("Questions")}}</a>
+                    </li>
+                    <li class='list nort books'><a class='list-item' href='{{request.base_url}}books'
+                            title='{{function.utc("Books")}}'>{{function.utc("Books")}}</a></li>
+                </ul>{%endif%}
+            </div>
+            <div class='IN020 DIS01'>
+                {%if search_hide != True %}
+                <form action='/search' class='search' method='get'>
+                    <div class="IN046">
+                        <input name='q' placeholder='{{function.utc("Search")}}…' type='search'
+                            value='{{request.query_params.get("q", "")}}' />
+                    </div>
+                    <div class="IN047">
+                        <button class="IN049" title="Search button">{{svg.ic_search | safe}}</button>
+                    </div>
+                </form>
+                {% endif %}
+                <a href="#subMenu" class='button icon' js-name="button" title='Sub Menu'
+                    jsname="subMenu">{{svg.menu_nine | safe}}</a>{%if auth_session %}
+                <a href="#accountWindow" js-name="button" role='button' class='member button icon'
+                    jsname="accountWindow"
+                    aria-label="{{response.site_name  | safe}} खाता: {{auth_session.name}}  {{auth_session.email}}">
+                    <img loading='eager' height="34" width="34"
+                        src="{{auth_session.img or 'icon/member.png'}}?size=50x50" alt="User Profile Image">
+                </a>{% else %}
+                <a class="button login"
+                    href="/ut/accounts/login{% if request.path and request.path != '/ut/accounts/login' %}?redirect={{ request.url }}{% endif %}"
+                    target="_self" title="Login">
+                    {{ function.utc('Login') }}
+                </a>
+                {%endif%}
+            </div>
+            <div class='setting-container'></div>
+        </header>
+    </div>
+    <div class="clear">
+        <h1 class="hidden">Create Account</h1>
+        <div style="padding: 24px 0;" class="">
+            {%if response.message %}<p class="b_message">{{response.message | safe}}</p>{%endif%}
+        </div>
+        <div class="DIS01" style="margin: 0 auto;padding:0 60px;justify-content: center; gap: 40px;">
+            <aside class="box-value-prop">
+                <style>
+                    .logo-container {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        width: 100%;
+                        height: 100%;
+                        padding: 29px;
+                        border-radius: 40px 0 40px 0;
+                        background: var(--btn-dark-bg);
+                        ;
+                    }
+
+                    .logo-container svg {
+                        width: 200px;
+                        height: 200px;
+                    }
+
+                    .logo-container p {
+                        color: var(--btn-dark-text);
+                    }
+                </style>
+                <div class="logo-container">
+                    {{svg.ic_logo | safe}}
+                    <p>
+                        {{site_name}} is an education and online examination platform designed to connect students and
+                        teachers in one place. Students can learn, practice and take exams, while teachers can create,
+                        manage and conduct examinations easily.
+                    </p>
+                </div>
+            </aside>
+            <main class="loginForm IN006">
+                <div class="welcome-to">
+                    <h2 class="hdr-better-way IN014">Create Your Account ✨</h2>
+                    <p>Create your account and unlock everything we have to offer.</p>
+                </div>
+                <form class="form" method="post">
+                    <input name="name" type="text" class="name {{response.name_error}}" placeholder="Full Name"
+                        value="{{response.name}}" autocomplete="name" />
+
+                    <div class="conter">
+                        <input name="email" type="email" class="email {{response.email_error}}" placeholder="Email Id"
+                            value="{{response.email}}" autocomplete="email" />
+                        <input name="mobile" type="tel" class="mobile {{response.mobile_error}}"
+                            placeholder="Mobile Number" value="{{response.mobile}}" autocomplete="tel" />
+                    </div>
+
+                    <div class="conter">
+                        <input name="password" type="password" class="password show_hendler {{response.password_error}}"
+                            placeholder="Password" value="{{response.password}}" autocomplete="new-password" />
+                        <input name="cpassword" type="password"
+                            class="cpassword show_hendler {{response.cpassword_error}}" placeholder="Confirm Password"
+                            value="{{response.cpassword}}" autocomplete="new-password" />
+                    </div>
+
+
+                    <div class="captcha-box f007">
+                        <img class="F0022" height="40" width="160" style="width: 160px;"
+                            src="/img/captcha?go=?{{response.key}}" alt="Captcha">
+
+                        <div class="refresh" onclick="setCaptcha(this)">
+                            {{svg.ic_refresh | safe}}
+                        </div>
+
+                        <input class="input captcha_input" type="text" name="captcha" spellcheck="false"
+                            placeholder="Enter Captcha" id="captcha_input" autocomplete="off" inputmode="text"
+                            autocapitalize="none">
+                    </div>
+
+
+                    <label class="appt DIS01">
+                        <input type="checkbox" name="terms" required>
+                        <span>{{ function.utc('I agree to the {0}.').format('<a href="/terms-and-conditions"
+                                target="_blank">'+function.utc("Terms and Conditions") + '</a>') | safe
+                            }}</span>
+                    </label>
+                    <button class="submit">{{function.utc('Sign Up')}}</button>
+                    <p>{{function.utc('Already have an account?')}} <a
+                            href="/ut/accounts/login">{{function.utc('Login')}}</a>.</p>
+                </form>
+            </main>
+
+        </div>
+    </div>
+    <script>
+        $.event("show", (a, b, c = function (d, e = $("password")) {
+            this.get('array') == 'true'
+                ? (this.add('array', false), e.add('type', 'password'))
+                : (this.add('array', true), e.add('type', 'text'));
+        }) => a.event.on(c))
+
+        $.weres("show_hendler").for(function (i) {
+            let t;
+            i.event("focus", function () {
+                let o = i.get(),
+                    y = i.get("type"),
+                    s = $.weres("show_hide");
+
+                s.forEach(e => e.remove());
+
+                i.show_hide = i.p.create.span("show_hide button");
+                i.style.paddingRight = o.height + "px";
+                i.show_hide
+                    .add("title", "Show Password")
+                    .add("action", y)
+                    .add("style", `left:${o.right - o.height}px;top:${o.top}px;height:${o.height}px;width:${o.height}px`)
+                    .event.on(function () {
+                        i.add("type", i.get("type") === "text" ? "password" : "text");
+                        i.focus();
+
+                        let v = i.value.trim(),
+                            l = v.length;
+
+                        i.setSelectionRange(l, l);
+                    })
+                    .create.span("show_hide_icon");
+            });
+
+            i.event("blur", function (e) { t = setTimeout(() => e.target !== document.activeElement && e.target.show_hide.remove(), 500) });
+        }
+        )
+    </script>
+</body>
+
+</html>

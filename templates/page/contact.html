@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/widgets/forms.css">
+
+<style>
+    .container {
+        max-width: 600px;
+        padding-top: 60px !important;
+    }
+
+    button svg {
+        fill: #fff;
+    }
+
+    @media screen and (max-width:500px) {
+        .captcha-box {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<main class="container">
+    <h1 class="article-title" title="Contact">Contact for our team.</h1>
+</main>
+<div class="hidden">
+    <div class="submit-IN068 DIS01">
+        <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24px" height="24px">
+            <path fill-rule="evenodd"
+                d="M 18.4548 2.6208 c -0.3 -0.2544 -0.7712 -0.2908 -1.2584 -0.0952 l -0.0008 0 C 16.6832 2.7312 2.6912 8.7328 2.1216 8.978 c -0.1036 0.036 -1.0084 0.3736 -0.9152 1.1256 c 0.0832 0.678 0.8104 0.9588 0.8992 0.9912 l 3.5572 1.218 c 0.236 0.7856 1.106 3.684 1.2984 4.3032 c 0.12 0.386 0.3156 0.8932 0.6584 0.9976 c 0.3008 0.116 0.6 0.01 0.7936 -0.142 l 2.1748 -2.0172 l 3.5108 2.738 l 0.0836 0.05 c 0.2384 0.1056 0.4668 0.1584 0.6848 0.1584 c 0.1684 0 0.33 -0.0316 0.4844 -0.0948 c 0.526 -0.216 0.7364 -0.7172 0.7584 -0.774 l 2.6224 -13.6308 C 18.8924 3.1732 18.67 2.8028 18.4548 2.6208 z M 8.8 12.8 l -1.2 3.2 l -1.2 -4 l 9.2 -6.8 L 8.8 12.8 z">
+            </path>
+        </svg>
+        <span>Send message</span>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    (function (q, formsFactory) {
+        "use strict";
+
+        return $.require("widgets/forms", function Form(module) {
+            return formsFactory(module, q);
+        });
+
+    }($.getFunction(), function (forms, query) {
+        "use strict";
+
+        const { is } = query;
+        const form = forms($("container"));
+
+        // Full Name Input
+        form.input({
+            title: "Full Name",
+            type: "text",
+            required: true,
+            name: "fullname",
+            spellcheck: "true",
+            placeholder: "Full Name"
+        });
+
+        // Username or Email Input
+        form.input({
+            title: "User Name or Email Id",
+            type: "text",
+            required: true,
+            name: "username",
+            value: "{{response.auth_session.username}}",
+            spellcheck: "true",
+            placeholder: "User Name or Email Id",
+            description: "If you are associated with us please mention your username, otherwise provide an email ID our team can contact."
+        });
+
+        // Message Textarea
+        form.textarea({
+            title: "Your message",
+            name: "message",
+            required: true,
+            spellcheck: "true",
+            placeholder: "Your message",
+            description: "Our team can read your message only in English and Hindi, so please use these languages."
+        });
+
+        // Select Dropdown
+        form.select({
+            title: "Type",
+            name: "types",
+            value: ["Account", "Self", "Other"],
+            addCustonValue: true // typo retained if intentional in your widget; otherwise fix to 'addCustomValue'
+        });
+
+        // Handle form value change (optional logic)
+        form.change = function (event, action) {
+            const submitValue = action.getValue();
+            const submitButton = action.getSubmitButton();
+
+            const checkValue = function (a, b) {
+                return is(a) && is(b) ? a.trim() === b.trim() : false;
+            };
+
+            // Additional logic can be added here
+        };
+
+        // On successful submission
+        form.finish = function (query) {
+            const message = query.is("message");
+            if (message) $.message(message);
+            console.log("Form submitted:", query);
+        };
+
+        // On error
+        form.error = function (query) {
+            const errors = query.export("error");
+            console.log("Form error:", errors);
+        };
+
+        // Final setup
+        form.addCaptcha();
+        form.setRequestRoot("contact");
+        form.submitButton($("submit-IN068"));
+    }));
+
+</script>
+
+{% endblock %}
