@@ -199,7 +199,7 @@ class QuizQuestion(BaseSecondary):
         )
 
         data["url"] = (
-            f"{app_context.request.host_url}practice{f"/{self.terms.slug}" if hasattr(self, "terms") else ""}/{self.id}"
+            f"{app_context.request.host_url}practice{f"/{self.terms.slug}" if getattr(self, 'terms', None) else ""}/{self.id}"
         )
         data["category"] = [
             {
