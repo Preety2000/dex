@@ -174,8 +174,8 @@ class _QuizQuestion:
     term: _Terms = None
     category: list[_Terms] = field(default_factory=list)
     
-    prev_quiz:_QuizQuestion = None
-    next_quiz: _QuizQuestion = None
+    prev_quiz: str = None
+    next_quiz: str = None
     
 @dataclass
 class _PostsMetaTags:
