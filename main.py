@@ -4,6 +4,7 @@ import string
 from typing import Optional
 from fastapi import (
     FastAPI,
+    HTTPException,
     Request,
     Response,
     WebSocket,
@@ -183,23 +184,27 @@ async def TExplorer(
 
 
 @app.get("/script/{filename:path}", response_class=HTMLResponse)
-async def script(filename: str, request: Request = None):
-
+@app.get("/script/{filename:path}", response_class=HTMLResponse)
+async def script(filename: str, request: Request):
     if not filename.endswith(".js"):
         filename += ".js"
 
-    # If filename is not provided, assign the resource as the filename
     file_path = os.path.join(folder.static_js, filename)
 
-    print(f"Requesting JS file: {filename}, Full path: {file_path}")
+    print(f"Requesting JS file: {filename}, " f"Full path: {file_path}")
 
-    if os.path.exists(file_path):
+    if not os.path.isfile(file_path):
+        print(f"JS file NOT FOUND: {file_path}")
+        raise HTTPException(
+            status_code=404,
+            detail=f"JavaScript file not found: {filename}",
+        )
 
-        # Try to render the JS file as a template with dynamic values
+    try:
         await initialize_database()
 
-        # try:
         auth_session = await app_context.setting.member()
+
         response_object = {
             "request": request,
             "app_context": app_context,
@@ -208,35 +213,76 @@ async def script(filename: str, request: Request = None):
             "svg": app_context.svg_lists,
             **MetaData.to_dict(),
         }
-        response = templates.TemplateResponse(filename, response_object)
-        response.headers["Content-Type"] = "application/javascript"
-        # response.headers["Cache-Control"] = "public, max-age=3000"
-        # response.headers["Cache-Control"] = "public, max-age=0"
-        return response
-        # except Exception as e:
-        print(f"Error aaya js finding: {e}")
-        try:
-            return FileResponse(
-                path=file_path,
-                media_type="application/javascript",
-                filename=os.path.basename(file_path),
-            )
-        except Exception:
-            # Couldn't find the requested file
-            return HTMLResponse(
-                content=f"There is something wrong with this file I can't open it. file :[ {filename} ]",
-                media_type="text/plain; charset=utf-8",
-                status_code=404,
-            )
-            # If template rendering fails, send the file directly
-            return FileResponse(file_path, media_type="text/javascript")
-    else:
-        # If file does not exist, send the file directly
-        return HTMLResponse(
-            content=f"Couldn't find the requested file {request.url}",
-            media_type="text/plain; charset=utf-8",
-            status_code=404,
+
+        response = templates.TemplateResponse(
+            request=request,
+            name=filename,
+            context=response_object,
         )
+
+        response.headers["Content-Type"] = "application/javascript"
+
+        return response
+
+    except Exception as e:
+        print(f"ERROR while rendering JS {filename}: " f"{type(e).__name__}: {e}")
+        raise
+
+
+# async def script(filename: str, request: Request = None):
+
+#     if not filename.endswith(".js"):
+#         filename += ".js"
+
+#     # If filename is not provided, assign the resource as the filename
+#     file_path = os.path.join(folder.static_js, filename)
+
+#     print(f"Requesting JS file: {filename}, Full path: {file_path}")
+
+#     if os.path.exists(file_path):
+
+#         # Try to render the JS file as a template with dynamic values
+#         await initialize_database()
+
+#         # try:
+#         auth_session = await app_context.setting.member()
+#         response_object = {
+#             "request": request,
+#             "app_context": app_context,
+#             "function": app_context.function,
+#             "auth_session": auth_session,
+#             "svg": app_context.svg_lists,
+#             **MetaData.to_dict(),
+#         }
+#         response = templates.TemplateResponse(filename, response_object)
+#         response.headers["Content-Type"] = "application/javascript"
+#         # response.headers["Cache-Control"] = "public, max-age=3000"
+#         # response.headers["Cache-Control"] = "public, max-age=0"
+#         return response
+#         # except Exception as e:
+#         print(f"Error aaya js finding: {e}")
+#         try:
+#             return FileResponse(
+#                 path=file_path,
+#                 media_type="application/javascript",
+#                 filename=os.path.basename(file_path),
+#             )
+#         except Exception:
+#             # Couldn't find the requested file
+#             return HTMLResponse(
+#                 content=f"There is something wrong with this file I can't open it. file :[ {filename} ]",
+#                 media_type="text/plain; charset=utf-8",
+#                 status_code=404,
+#             )
+#             # If template rendering fails, send the file directly
+#             return FileResponse(file_path, media_type="text/javascript")
+#     else:
+#         # If file does not exist, send the file directly
+#         return HTMLResponse(
+#             content=f"Couldn't find the requested file {request.url}",
+#             media_type="text/plain; charset=utf-8",
+#             status_code=404,
+#         )
 
 
 @app.api_route("/media/{root:path}", methods=["GET", "POST"])
