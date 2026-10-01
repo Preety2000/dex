@@ -82,7 +82,7 @@ class QueryPaginator:
         query: Any = None,
         types: str | None = None,
         columns: dict | None = None,
-        callback: callable | None = None,
+        callback: Callable | None = None,
         transform: Callable | None = None,
         orders: Any = None,
         search_columns: list = None,
