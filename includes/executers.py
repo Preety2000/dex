@@ -152,7 +152,7 @@ async def build_http_response(result, templates, request):
         # ---------------------------------------------------------
         # Allowed templates
         # ---------------------------------------------------------
-        allowed_templates = {
+        allowed_templates = (
             "index",
             "index.mobile",
             "query/exam",
@@ -170,15 +170,9 @@ async def build_http_response(result, templates, request):
             "member/forgot_password",
             "query/login_required",
             "member/teacher_verify_identity",
-            "query/working",
-            "error",
-        }
+        )
 
         if template_name not in allowed_templates:
-            print(
-                f"WARNING: Template '{template_name}' "
-                f"is not in allowed_templates. Using 'devstop'."
-            )
             template_name = "mdftr"
 
         # ---------------------------------------------------------

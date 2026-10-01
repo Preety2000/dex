@@ -1,3 +1,4 @@
+from email.mime import image
 import os
 import math
 import fitz
@@ -394,15 +395,54 @@ class Media:
         letter = string[0].upper()
         background_color = colors.get(letter, "#9E9E9E")
 
+        # image = Image.new("RGB", (400, 400), background_color)
+        # draw = ImageDraw.Draw(image)
+
+        # try:
+        #     font = ImageFont.truetype("arial.ttf", 240)
+        # except Exception:
+        #     font = ImageFont.load_default()
+
+        # draw.text((120, 70), letter, fill="#FFFFFF", font=font)
+
+        # return image
+
         image = Image.new("RGB", (400, 400), background_color)
         draw = ImageDraw.Draw(image)
 
-        try:
-            font = ImageFont.truetype("arial.ttf", 240)
-        except Exception:
-            font = ImageFont.load_default()
+        # Auto-fit font size
+        max_width = 360
+        max_height = 360
 
-        draw.text((120, 70), letter, fill="#FFFFFF", font=font)
+        font_size = 400
+
+        while font_size > 10:
+            try:
+                font = ImageFont.truetype("arial.ttf", font_size)
+            except Exception:
+                font = ImageFont.load_default()
+                break
+
+            bbox = draw.textbbox((0, 0), letter, font=font)
+
+            text_width = bbox[2] - bbox[0]
+            text_height = bbox[3] - bbox[1]
+
+            if text_width <= max_width and text_height <= max_height:
+                break
+
+            font_size -= 2
+
+        # Center automatically
+        bbox = draw.textbbox((0, 0), letter, font=font)
+
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+
+        x = (400 - text_width) // 2 - bbox[0]
+        y = (400 - text_height) // 2 - bbox[1]
+
+        draw.text((x, y), letter, fill="#FFFFFF", font=font)
 
         return image
 
