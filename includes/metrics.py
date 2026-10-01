@@ -117,7 +117,7 @@ class MetricsManager:
         return result
 
     @classmethod
-    async def practice_metrics(cls, mcq_id: int, options: Iterable[str]) -> dict[str, Any]:
+    async def practice_metrics(cls, mcq_id: int, options: Iterable[str], servic=None) -> dict[str, Any]:
         result: dict[str, Any] = {}
         options_set = set(options)
 
