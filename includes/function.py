@@ -103,61 +103,6 @@ class Functions:
             pass
         return value if isinstance(value, (int, float)) else default
 
-    def get_image(self, image, option={}, types=None):
-        images_path = os.path.join(self.state.folder.static_folder, image)
-
-        # try:
-
-        # print(images_path)
-
-        # Open and resize the image
-        try:
-            base_image = Image.open(images_path)
-        except:
-            return "Image unavailable."
-
-        try:
-            width = option.get("width")
-            height = option.get("height")
-            if width and height:
-                base_image = base_image.resize((width, height))
-        except:
-            pass
-
-        # Get image size
-        width, height = base_image.size
-        # Encode image as Base64
-        image_io = BytesIO()
-        base_image.save(image_io, "WEBP")
-        image_io.seek(0)
-        base64_string = base64.b64encode(image_io.read()).decode("utf-8")
-        base64_header = f"data:image/webp;base64,{base64_string}"
-        # Handle favicon (ico)
-        if option == "ico":
-            image_data = base64.b64decode(base64_string)
-            image_stream = BytesIO(image_data)
-            image_stream.seek(0)
-            return StreamingResponse(image_stream, media_type="image/x-icon")
-        # Handle img response (webp)
-        if option == "img":
-            image_data = base64.b64decode(base64_string)
-            image_stream = BytesIO(image_data)
-            image_stream.seek(0)
-            return StreamingResponse(image_stream, media_type="image/webp")
-        # Return image properties and base64 encoding
-        elif types == True:
-            return {
-                "width": width,
-                "height": height,
-                "type": f"image/webp",
-                "image": base64_header,
-            }
-        else:
-            return {"image": base64_header}
-
-        # except Exception as e:
-        #     raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
-
     def utc(self, string):
         lowerString = re.sub(r"\s+", "", string.lower())
         lowerString = self.state.request.state.menuname.get(lowerString)

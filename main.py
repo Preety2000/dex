@@ -191,6 +191,8 @@ async def script(filename: str, request: Request = None):
     # If filename is not provided, assign the resource as the filename
     file_path = os.path.join(folder.static_js, filename)
 
+    print(f"Requesting JS file: {filename}, Full path: {file_path}")
+
     if os.path.exists(file_path):
 
         # Try to render the JS file as a template with dynamic values

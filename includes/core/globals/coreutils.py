@@ -6,7 +6,7 @@ import unicodedata
 from io import BytesIO
 from PIL import Image
 from datetime import datetime
-from typing import Any,  List, Union, Optional
+from typing import Any, List, Union, Optional
 
 from fastapi.responses import StreamingResponse
 from includes.core.repo.dir_manager import folder
@@ -120,6 +120,9 @@ def process_image(
     """
 
     image_path = os.path.join(folder.static_folder, image_relative_path)
+    print(
+        f"Processing image at: {image_path} with width={width}, height={height}, output_type={output_type}"
+    )
     if not os.path.exists(image_path):
         return "Image unavailable."
     try:
