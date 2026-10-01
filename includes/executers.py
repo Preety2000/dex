@@ -76,43 +76,57 @@ async def build_http_response(result, templates, request):
         if start_time:
             app_context.response["fetch_time"] = (end_time - start_time).total_seconds()
 
-        # Direct responses return
+        # Direct responses
         if isinstance(result, str):
             return result
 
         if isinstance(result, (StreamingResponse, HTMLResponse)):
             return result
 
+        # If result is not a dictionary, return as it is
         if not isinstance(result, dict):
             return result
 
-        # Inject global template data
-        template_context = {
-            **result,
-            "request": request,
-            "security": _Security,
-            "app_context": app_context,
-            "response": app_context.response,
-            "svg": getattr(app_context, "svg_lists", None),
-            "config": getattr(app_context, "config", None),
-            "function": getattr(app_context, "function", None),
-            **MetaData.to_dict(),
-        }
+        # Build template context
+        template_context = dict(result)
+
+        template_context.update(
+            {
+                "request": request,
+                "security": _Security,
+                "app_context": app_context,
+                "response": app_context.response,
+                "svg": getattr(app_context, "svg_lists", None),
+                "config": getattr(app_context, "config", None),
+                "function": getattr(app_context, "function", None),
+            }
+        )
+
+        # Add metadata safely
+        metadata = MetaData.to_dict()
+
+        if isinstance(metadata, dict):
+            template_context.update(metadata)
 
         # Handle redirect
         redirect_url = MetaData.redirect_url
+
         if redirect_url:
             return templates.TemplateResponse(
-                "redirect.html",
-                {"redirect": redirect_url, "request": request, "response": None},
+                name="redirect.html",
+                context={
+                    "redirect": redirect_url,
+                    "request": request,
+                    "response": None,
+                },
             )
 
-        # Template selection
+        # Select template
         template_name = template_context.get("template") or "error"
 
         print("template_name", template_name)
 
-        if not template_name in (
+        allowed_templates = {
             "index",
             "index.mobile",
             "query/exam",
@@ -130,33 +144,55 @@ async def build_http_response(result, templates, request):
             "member/forgot_password",
             "query/login_required",
             "member/teacher_verify_identity",
-        ):
+            "query/working",
+            "error",
+        }
+
+        if template_name not in allowed_templates:
             template_name = "devstop"
 
-        # Determine HTTP status code
-        status_code_map = {"query/working": 503, "error": 404}
+        # HTTP status code
+        status_code_map = {
+            "query/working": 503,
+            "error": 404,
+        }
+
         status_code = status_code_map.get(template_name, 200)
 
-        # Fallback for empty/invalid template name
-        if not template_name or template_name == "error":
-            # Optional explicit fallback redirect
-            if not template_context.get("template"):
-                return templates.TemplateResponse(
-                    "redirect.html", {"redirect": "/", "request": request}
-                )
+        # Fallback
+        if not template_name:
+            return templates.TemplateResponse(
+                name="redirect.html",
+                context={
+                    "redirect": "/",
+                    "request": request,
+                },
+            )
 
+        # Render template
         return templates.TemplateResponse(
-            f"{template_name}.html",
-            {**template_context, "request": request},
+            name=f"{template_name}.html",
+            context=template_context,
             status_code=status_code,
         )
+
+    except Exception as e:
+        print(f"ERROR in build_http_response: {type(e).__name__}: {e}")
+        raise
 
     finally:
         # Clean session teardown
         if hasattr(app_context, "main_session"):
-            app_context.main_session.close()
+            try:
+                app_context.main_session.close()
+            except Exception as e:
+                print(f"main_session close error: {e}")
+
         if hasattr(app_context, "secondary_session"):
-            app_context.secondary_session.close()
+            try:
+                app_context.secondary_session.close()
+            except Exception as e:
+                print(f"secondary_session close error: {e}")
 
 
 async def enrich_request_response(response):
