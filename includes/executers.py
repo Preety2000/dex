@@ -83,7 +83,7 @@ async def build_http_response(result, templates, request):
         if isinstance(result, (StreamingResponse, HTMLResponse)):
             return result
 
-        # If result is not a dictionary, return as it is
+        # Non-dict response
         if not isinstance(result, dict):
             return result
 
@@ -102,7 +102,7 @@ async def build_http_response(result, templates, request):
             }
         )
 
-        # Add metadata safely
+        # Add metadata
         metadata = MetaData.to_dict()
 
         if isinstance(metadata, dict):
@@ -113,6 +113,7 @@ async def build_http_response(result, templates, request):
 
         if redirect_url:
             return templates.TemplateResponse(
+                request=request,
                 name="redirect.html",
                 context={
                     "redirect": redirect_url,
@@ -124,7 +125,7 @@ async def build_http_response(result, templates, request):
         # Select template
         template_name = template_context.get("template") or "error"
 
-        print("template_name", template_name)
+        print("template_name:", template_name)
 
         allowed_templates = {
             "index",
@@ -146,6 +147,7 @@ async def build_http_response(result, templates, request):
             "member/teacher_verify_identity",
             "query/working",
             "error",
+            "devstop",
         }
 
         if template_name not in allowed_templates:
@@ -162,6 +164,7 @@ async def build_http_response(result, templates, request):
         # Fallback
         if not template_name:
             return templates.TemplateResponse(
+                request=request,
                 name="redirect.html",
                 context={
                     "redirect": "/",
@@ -171,13 +174,14 @@ async def build_http_response(result, templates, request):
 
         # Render template
         return templates.TemplateResponse(
+            request=request,
             name=f"{template_name}.html",
             context=template_context,
             status_code=status_code,
         )
 
     except Exception as e:
-        print(f"ERROR in build_http_response: {type(e).__name__}: {e}")
+        print(f"ERROR in build_http_response: " f"{type(e).__name__}: {e}")
         raise
 
     finally:
