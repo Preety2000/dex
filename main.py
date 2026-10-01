@@ -196,39 +196,38 @@ async def script(filename: str, request: Request = None):
         # Try to render the JS file as a template with dynamic values
         await initialize_database()
 
+        # try:
+        auth_session = await app_context.setting.member()
+        response_object = {
+            "request": request,
+            "app_context": app_context,
+            "function": app_context.function,
+            "auth_session": auth_session,
+            "svg": app_context.svg_lists,
+            **MetaData.to_dict(),
+        }
+        response = templates.TemplateResponse(filename, response_object)
+        response.headers["Content-Type"] = "application/javascript"
+        # response.headers["Cache-Control"] = "public, max-age=3000"
+        # response.headers["Cache-Control"] = "public, max-age=0"
+        return response
+        # except Exception as e:
+        print(f"Error aaya js finding: {e}")
         try:
-            auth_session = await app_context.setting.member()
-            response_object = {
-                "request": request,
-                "app_context": app_context,
-                "function": app_context.function,
-                "auth_session": auth_session,
-                "svg": app_context.svg_lists,
-                **MetaData.to_dict(),
-            }
-
-            response = templates.TemplateResponse(filename, response_object)
-            response.headers["Content-Type"] = "application/javascript"
-            # response.headers["Cache-Control"] = "public, max-age=3000"
-            # response.headers["Cache-Control"] = "public, max-age=0"
-            return response
-        except Exception as e:
-            print(f"Error aaya js finding: {e}")
-            try:
-                return FileResponse(
-                    path=file_path,
-                    media_type="application/javascript",
-                    filename=os.path.basename(file_path),
-                )
-            except Exception:
-                # Couldn't find the requested file
-                return HTMLResponse(
-                    content=f"There is something wrong with this file I can't open it. file :[ {filename} ]",
-                    media_type="text/plain; charset=utf-8",
-                    status_code=404,
-                )
-                # If template rendering fails, send the file directly
-                return FileResponse(file_path, media_type="text/javascript")
+            return FileResponse(
+                path=file_path,
+                media_type="application/javascript",
+                filename=os.path.basename(file_path),
+            )
+        except Exception:
+            # Couldn't find the requested file
+            return HTMLResponse(
+                content=f"There is something wrong with this file I can't open it. file :[ {filename} ]",
+                media_type="text/plain; charset=utf-8",
+                status_code=404,
+            )
+            # If template rendering fails, send the file directly
+            return FileResponse(file_path, media_type="text/javascript")
     else:
         # If file does not exist, send the file directly
         return HTMLResponse(
