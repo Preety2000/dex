@@ -86,7 +86,7 @@ numba
 numpy
 onnxruntime
 openai
-opencv-python
+opencv-python-headless
 packageurl-python
 packaging
 pdf2image
@@ -177,4 +177,3 @@ websockets
 Werkzeug
 wheel
 yarl
-opencv-python
