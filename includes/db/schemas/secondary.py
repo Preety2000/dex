@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any,  List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 # 1. Books Schemas
@@ -328,8 +328,8 @@ class ArticleResponse(ArticleBase):
     timestamp: datetime
     update_timestamp: datetime
     mdata: Optional[ArticleMetadataResponse] = None
-    prev_article: Optional[Dict[str, Any]] = None
-    next_article: Optional[Dict[str, Any]] = None
+    prev_article: Optional[dict[str, Any]] = None
+    next_article: Optional[dict[str, Any]] = None
     likes: Optional[int] = None
     category: Optional[List[TermsResponse]] = None
 

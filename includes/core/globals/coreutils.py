@@ -6,7 +6,7 @@ import unicodedata
 from io import BytesIO
 from PIL import Image
 from datetime import datetime
-from typing import Any, Dict, List, Union, Optional
+from typing import Any,  List, Union, Optional
 
 from fastapi.responses import StreamingResponse
 from includes.core.repo.dir_manager import folder
@@ -23,7 +23,7 @@ def is_empty(value: Any) -> bool:
     return not bool(value)
 
 
-def deep_replace(data: Any, replacements: Optional[Dict[Any, Any]] = None) -> Any:
+def deep_replace(data: Any, replacements: Optional[dict[Any, Any]] = None) -> Any:
     """Recursively replaces values/keys in nested structures (dicts, lists, tuples, strings)."""
     if replacements is None:
         replacements = {False: 0, True: 1, None: ""}
@@ -114,7 +114,7 @@ def process_image(
     *,
     width: Optional[int] = None,
     height: Optional[int] = None,
-) -> Union[Dict[str, Any], StreamingResponse, str]:
+) -> Union[dict[str, Any], StreamingResponse, str]:
     """
     Processes an image (resizing, converting to WebP) and returns Base64 or StreamingResponse.
     """

@@ -2,7 +2,7 @@ import os
 import re
 import copy
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any,  List, Optional
 
 from sqlalchemy import select
 from includes.core.device_encoder import decode_device
@@ -36,7 +36,7 @@ def generate_roll_and_reg(record):
 
 async def format_session_info(
     record: MemberSession, session_ids: Optional[List[int]] = None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     session_ids = session_ids or []
     return {
         "active": record.id in session_ids,

@@ -1,7 +1,7 @@
 import base64
 import io
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional,  Any
 
 from PIL import Image, ImageOps, ImageColor, ImageDraw
 
@@ -129,7 +129,7 @@ class Thumbnail:
         video_position: float = 0.1,
         background: str = "#ffffff",
         size: int = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Universal thumbnail generator.
 
@@ -1052,7 +1052,7 @@ def create_thumbnail(
     height: Optional[int] = None,
     fit: str = "contain",
     video_position: float = 0.1,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
 
     return Thumbnail.create(
         file_path=file_path,

@@ -13,7 +13,7 @@ from includes.db.dataclass import _QuizQuestion, serialize, to_dict
 from includes.db.models.secondary import QuizQuestion, QuizRelationships, Terms
 
 
-from typing import Dict, Tuple, Optional, List
+from typing import  Tuple, Optional, List
 from includes.schemas.cache.subject import SubjectCache
 from includes.schemas.cache.terms import TermsCache
 from includes.schemas.subject import ClassSubject
@@ -25,7 +25,7 @@ async def get_mcq_json(
     subject=None,
     title=None,
     **more,
-) -> Tuple[Dict, object]:
+) -> Tuple[ object]:
     response = {}
 
     if not item:
@@ -65,7 +65,7 @@ async def get_mini_mcq_json(
     subject=None,
     title=None,
     **more,
-) -> Tuple[Dict, object]:
+) -> Tuple[ object]:
     response = {}
 
     if not item:

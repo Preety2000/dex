@@ -29,7 +29,7 @@ class RequestContext:
     item: Optional[str] = None
 
     # extra: store remaining path segments dynamically
-    extra_segments: Dict[str, str] = field(default_factory=dict)
+    extra_segments: dict[str, str] = field(default_factory=dict)
 
 def components(url: str = None)-> RequestContext:
     parsed = urlparse(str(url or ""))

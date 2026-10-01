@@ -5,7 +5,7 @@ import hashlib
 import mimetypes
 from io import BytesIO
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any,  List
 from contextlib import contextmanager
 
 from PIL import Image
@@ -300,7 +300,7 @@ class MediaManager:
     @classmethod
     async def fetch_or_sync_assets(
         cls, directory_path: str, target_filenames: List[str] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> List[dict[str, Any]]:
         """
         Database se existing media assets fetch karta hai.
         Jo files DB me missing hain unhe scan karke DB me sync/insert karta hai
@@ -311,7 +311,7 @@ class MediaManager:
             return []
 
         db = cls._get_db()
-        resolved_assets: List[Dict[str, Any]] = []
+        resolved_assets: List[dict[str, Any]] = []
 
         with db.session_scope() as session:
             db_records = (

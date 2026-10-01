@@ -1,6 +1,6 @@
 import copy
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any,  List, Optional, Tuple, Union
 
 from sqlalchemy import delete, desc, func, select, update
 
@@ -41,7 +41,7 @@ def get_timestamp() -> Tuple[Any, int, int]:
     return full_timestamp.date(), full_timestamp.hour, full_timestamp.minute
 
 
-async def json(query: Article) -> Optional[Dict[str, Any]]:
+async def json(query: Article) -> Optional[dict[str, Any]]:
     """Serialize Article model into a JSON-compatible dictionary."""
     if not query:
         return None
@@ -70,7 +70,7 @@ async def json(query: Article) -> Optional[Dict[str, Any]]:
     parameters = await TermsCache.get_by_id(article.parameter)
     url = await get_artical_url(article)
 
-    async def _fetch_metadata(mdata: Optional[ArticleMetadata]) -> Dict[str, Any]:
+    async def _fetch_metadata(mdata: Optional[ArticleMetadata]) -> dict[str, Any]:
         if not mdata:
             return {}
 
@@ -128,7 +128,7 @@ class ArticleService:
         return get_timestamp()
 
     @staticmethod
-    async def gets(limit: int) -> List[Dict[str, Any]]:
+    async def gets(limit: int) -> List[dict[str, Any]]:
         def callback(records):
             set_response("total", records.count())
             set_response("draft", records.filter(Article.status == "Draft").count())
@@ -149,7 +149,7 @@ class ArticleService:
 
     @staticmethod
     async def returns_error(
-        query: Article, error_type: str, data_querys: Dict[str, Any]
+        query: Article, error_type: str, data_querys: dict[str, Any]
     ):
         parameters = await TermsCache.get_by_id(query.parameter)
         record = serialize(query)
@@ -172,7 +172,7 @@ class ArticleService:
         return data_querys
 
     @staticmethod
-    async def other_exit_data(db, article_id: int, data_querys: Dict[str, Any]):
+    async def other_exit_data(db, article_id: int, data_querys: dict[str, Any]):
         is_type = int(data_querys.get("type", 0))
         categories = [int(c) for c in data_querys.get("category", [])]
 
@@ -247,7 +247,7 @@ class ArticleService:
         ]
 
     @staticmethod
-    async def insert(data_querys: Dict[str, Any]):
+    async def insert(data_querys: dict[str, Any]):
         if app_context.response.get("error"):
             return data_querys
 
@@ -300,7 +300,7 @@ class ArticleService:
         return data_querys
 
     @staticmethod
-    async def update(data_querys: Dict[str, Any]):
+    async def update(data_querys: dict[str, Any]):
         error_msg = (
             "No articles found. You can add a new article here: "
             '<a href="/admin/content/insert">Create Article</a>'
@@ -371,7 +371,7 @@ class ArticleService:
         return data_querys
 
     @staticmethod
-    async def get_trending_articles(limit: int = 10) -> List[Dict[str, Any]]:
+    async def get_trending_articles(limit: int = 10) -> List[dict[str, Any]]:
         db = await active_secondary_db()
 
         rank_column = (
@@ -426,7 +426,7 @@ class ArticleService:
     @staticmethod
     async def getCollection(
         query: Union[int, str, Article] = None,
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         article_query = await ArticleService.get_article(query)
         if not article_query:
             return None
@@ -491,7 +491,7 @@ class ArticleService:
         }
 
     @staticmethod
-    async def addCollection(querys: Dict[str, Any]) -> Dict[str, Any]:
+    async def addCollection(querys: dict[str, Any]) -> dict[str, Any]:
         query_type = querys.get("type", 0)
         parameter = querys.get("parameter", 0)
         subject_id = querys.get("subject_id", 0)

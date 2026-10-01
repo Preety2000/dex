@@ -97,7 +97,7 @@ class Metadata:
         return asdict(self)
 
     # Instance Method for Updating Attributes
-    def update_from_dict(self, data: Dict[str, Any]) -> "Metadata":
+    def update_from_dict(self, data: dict[str, Any]) -> "Metadata":
         """Dictionary se Metadata instance attributes ko update karta hai."""
         if not data or not isinstance(data, dict):
             return self

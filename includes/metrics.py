@@ -1,6 +1,6 @@
 import time
 from sqlalchemy import select
-from typing import Any, Dict, Iterable
+from typing import Any,  Iterable
 
 from includes.core.globals.coreutils import format_view_count
 from includes.db.connection import active_secondary_db, get_contry
@@ -8,7 +8,7 @@ from includes.db.models.secondary import ArticleView, QuizView
 
 
 
-VIEW_CACHE: Dict[str, Dict[int, Dict[str, Any]]] = {
+VIEW_CACHE: dict[str, dict[int, dict[str, Any]]] = {
     "article": {},
     "practice": {},
 }
@@ -103,8 +103,8 @@ class MetricsManager:
         return rank_value
 
     @classmethod
-    async def article_metrics(cls, id: int, options: Iterable[str], servic=None) -> Dict[str, Any]:
-        result: Dict[str, Any] = {}
+    async def article_metrics(cls, id: int, options: Iterable[str], servic=None) -> dict[str, Any]:
+        result: dict[str, Any] = {}
         options_set = set(options)
 
         if "rank" in options_set and servic:
@@ -117,8 +117,8 @@ class MetricsManager:
         return result
 
     @classmethod
-    async def practice_metrics(cls, mcq_id: int, options: Iterable[str]) -> Dict[str, Any]:
-        result: Dict[str, Any] = {}
+    async def practice_metrics(cls, mcq_id: int, options: Iterable[str]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
         options_set = set(options)
 
         if "views" in options_set:

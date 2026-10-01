@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any
+from typing import Optional, List,  Any
 from urllib.parse import unquote, urlparse
 
 
@@ -64,7 +64,7 @@ class DynamicURLRoute:
             segments=segments,
         )
 
-    def get_route_summary(self) -> Dict[str, Any]:
+    def get_route_summary(self) -> dict[str, Any]:
         """Helper method to return active route properties as dictionary."""
         return {
             k: v for k, v in self.__dict__.items() if v is not None and k != "segments"

@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Dict, List, Optional
+from typing import Any,  List, Optional
 
 from includes.admin.modals import checked
 from includes.admin.schemas.backup import ClassBeckup
@@ -23,7 +23,7 @@ def empty_message(message: str, types: Optional[str] = None) -> str:
 class AdminClassTerms:
 
     @staticmethod
-    async def get_all_terms_by_subject() -> List[Dict[str, Any]]:
+    async def get_all_terms_by_subject() -> List[dict[str, Any]]:
         """Fetch all subjects with their associated terms.
 
         Optimized to prevent N+1 queries.
@@ -38,7 +38,7 @@ class AdminClassTerms:
         all_terms = sdb.query(Terms).order_by(asc(Terms.name)).all()
 
         # Group terms by subject_id
-        terms_by_subject: Dict[int, List[Dict[str, Any]]] = defaultdict(list)
+        terms_by_subject: dict[int, List[dict[str, Any]]] = defaultdict(list)
         for term in all_terms:
             terms_by_subject[term.subject_id].append(
                 {
@@ -64,10 +64,10 @@ class AdminClassTerms:
         return data
 
     @staticmethod
-    async def getList(limit: int = 20, **more) -> List[Dict[str, Any]]:
+    async def getList(limit: int = 20, **more) -> List[dict[str, Any]]:
         """Fetch paginated terms records with subject metadata attached."""
 
-        async def add_subject(data_item: Dict[str, Any]) -> Dict[str, Any]:
+        async def add_subject(data_item: dict[str, Any]) -> dict[str, Any]:
             data_item["subject"] = serialize(
                 await SubjectCache.get_by_id(data_item["subject_id"])
             )
@@ -85,7 +85,7 @@ class AdminClassTerms:
         return data.records
 
     @staticmethod
-    async def insert(data: Dict[str, Any]) -> Dict[str, Any]:
+    async def insert(data: dict[str, Any]) -> dict[str, Any]:
         if app_context.response.get("error"):
             return data
 
@@ -119,7 +119,7 @@ class AdminClassTerms:
         return {"redirect": True}
 
     @staticmethod
-    async def update(data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    async def update(data: dict[str, Any]) -> Optional[dict[str, Any]]:
         if app_context.response.get("error"):
             return data
 
@@ -173,9 +173,9 @@ class AdminClassTerms:
         return None
 
     @staticmethod
-    async def terms_query(roots: DynamicURLRoute) -> Dict[str, Any]:
+    async def terms_query(roots: DynamicURLRoute) -> dict[str, Any]:
 
-        async def add_more(term: Dict[str, Any]) -> Dict[str, Any]:
+        async def add_more(term: dict[str, Any]) -> dict[str, Any]:
             app_context.response["subjects"] = []
             subject_id = int(term.get("subject_id") or 0)
 

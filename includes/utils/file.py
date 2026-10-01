@@ -5,7 +5,7 @@ import subprocess
 import time
 import cv2
 import platform
-from typing import List, Dict, Any, Optional
+from typing import List,  Any, Optional
 
 # pip install opencv-python
 from dataclasses import dataclass
@@ -547,14 +547,14 @@ async def get_file_metadata(source):
 
 def serialize_media_asset(
     record: Optional[MediaAsset], *, file_type: Optional[str] = None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     MediaAsset ORM object ko dictionary format me serialize karta hai.
     """
     if record is None:
         return {}
 
-    serialized_data: Dict[str, Any] = {
+    serialized_data: dict[str, Any] = {
         "id": getattr(record, "id", None),
         "name": getattr(record, "name", ""),
         "src": getattr(record, "src", ""),
@@ -578,7 +578,7 @@ def serialize_media_asset(
 
 def get_paginated_files(
     directory_path: str, start: int = 0, end: int = 50
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Fast system command ka use karke total count batata hai
     aur start se end index ke beech ki file names return karta hai.

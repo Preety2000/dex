@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Optional
+from typing import  Optional
 from contextlib import contextmanager
 
 from pydantic import BaseModel
@@ -30,7 +30,7 @@ MAIN_DB_URL = f"sqlite:///{DB_DIR / 'db_vidya.db'}"
 
 EXAM_DB_URL = f"sqlite:///{DB_DIR / 'db_exam.db'}"
 
-SECONDARY_DB_URLS: Dict[str, str] = {
+SECONDARY_DB_URLS: dict[str, str] = {
     "hindi": f"sqlite:///{DB_DIR / 'db_hindi.db'}"
 }
 
@@ -104,7 +104,7 @@ exam_engine, ExamSession = create_session_factory(
 # SECONDARY DATABASES
 # ============================================================
 
-SecondarySessionList: Dict[str, scoped_session] = {}
+SecondarySessionList: dict[str, scoped_session] = {}
 
 for db_key, db_url in SECONDARY_DB_URLS.items():
 

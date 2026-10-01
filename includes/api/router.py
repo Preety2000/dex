@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any,  List, Optional
 from urllib.parse import unquote, urlparse
 
 
@@ -42,7 +42,7 @@ class DynamicSokitURLRoute:
             segments=segments,
         )
 
-    def get_route_summary(self) -> Dict[str, Any]:
+    def get_route_summary(self) -> dict[str, Any]:
         """Helper method to return active route properties as dictionary."""
         return {
             k: v for k, v in self.__dict__.items() if v is not None and k != "segments"
