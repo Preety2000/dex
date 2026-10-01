@@ -20,6 +20,7 @@ from includes.schemas.objective import get_mcq_by_terms_id
 from includes.schemas.cache.terms import TermsCache
 from includes.services.member.member import ClassUser
 from includes.route_handler import StaticRouteHandler
+from includes.utils.utils import get_query_value
 
 
 async def get_terms_by_resource_cached(resource_id):
@@ -142,8 +143,9 @@ async def build_http_response(result, templates, request):
         # ---------------------------------------------------------
         template_name = template_context.get("template")
 
-        if not isinstance(template_name, str) or not template_name.strip():
-            template_name = "error"
+        if not get_query_value("isme"):
+            if not isinstance(template_name, str) or not template_name.strip():
+                template_name = "error"
 
         template_name = template_name.strip()
 

@@ -2,7 +2,7 @@ $.define("dm/action", function Action(ED) {
     var category = $.weres("category");
     const { N, E, A, B, F } = $.getFunction();
     var ve = '[{"title":"स्वतंत्रता प्राप्ति के समय महात्मा गांधी थे।","correct_answer":"कांग्रेस के सदस्य नहीं थे","incorrect_answer":["कांग्रेस कार्यसमिति के सदस्य","कांग्रेस के महासचिव","कांग्रे्रेस के अध्यक्ष"],"subject":"History","category":["इस्लामिक समाज","भारत छोड़ो आन्दोलन"]},{"title":"स्वतंत्रता प्राप्ति के समय महात्मा गांधी थे।","correct_answer":"कांग्रेस के सदस्य नहीं थे","incorrect_answer":["कांग्रेस कार्यसमिति के सदस्य","कांग्रेस के महासचिव","कांग्रे्रेस के अध्यक्ष"],"subject":"History","category":["इस्लामिक समाज","भारत छोड़ो आन्दोलन"]}]'
-
+    const request = $.apirequest("/api/admin/insert", true);
     const cr = (a, b, c, d) => (a || $).create(b, c, d)
     const sp = (a, b, c, d) => (a || $).create.span(b, c, d)
     const rm = (a, b, c, d) => (a || $.create.span(null)).remove()

@@ -1,9 +1,7 @@
-from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, String, Text
+from sqlalchemy import BigInteger, Column, Float, Integer, String, Text
 
 from includes.db.models.owner import BaseOwner
 from includes.db.models.utils import TimeStamp
-
-
 
 
 class Payment(BaseOwner):
@@ -18,5 +16,7 @@ class Payment(BaseOwner):
     redirect_url = Column(Text, nullable=True)
     transaction_id = Column(String(200), nullable=True)
     response_data = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=TimeStamp.now_iso, nullable=False)
-    updated_at = Column(DateTime, default=TimeStamp.now_iso, onupdate=TimeStamp.now_iso, nullable=False)
+    created_at = Column(TimeStamp, default=TimeStamp.now_iso, nullable=False)
+    updated_at = Column(
+        TimeStamp, default=TimeStamp.now_iso, onupdate=TimeStamp.now_iso, nullable=False
+    )

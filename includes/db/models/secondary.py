@@ -2,13 +2,12 @@ import json
 from sqlalchemy.ext.declarative import declarative_base
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import format_view_count
-from includes.core.globals.coreutils import format_datetime
+from includes.core.globals.coreutils import format_TimeStamp
 from includes.db.models.utils import TimeStamp, JsonList
 from sqlalchemy.orm import column_property, relationship
 from sqlalchemy import (
     BigInteger,
     Column,
-    DateTime,
     Integer,
     String,
     Text,
@@ -84,7 +83,7 @@ class Syllabus(BaseSecondary):
     subject = Column(String(100), nullable=False)
     university = Column(Integer, nullable=False)
     content = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=TimeStamp.now_iso)
+    timestamp = Column(TimeStamp, default=TimeStamp.now_iso)
 
 
 class Courses(BaseSecondary):
@@ -94,7 +93,7 @@ class Courses(BaseSecondary):
     slug = Column(String(100), nullable=False)
     university = Column(Integer, nullable=False)
     content = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=TimeStamp.now_iso)
+    timestamp = Column(TimeStamp, default=TimeStamp.now_iso)
 
 
 class Jobs(BaseSecondary):
@@ -105,8 +104,8 @@ class Jobs(BaseSecondary):
     types = Column(Integer, nullable=False)
     admitcard = Column(Integer, nullable=False)
     content = Column(Text, nullable=False)
-    lastsate = Column(DateTime, nullable=False)
-    timestamp = Column(DateTime, default=TimeStamp.now_iso)
+    lastsate = Column(TimeStamp, nullable=False)
+    timestamp = Column(TimeStamp, default=TimeStamp.now_iso)
 
 
 class BooksRelationship(BaseSecondary):
@@ -133,7 +132,7 @@ class UserRelationships(BaseSecondary):
     __tablename__ = "users_relationships"
     article_id = Column(Integer, primary_key=True)
     users_id = Column(Integer, primary_key=True)
-    timestamp = Column(DateTime, default=TimeStamp.now_iso)
+    timestamp = Column(TimeStamp, default=TimeStamp.now_iso)
 
 
 class QuizQuestion(BaseSecondary):
@@ -146,7 +145,7 @@ class QuizQuestion(BaseSecondary):
     subject_id = Column(Integer, nullable=False)
     status = Column(String(100), nullable=False)
     views = Column(Integer, nullable=False)
-    timestamp = Column(DateTime, default=TimeStamp.now_iso)
+    timestamp = Column(TimeStamp, default=TimeStamp.now_iso)
 
     def next_prev_question(self):
         # Base query for QuizQuestion
@@ -225,9 +224,9 @@ class Article(BaseSecondary):
     slug = Column(String(100), nullable=False)
     parameter = Column(Integer, nullable=True)
     content = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=TimeStamp.now_iso)
+    timestamp = Column(TimeStamp, default=TimeStamp.now_iso)
     update_timestamp = Column(
-        DateTime, default=TimeStamp.now_iso, onupdate=TimeStamp.now_iso
+        TimeStamp, default=TimeStamp.now_iso, onupdate=TimeStamp.now_iso
     )
     thumbnail = Column(Text, nullable=True)
     status = Column(String(255), nullable=True)
@@ -274,7 +273,7 @@ class Article(BaseSecondary):
 
     async def to_dataclass(self, *, category=None, like=None) -> _Article:
         article = _Article(**serialize(self))
-        article.date = format_datetime(self.timestamp)
+        article.date = format_TimeStamp(self.timestamp)
 
         if like is True:
             article.likes = (
@@ -367,7 +366,7 @@ class Trending(BaseSecondary):
     trending = Column(Integer)
     # question = Column(Integer, primary_key=True)
     # trending = Column(Integer, primary_key=True)
-    timestamp = Column(DateTime, default=TimeStamp.now_iso)
+    timestamp = Column(TimeStamp, default=TimeStamp.now_iso)
 
 
 class Beckup(BaseSecondary):
@@ -376,7 +375,7 @@ class Beckup(BaseSecondary):
     title = Column(String(200), nullable=False)
     content = Column(Text, nullable=False)
     types = Column(String(100), nullable=False)
-    timestamp = Column(DateTime, default=TimeStamp.now_iso)
+    timestamp = Column(TimeStamp, default=TimeStamp.now_iso)
 
 
 class ArticleView(BaseSecondary):
@@ -386,9 +385,9 @@ class ArticleView(BaseSecondary):
     country = Column(String(100), nullable=True, index=True)
 
     view_count = Column(Integer, nullable=False, default=0)
-    created_at = Column(DateTime, nullable=False, default=TimeStamp.now_iso)
+    created_at = Column(TimeStamp, nullable=False, default=TimeStamp.now_iso)
     updated_at = Column(
-        DateTime,
+        TimeStamp,
         nullable=False,
         default=TimeStamp.now_iso,
         onupdate=TimeStamp.now_iso,
@@ -402,9 +401,9 @@ class QuizView(BaseSecondary):
     country = Column(String(100), nullable=True, index=True)
 
     view_count = Column(Integer, nullable=False, default=0)
-    created_at = Column(DateTime, nullable=False, default=TimeStamp.now_iso)
+    created_at = Column(TimeStamp, nullable=False, default=TimeStamp.now_iso)
     updated_at = Column(
-        DateTime,
+        TimeStamp,
         nullable=False,
         default=TimeStamp.now_iso,
         onupdate=TimeStamp.now_iso,

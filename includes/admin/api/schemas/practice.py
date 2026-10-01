@@ -143,7 +143,7 @@ class AdminApiMCQ:
 
                 if existing_question != data["title"]:
                     # Create new question
-                    return cls._create_question(cls, db, data, subject)
+                    return cls._create_question(db, data, subject)
 
                 cls._update_question(
                     existing_question,
@@ -171,7 +171,7 @@ class AdminApiMCQ:
             # --------------------------------
             # Create new question
             # --------------------------------
-            return cls._create_question(cls, db, data, subject)
+            return cls._create_question(db, data, subject)
 
         except Exception:
             db.rollback()
