@@ -169,6 +169,9 @@ async def build_http_response(result, templates, request):
             "member/signup_animation",
             "member/forgot_password",
             "query/login_required",
+            "widget/results_index",
+            "widget/answer_sheet",
+            "widget/get_results",
             "member/teacher_verify_identity",
         )
 
