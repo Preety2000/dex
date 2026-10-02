@@ -145,7 +145,7 @@ class API_EXAM_MANAGER:
                         (i.get("mcq_count", 0) for i in (item.get("terms") or [])),
                         default=0,
                     )
-                    < count
+                    < 10
                 ):
                     continue
 
