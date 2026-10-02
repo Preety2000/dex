@@ -194,3 +194,67 @@ def collect_user_signals(ip):
             ),
         },
     }
+
+
+def get_device_info(ip):
+
+    # -------------------------
+    # Headers (FIXED: consistent variables)
+    # -------------------------
+    user_agent_string = app_context.request.headers.get("User-Agent", "")
+    accept_language = app_context.request.headers.get("Accept-Language", "")
+    client_timezone = app_context.request.headers.get("X-Timezone", "")
+
+    ua = parse(user_agent_string)
+
+    # -------------------------
+    # Device info (FULL)
+    # -------------------------
+    platform = ua.os.family
+    browser = ua.browser.family
+    device = ua.device.family
+
+    # -------------------------
+    # Connection classification
+    # -------------------------
+    score = {"mobile": 0, "broadband": 0, "vpn": 0, "datacenter": 0}
+
+    result = max(score, key=score.get)
+    confidence = (score[result] / 5) * 100 if score[result] > 0 else 0
+
+    # -------------------------
+    # Risk score (FIXED SAFE)
+    # -------------------------
+    risk_score = 0
+
+    if device == "Other":
+        risk_score += 10
+
+    if "bot" in user_agent_string.lower():
+        risk_score += 40
+
+    if not accept_language:
+        risk_score += 10
+
+    if result == "datacenter":
+        risk_score += 25
+
+    risk_score = min(risk_score, 100)
+    device_type = "mobile" if user_agent_string.find("Mobile") != -1 else "desktop"
+    device_info = {
+        "device_type": device_type,
+        "platform": platform,
+        "browser": browser,
+        "device": device,
+        "platform_version": ua.os.version_string,
+        "browser_version": ua.browser.version_string,
+        "is_mobile": ua.is_mobile,
+        "is_pc": ua.is_pc,
+        "is_tablet": ua.is_tablet,
+        "is_bot": ua.is_bot,
+    }
+
+    # -------------------------
+    # FINAL OUTPUT (COMPLETE)
+    # -------------------------
+    return device_info

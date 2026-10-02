@@ -2,7 +2,7 @@ import hashlib
 import requests
 
 from datetime import datetime, timedelta
-from includes.core.client_info import collect_user_signals
+from includes.core.client_info import collect_user_signals, get_device_info
 from includes.core.globals.entry import app_context
 
 
@@ -118,6 +118,7 @@ class IP:
         fingerprint_id = generate_fingerprint(app_context.request)
         cached_data = IP.get(fingerprint_id)
         if cached_data:
+            cached_data["device"] = get_device_info(app_context.request)
             return cached_data
 
         try:
