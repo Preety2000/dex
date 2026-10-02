@@ -448,7 +448,7 @@ class ClassObjective:
                 return {it: mcq_json.get(it) for it in get_list}
 
             data = await NewQueryPaginator.paginate(
-                types="query",
+                types="referer",
                 query=query,
                 model=QuizQuestion,
                 limit=limit,
