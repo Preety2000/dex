@@ -1,6 +1,7 @@
 from includes.admin.modals import checked, emptyMessage
 from includes.core.globals.coreutils import is_empty, slugify
 from includes.core.globals.entry import app_context
+from includes.db.models.owner import Subject
 from includes.db.models.secondary import Syllabus
 from includes.schemas.router_schema import DynamicURLRoute
 from includes.utils.utils import get_post_value
@@ -177,7 +178,7 @@ class AClassSyllabus:
         # Subjects
         subjects = []
 
-        for subject in app_context.db.subject.all():
+        for subject in app_context.db.query(Subject).all():
             item = {
                 "id": subject.id,
                 "name": subject.name,

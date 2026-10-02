@@ -16,7 +16,7 @@ class ClassSubject:
 
     @staticmethod
     def get(query=None, quet=None):
-        subject = app_context.db.subject
+        subject =app_context.db.query(Subject)
 
         if query is True and isinstance(query, bool):
             all_subjects = subject.order_by(asc(Subject.name)).all()

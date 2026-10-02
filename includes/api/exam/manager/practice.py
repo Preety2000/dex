@@ -161,7 +161,7 @@ class SELF_EXAM_MANAGER:
             ).filter(QuizRelationships.terms_id == terms_query.id)
 
         if subject and subject != "All Subject":
-            db_subject = app_context.db.subject.filter(
+            db_subject =app_context.db.query(Subject).filter(
                 (Subject.slug == subject) | (Subject.name == subject)
             ).first()
 
@@ -176,7 +176,7 @@ class SELF_EXAM_MANAGER:
 
         data_querys = {}
         for i, query in enumerate(quizquestion):
-            db_subject_one = app_context.db.subject.filter(
+            db_subject_one =app_context.db.query(Subject).filter(
                 Subject.id == query.subject
             ).first()
             subject_name = db_subject_one.name if db_subject_one else "Default"
