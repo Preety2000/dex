@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import posixpath
 import random
 import string
 from typing import Optional
@@ -191,7 +192,7 @@ async def script(filename: str, request: Request):
     if not filename.endswith(".js"):
         filename += ".js"
 
-    file_path = os.path.join(folder.static_js, filename)
+    file_path = posixpath.join(folder.static_js, filename)
 
     print(f"Requesting JS file: {filename}, " f"Full path: {file_path}")
 
@@ -203,7 +204,7 @@ async def script(filename: str, request: Request):
         )
 
     try:
-        
+
         if "sess" in Path(file_path).parts:
             await initialize_database()
             auth_session = await app_context.setting.member()
@@ -215,22 +216,20 @@ async def script(filename: str, request: Request):
                 "svg": app_context.svg_lists,
                 **MetaData.to_dict(),
             }
-    
+
             response = templates.TemplateResponse(
                 request=request,
                 name=filename,
                 context=response_object,
             )
-    
+
             response.headers["Content-Type"] = "application/javascript"
             return response
-        
+
         return FileResponse(
             file_path,
             media_type="application/javascript",
         )
-        
-        
 
     except Exception as e:
         print(f"ERROR while rendering JS {filename}: " f"{type(e).__name__}: {e}")
@@ -307,8 +306,6 @@ async def resource(request: Request, roots: str):
     return response
 
 
-
-
 # ngrok http 8000
 
 # python -m uvicorn main:app --reload
@@ -317,4 +314,3 @@ async def resource(request: Request, roots: str):
 
 
 # pip freeze > requirements.txt
-

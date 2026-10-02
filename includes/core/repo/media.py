@@ -1,6 +1,7 @@
 from email.mime import image
 import os
 import math
+import posixpath
 import fitz
 import aiofiles
 import mimetypes
@@ -58,7 +59,7 @@ def svg_to_png_bytesio(svg_path: str, width=None, height=None):
 
 
 def videos(folder_path, filename):
-    file_path = os.path.join(folder_path, filename)
+    file_path = posixpath.join(folder_path, filename)
 
     if not os.path.isfile(file_path):
         raise HTTPException(status_code=404, detail="File not found")
@@ -129,7 +130,7 @@ class Media:
 
             if file.endswith(".svg"):
 
-                file_path = os.path.join(folder_path, file)
+                file_path = posixpath.join(folder_path, file)
 
                 with open(file_path, "r", encoding="utf-8") as svg_file:
                     file_content = svg_file.read()
@@ -171,7 +172,7 @@ class Media:
 
             elif mime_type.startswith("audio"):
 
-                svgfile = os.path.join(folder.static_svg, "audio.svg")
+                svgfile = posixpath.join(folder.static_svg, "audio.svg")
 
                 buffered = svg_to_png_bytesio(svgfile)
 
@@ -251,9 +252,8 @@ class Media:
                     app_context.route.resource_slug or "empty.png"
                 )
             if app_context.route.resource_slug:
-                app_context.route.resource_type = os.path.join(
-                    app_context.route.resource_type,
-                    app_context.route.resource_slug
+                app_context.route.resource_type = posixpath.join(
+                    app_context.route.resource_type, app_context.route.resource_slug
                 )
 
             return process_image(f"img\{app_context.route.resource_type}", "img")
@@ -282,7 +282,7 @@ class Media:
 
             thumb_name = Path(file_path).name + ".webp"
 
-            thumb_path = os.path.join(folder.root, "thumbs", thumb_name)
+            thumb_path = posixpath.join(folder.root, "thumbs", thumb_name)
 
             if not os.path.exists(thumb_path):
 
@@ -299,7 +299,7 @@ class Media:
             roll_no, folder_path = get_email_folder_info(
                 app_context.route.resource_type, False
             )
-            file_path = os.path.join(folder_path, "profile.webp")
+            file_path = posixpath.join(folder_path, "profile.webp")
 
             name = "*"
             if roll_no and not os.path.exists(file_path):
@@ -337,7 +337,7 @@ class Media:
             and app_context.route.resource_type
             and app_context.route.resource_slug
         ):
-            path = os.path.join(
+            path = posixpath.join(
                 folder.exnr,
                 app_context.route.resource_type,
                 app_context.route.resource_slug,
@@ -346,16 +346,16 @@ class Media:
                 return self.file_sender(path)
             return self.file_sender("/")
 
-        upload_path = os.path.join(folder.upload_folder, app_context.route.scope_slug)
-        static_path = os.path.join(folder.static_folder, app_context.route.scope_slug)
+        upload_path = posixpath.join(folder.upload_folder, app_context.route.scope_slug)
+        static_path = posixpath.join(folder.static_folder, app_context.route.scope_slug)
 
         if app_context.route.resource_type:
-            upload_path = os.path.join(upload_path, app_context.route.resource_type)
-            static_path = os.path.join(static_path, app_context.route.resource_type)
+            upload_path = posixpath.join(upload_path, app_context.route.resource_type)
+            static_path = posixpath.join(static_path, app_context.route.resource_type)
 
         if app_context.route.resource_slug:
-            upload_path = os.path.join(upload_path, app_context.route.resource_slug)
-            static_path = os.path.join(static_path, app_context.route.resource_slug)
+            upload_path = posixpath.join(upload_path, app_context.route.resource_slug)
+            static_path = posixpath.join(static_path, app_context.route.resource_slug)
 
         if os.path.exists(upload_path):
             return self.file_sender(upload_path)
@@ -453,7 +453,7 @@ class Media:
     # FILE METADATA
     def get_file_metadata(self, folder_path, file, filetype):
 
-        file_path = os.path.join(folder_path, file)
+        file_path = posixpath.join(folder_path, file)
 
         stat = os.stat(file_path)
 

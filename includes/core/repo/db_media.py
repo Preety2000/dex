@@ -1,11 +1,12 @@
 import os
 import math
+import posixpath
 import fitz
 import hashlib
 import mimetypes
 from io import BytesIO
 from datetime import datetime
-from typing import Any,  List
+from typing import Any, List
 from contextlib import contextmanager
 
 from PIL import Image
@@ -162,7 +163,7 @@ class MediaManager:
         is_public: bool = True,
         storage_provider: str = "local",
     ):
-        file_path = os.path.join(directory_path, file)
+        file_path = posixpath.join(directory_path, file)
         stat = os.stat(file_path)
 
         size_bytes, file_size = MediaManager.calculate_file_size(file_path)
@@ -243,7 +244,7 @@ class MediaManager:
             return {"status": "error", "message": "Directory not found", "data": []}
 
         for file in os.listdir(directory_path):
-            file_path = os.path.join(directory_path, file)
+            file_path = posixpath.join(directory_path, file)
             if os.path.isfile(file_path):
                 meta = MediaManager.parse_file_metadata(
                     file=file,
@@ -270,7 +271,7 @@ class MediaManager:
 
         parsed_metadata_list = []
         for file in missing_files:
-            file_path = os.path.join(directory_path, file)
+            file_path = posixpath.join(directory_path, file)
             if os.path.exists(file_path) and os.path.isfile(file_path):
                 meta = MediaManager.parse_file_metadata(
                     file=file,

@@ -3,6 +3,7 @@ import copy
 import inspect
 import os
 import mimetypes
+import posixpath
 import re
 import time
 import fitz
@@ -340,14 +341,14 @@ class FileUpload:
         # Save original document
         ext = os.path.splitext(file.filename)[1].lower()
         filename = secure_filename("ve_verification" + ext)
-        filepath = os.path.join(user_dir, filename)
+        filepath = posixpath.join(user_dir, filename)
         file_bytes = await file.read()
         with open(filepath, "wb") as f:
             f.write(file_bytes)
 
         # Common preview/icon
         icon_name = "b95f30192536.png"
-        icon_path = os.path.join(user_dir, icon_name)
+        icon_path = posixpath.join(user_dir, icon_name)
 
         if file.content_type == "application/pdf":
             pdf_to_icon(filepath, icon_path)
@@ -375,7 +376,7 @@ class FileUpload:
                 if not allowed_file(filename, filetype):
                     return {"error": "File type not allowed"}
 
-                file_path = os.path.join(folder_path, filename)
+                file_path = posixpath.join(folder_path, filename)
 
                 await self.save_upload_file(file, file_path)
 
@@ -384,11 +385,11 @@ class FileUpload:
                 # create thumbnail
                 thumb_name = f"{filename}.webp"
 
-                thumb_folder = os.path.join(folder.root, "thumbs")
+                thumb_folder = posixpath.join(folder.root, "thumbs")
 
                 os.makedirs(thumb_folder, exist_ok=True)
 
-                thumb_path = os.path.join(thumb_folder, thumb_name)
+                thumb_path = posixpath.join(thumb_folder, thumb_name)
 
                 if not os.path.exists(thumb_path):
                     self.create_thumbnail_file(file_path, thumb_path)
@@ -454,7 +455,7 @@ class FileUpload:
             # Folder nahi hai to create hoga
             os.makedirs(directory, exist_ok=True)
 
-            file_path = os.path.join(directory, filename)
+            file_path = posixpath.join(directory, filename)
 
             try:
                 # FastAPI / Starlette UploadFile ko chunk-wise save karo

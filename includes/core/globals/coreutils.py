@@ -1,4 +1,5 @@
 import os
+import posixpath
 import re
 import uuid
 import base64
@@ -118,8 +119,8 @@ def process_image(
     """
     Processes an image (resizing, converting to WebP) and returns Base64 or StreamingResponse.
     """
+    image_path = posixpath.join(folder.static_folder, image_relative_path)
 
-    image_path = os.path.join(folder.static_folder, image_relative_path)
     print(
         f"Processing image at: {image_path} with width={width}, height={height}, output_type={output_type}"
     )
