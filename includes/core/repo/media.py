@@ -239,7 +239,9 @@ class Media:
         # SVG
         if app_context.route.scope_slug == "svg":
             if app_context.route.resource_slug:
-                app_context.route.resource_type = f"{app_context.route.resource_type}/{app_context.route.resource_slug}"
+                app_context.route.resource_type = posixpath.join(
+                    app_context.route.resource_type, app_context.route.resource_slug
+                )
 
             return self.get_svg(app_context.route.resource_type)
 
@@ -256,14 +258,16 @@ class Media:
                     app_context.route.resource_type, app_context.route.resource_slug
                 )
 
-            return process_image(f"img\{app_context.route.resource_type}", "img")
+            return process_image(f"img/{app_context.route.resource_type}", "img")
 
         # ==============================
         # ICon
         # ==============================
         if app_context.route.scope_slug == "icon":
             if app_context.route.resource_slug:
-                app_context.route.resource_type = f"{app_context.route.resource_type}/{app_context.route.resource_slug}"
+                app_context.route.resource_type = posixpath.join(
+                    app_context.route.resource_type, app_context.route.resource_slug
+                )
 
             print(app_context.route.resource_type)
             return process_image(f"icon/{app_context.route.resource_type}", "img")
