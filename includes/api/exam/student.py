@@ -161,11 +161,7 @@ class Student:
 
         db = await active_exam_db()
 
-        record = (
-            db.query(model)
-            .filter_by(roll_no=roll_no,exam_id=exam_id)
-            .first()
-        )
+        record = db.query(model).filter_by(roll_no=roll_no, exam_id=exam_id).first()
 
         if not record:
             return None
@@ -231,7 +227,7 @@ class Student:
         record.pe_point = update_data.pe_point
 
         if update_data.is_submitted:
-            # record.submit_exam()
+            record.submit_exam()
             data = await IS_RESULTS.get_result(update_data, True)
             try:
                 record.allmarks = data[3][1]
