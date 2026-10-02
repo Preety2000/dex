@@ -231,11 +231,12 @@ class Student:
         record.pe_point = update_data.pe_point
 
         if update_data.is_submitted:
-            record.submit_exam()
+            # record.submit_exam()
             data = await IS_RESULTS.get_result(update_data, True)
             try:
                 record.allmarks = data[3][1]
             except:
+                print("allmarks adding error")
                 pass
 
         db.commit()

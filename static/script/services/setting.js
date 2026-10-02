@@ -587,7 +587,7 @@ $(function Setting(r) {
         ];
         [a, b] = boxs(s.each.IN091);
         c = b.create("padding-ten-twenty space-between width")
-        colloun(c, "{{function.utc('Languages')}}", "{{function.utc('Applies to new tabs, pages, dialogues and other menus')}}");
+        colloun(c, "Languages", "Applies to new tabs, pages, dialogues and other menus");
         icon(c, 5008);
 
         let values = [];

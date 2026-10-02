@@ -1492,4 +1492,9 @@ form .button-container button,
     height: 60px;
 }
 
+
+.co-slexam .F0007 {
+    overflow-y: scroll !important;
+}
+
 /* last F0047 */

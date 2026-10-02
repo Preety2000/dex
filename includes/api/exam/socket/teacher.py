@@ -39,7 +39,7 @@ def build_order_by(key):
             "roll_no": ExamRequestSession.roll_no,
             "date": ExamRequestSession.started_at,
         }[field]
-        print(field, direction)
+      
     except (ValueError, KeyError):
         return asc(ExamRequestSession.started_at)  # default
 

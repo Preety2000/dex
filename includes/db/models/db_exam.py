@@ -109,7 +109,7 @@ class ExamDetails(ExamDb):
     keys = Column(String(36), default=generate_uuid, unique=True)
     teacher_id = Column(Integer, nullable=False)
     exam_name = Column(Text)
-    exam_category = Column(Text, nullable=True)
+    exam_category = Column(JsonList, nullable=True)
     details = Column(JsonList)
     questions = Column(JsonList)
     notification = Column(Boolean, default=False)

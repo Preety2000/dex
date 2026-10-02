@@ -251,8 +251,12 @@ class Media:
                     app_context.route.resource_slug or "empty.png"
                 )
             if app_context.route.resource_slug:
-                app_context.route.resource_type = f"{app_context.route.resource_type}/{app_context.route.resource_slug}"
-            return process_image(f"img/{app_context.route.resource_type}", "img")
+                app_context.route.resource_type = os.path.join(
+                    app_context.route.resource_type,
+                    app_context.route.resource_slug
+                )
+
+            return process_image(f"img\{app_context.route.resource_type}", "img")
 
         # ==============================
         # ICon

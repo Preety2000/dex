@@ -60,6 +60,9 @@ def calculate_marks(all_q, marks_q, correct, ratio=None):
 
 
 def get_timestamp_and_year(timestamp):
+    if timestamp is None:
+        timestamp = TimeStamp.now_iso()
+    
     dt = TimeStamp.timestamp(timestamp)
     return dt.strftime("%d %B, %Y at %I:%M %p"), dt.strftime("%Y")
 

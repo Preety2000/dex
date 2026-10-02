@@ -121,7 +121,6 @@ class Setting:
     # -------------------------------
     async def preferences(self):
         q = await self.initialize_settings()
-        # print(q)
         return q
 
     async def get(self, key: str | None = None, default=None):

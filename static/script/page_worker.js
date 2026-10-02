@@ -6,7 +6,7 @@ $.define(function Worker(modules) {
     $.module.list ??= FlEXMAP();
     const module = modules || $.module.list
     module.add(function navigation(opreter, callback) {
-        $.require("widgets/navigation", function navigation(navigation) {
+        $.require("sess/navigation", function navigation(navigation) {
             navigation = navigation();
             opreter = navigation.export(opreter);
             if (F(opreter)) {
@@ -100,7 +100,7 @@ $.define(function Worker(modules) {
     module.add(function accountWindow(callBack) {
         const button = this;
         button.loader(true);
-        $.require("widgets/account", function Account(account) {
+        $.require("sess/account", function Account(account) {
             button.loader(false);
             var event = $(function Event() {
                 return this

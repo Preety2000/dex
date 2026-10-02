@@ -215,7 +215,6 @@ async def captcha_verification():
     # captcha_code = form_data.get("captcha")
     captcha_code = await get_post_value("captcha")
     return True
-    print(captcha_code)
     if not captcha_code:
         return False
 

@@ -101,7 +101,14 @@ $(function results(_, a, b, c, d, e, f, g, h, i, j, k, l, T, U) {
             [sname, roll_number, ragistration_number],
             [examinant, instructor]
         ] = query;
+        
+        console.log(result_dg);
+        if (result_dg == null) {
+            $.loader(false);
+            return;
+        }
 
+        
         const templateRow = result_dg.choose('list_on_paper');
         const template = templateRow.innerHTML;
 

@@ -109,7 +109,7 @@ $.DOMContentLoaded(query => $.require("Worker", function (module) {
         x(function clickAction(a) {
             if (a.get?.("target")) return;
             try { new URL(a.href).href === r.href && a.get?.("jsname") && m.inhance(a); } catch { }
-            return a.event.on(b => (b.preventDefault(), m.inhance(a)));
+            return a.addEventListener("click", b => (b.preventDefault(), m.inhance(a)));
         });
 
         x((name, cb) => $.module({

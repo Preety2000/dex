@@ -26,5 +26,6 @@ class Results:
         )
 
         record = await Student.get_by_exam_key(source, code)
+        print(app_context.route)
         app_context.response["record"] = record
         return "widget/results_index"

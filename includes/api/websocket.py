@@ -30,7 +30,7 @@ from includes.api.chat.socket.index import ChatSokete
 from includes.api.router import DynamicSokitURLRoute
 from includes.core.globals.entry import app_context
 from includes.api.exam.session.ev import STUDENT_LIVE_IN_EXAME
-from includes.api.exam.socket.index import ExameSokete
+from includes.api.exam.socket.index import ExamSocket
 from includes.middleware.auth_websocket import AuthWebsocket
 from includes.src.chat.relationships import ChatRelationships
 
@@ -144,7 +144,7 @@ class APIWS:
         # conn_id = id(self.websocket)
 
         if roots.scope_type == "exam":
-            clsexco = ExameSokete(self.websocket)
+            clsexco = ExamSocket(self.websocket)
             data = await clsexco.websocket_handler(incoming, roots)
             return data, None
 

@@ -72,6 +72,9 @@ $.define(function MCQ(container, opretar, ES) {
 
     extend(function startCountdown(a, b, c) {
         let d = 0, e = a(), f = setInterval(() => {
+
+            console.log(ES.ws?.readyState);
+            
             ES.ws?.readyState > WebSocket.CLOSING && (!$("IN031") && hx() && $.confirm({
                 h: "Connection Blocked",
                 t: "The server connection was blocked by your browser or network settings. Check your internet connection, disable VPN/proxy if needed, and ensure cookies are enabled.",

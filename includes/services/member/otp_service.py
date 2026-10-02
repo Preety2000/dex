@@ -10,7 +10,4 @@ def send_otp(mobile: str):
 
     response = requests.get(url, timeout=10)
 
-    print(response.status_code)
-    print(response.json())
-
     return response.json()

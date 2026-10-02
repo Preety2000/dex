@@ -78,6 +78,7 @@ class QS:
                     )
         except:
             return "Error code: Ex_85858"
+        
         return templates.TemplateResponse(
             f"qs/error.html", {"request": request}, status_code=403
         )

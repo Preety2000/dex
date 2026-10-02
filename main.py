@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import random
 import string
 from typing import Optional
@@ -10,9 +11,9 @@ from fastapi import (
     WebSocket,
 )
 from fastapi.responses import (
-    FileResponse,
     HTMLResponse,
     JSONResponse,
+    FileResponse,
     StreamingResponse,
 )
 from fastapi.templating import Jinja2Templates
@@ -68,6 +69,7 @@ template_paths = [
     "static/script",
     "static/script/cdn",
     "static/script/dm",
+    "static/script/sess",
     "static/script/services",
     "static/script/widgets",
 ]
@@ -201,88 +203,38 @@ async def script(filename: str, request: Request):
         )
 
     try:
-        await initialize_database()
-
-        auth_session = await app_context.setting.member()
-
-        response_object = {
-            "request": request,
-            "app_context": app_context,
-            "function": app_context.function,
-            "auth_session": auth_session,
-            "svg": app_context.svg_lists,
-            **MetaData.to_dict(),
-        }
-
-        response = templates.TemplateResponse(
-            request=request,
-            name=filename,
-            context=response_object,
+        
+        if "sess" in Path(file_path).parts:
+            await initialize_database()
+            auth_session = await app_context.setting.member()
+            response_object = {
+                "request": request,
+                "app_context": app_context,
+                "function": app_context.function,
+                "auth_session": auth_session,
+                "svg": app_context.svg_lists,
+                **MetaData.to_dict(),
+            }
+    
+            response = templates.TemplateResponse(
+                request=request,
+                name=filename,
+                context=response_object,
+            )
+    
+            response.headers["Content-Type"] = "application/javascript"
+            return response
+        
+        return FileResponse(
+            file_path,
+            media_type="application/javascript",
         )
-
-        response.headers["Content-Type"] = "application/javascript"
-
-        return response
+        
+        
 
     except Exception as e:
         print(f"ERROR while rendering JS {filename}: " f"{type(e).__name__}: {e}")
         raise
-
-
-# async def script(filename: str, request: Request = None):
-
-#     if not filename.endswith(".js"):
-#         filename += ".js"
-
-#     # If filename is not provided, assign the resource as the filename
-#     file_path = os.path.join(folder.static_js, filename)
-
-#     print(f"Requesting JS file: {filename}, Full path: {file_path}")
-
-#     if os.path.exists(file_path):
-
-#         # Try to render the JS file as a template with dynamic values
-#         await initialize_database()
-
-#         # try:
-#         auth_session = await app_context.setting.member()
-#         response_object = {
-#             "request": request,
-#             "app_context": app_context,
-#             "function": app_context.function,
-#             "auth_session": auth_session,
-#             "svg": app_context.svg_lists,
-#             **MetaData.to_dict(),
-#         }
-#         response = templates.TemplateResponse(filename, response_object)
-#         response.headers["Content-Type"] = "application/javascript"
-#         # response.headers["Cache-Control"] = "public, max-age=3000"
-#         # response.headers["Cache-Control"] = "public, max-age=0"
-#         return response
-#         # except Exception as e:
-#         print(f"Error aaya js finding: {e}")
-#         try:
-#             return FileResponse(
-#                 path=file_path,
-#                 media_type="application/javascript",
-#                 filename=os.path.basename(file_path),
-#             )
-#         except Exception:
-#             # Couldn't find the requested file
-#             return HTMLResponse(
-#                 content=f"There is something wrong with this file I can't open it. file :[ {filename} ]",
-#                 media_type="text/plain; charset=utf-8",
-#                 status_code=404,
-#             )
-#             # If template rendering fails, send the file directly
-#             return FileResponse(file_path, media_type="text/javascript")
-#     else:
-#         # If file does not exist, send the file directly
-#         return HTMLResponse(
-#             content=f"Couldn't find the requested file {request.url}",
-#             media_type="text/plain; charset=utf-8",
-#             status_code=404,
-#         )
 
 
 @app.api_route("/media/{root:path}", methods=["GET", "POST"])
@@ -313,7 +265,7 @@ async def ut(roots: str = None, request: Request = None):
 
 @app.get("/exam/{root:path}", response_class=HTMLResponse)
 async def exam(roots: str = None, request: Request = None):
-    response = await handle_request_with_cache(callback=process_exam)
+    response = await handle_request_with_cache(callback=process_exam, allow_catch=None)
     response = await build_http_response(response, templates, request)
     return response
 
@@ -355,10 +307,7 @@ async def resource(request: Request, roots: str):
     return response
 
 
-# if __name__ == "__main__":
-# import uvicorn
-#     uvicorn.run(app)
-# uvicorn.run(app, ssl_keyfile="key.pem", ssl_certfile="cert.pem")
+
 
 # ngrok http 8000
 
@@ -369,23 +318,3 @@ async def resource(request: Request, roots: str):
 
 # pip freeze > requirements.txt
 
-# pip install redis
-# pip install fastapi
-# pip install jinja2
-# pip install SQLAlchemy
-# pip install Werkzeug
-# pip install pymysql
-# pip install aiofiles
-# pip install opencv-python
-# pip install Pillow
-# pip install pdf2image
-# pip install PyMuPDF
-# pip install msgpack
-# pip install svglib
-# pip install beautifulsoup4
-# pip install cryptography
-# pip install requests
-# pip install googletrans==4.0.0-rc1
-# pip install langdetect
-# pip install python-multipart
-# pip install websockets

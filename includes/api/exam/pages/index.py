@@ -13,7 +13,7 @@ class ExamIndexPage:
 
     @staticmethod
     async def get_exam(exam_id):
-        response, exam_query = await Exam.get_with_details(exam_id)
+        response = await Exam.get_with_details(exam_id)
         await ExamController.get_exam_summary(exam_id, response)
         return response
 

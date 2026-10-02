@@ -259,7 +259,6 @@ class ClassUser:
         self = cls()
         reso = app_context.route.resource_type.replace(".php", "")
 
-        print("reso", reso)
         if reso == "login":
             return await Login.authenticate()
 

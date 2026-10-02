@@ -143,12 +143,12 @@ async def build_http_response(result, templates, request):
         # ---------------------------------------------------------
         template_name = template_context.get("template")
 
+        print("template_name", template_name)
         if not isinstance(template_name, str) or not template_name.strip():
             template_name = "error"
 
         template_name = template_name.strip()
 
-        print("template_name:", template_name)
 
         # ---------------------------------------------------------
         # Allowed templates
@@ -176,9 +176,9 @@ async def build_http_response(result, templates, request):
             "member/teacher_verify_identity",
         )
 
-        if not get_query_value("isme"):
-            if template_name not in allowed_templates:
-                template_name = "mdftr"
+        # if not get_query_value("isme"):
+        #     if template_name not in allowed_templates:
+        #         template_name = "mdftr"
 
         # ---------------------------------------------------------
         # HTTP status code
@@ -243,7 +243,7 @@ async def enrich_request_response(response):
     return response
 
 
-async def handle_request_with_cache(**binds):
+async def handle_request_with_cache(*, allow_catch:bool=True, **binds):
     # Base initialization
     await initialize_database()
 
@@ -270,7 +270,8 @@ async def handle_request_with_cache(**binds):
         # Request execute karein aur updated MetaData.to_dict() ke saath cache karein
         handler = binds.get("callback", execute_request)
         session = await handler(app_context.route)
-        AppCache.add(encrypted_url, (MetaData.to_dict(), session))
+        if allow_catch is True:
+            AppCache.add(encrypted_url, (MetaData.to_dict(), session))
 
     # Response Enrichment & Processing
     app_context.response = await enrich_request_response(app_context.response)

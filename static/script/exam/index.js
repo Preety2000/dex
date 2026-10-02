@@ -636,31 +636,26 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
 
                 if (c !== 5060 || !e || typeof e !== "object" || Array.isArray(e))
                     return console.log("Event=>", e, q);
-
                 e.students && Object.assign(ES.students, e.students);
                 e.STUDENT_REQUEST_SEND_COUNT != null && set(studentRequestSend, ES.sr, e.STUDENT_REQUEST_SEND_COUNT);
                 e.STUDENT_JOINED_EXAM_COUNT != null && set(studentInStudent, ES.si, e.STUDENT_JOINED_EXAM_COUNT);
                 e.STUDENT_COMPLETED_EXAM_COUNT != null && set(studentsCompliteExam, ES.st, e.STUDENT_COMPLETED_EXAM_COUNT);
-
+                
 
                 for (const r of e.STUDENT_JOINED_EXAM || e.STUDENT_LEFT_EXAM || []) {
                     const i = ES.STUDENT_JOINED_EXAM.findIndex(v => v[0] === r[0]);
                     i > -1
-                        ? ES.STUDENT_JOINED_EXAM[i] = r
-                        : ES.STUDENT_JOINED_EXAM.push(r);
-
+                    ? ES.STUDENT_JOINED_EXAM[i] = r
+                    : ES.STUDENT_JOINED_EXAM.push(r);
+                    
                     ES.students[r[0]] && ES.addStudentsInExam(r[0]);
                 }
-
+                
                 for (const r of e.STUDENT_COMPLETED_EXAM || []) {
                     ES.STUDENT_COMPLETED_EXAM.push(r);
                     ES.students[r[0]] && ES.addComoletedList(r[0])
 
                 }
-                // for (const r of e.STUDENT_REQUEST_SEND || []) {
-                //     ES.students[id] && ES.addRequestList(id)
-                // }
-
                 e.STUDENT_REQUEST_SEND?.forEach(([id]) =>
                     ES.students[id] && ES.addRequestList(id)
                 );
@@ -812,12 +807,16 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                 for (const [id, , n] of [...ES.STUDENT_COMPLETED_EXAM].sort((a, b) => a[2] - b[2])) {
                     if (!ES.students[id]) {
                         return
-                    }
+                    }                    
                     const [name, rollNo, img] = ES.students[id];
                     const card = $.create("DIS01");
-                    makeList(ES.st.container, rollNo, name, img, card);
+                    const numb = card.create("mr-5");
+                    const list = makeList(ES.st.container, rollNo, name, img, card);
+                    
                     for (const i of ES.si.container.childrens)
                         i.get("auth-token") == AUTH_TOKEN.encode(rollNo, true) && i.remove();
+                    
+                    n != null && numb.create.span(null, String(n));
                     card.create.span('button', "Check Result").event.on(function () {
                         return window.open(
                             `/qs/${AUTH_TOKEN.encode(["result", id, rollNo, getRequestSearch("id")], true)}`,
@@ -826,7 +825,6 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                         )
                     })
                 }
-                console.log("addComoletedList", ES.st.container.children);
             };
 
             const section = (title, count, list) => createSectionGroup({ title, count, list }, warp);
@@ -868,11 +866,6 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
             ES.sr.bind(([id]) => ES.addRequestList(id));
 
             ES.st.bind(([id], container) => ES.addComoletedList(id))
-            // ES.st.bind(([id, , allmarks], container) => {
-            //     if (ES.exViewRes.students[id] === undefined) return;
-            //     const [name, rollNo, img] = ES.exViewRes.students[id];
-            //     makeList(container, rollNo, name, img, $.create.span(null, String(allmarks)));
-            // });
         };
         const contante = (form) => {
             const d = createWithPosition(null, 'eEimYe'); b.in(d);
@@ -1230,8 +1223,11 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
         };
 
         // Events
-        socket.onclose = (e) => {
+        socket.onclose = (event) => {
             console.log("WebSocket closed");
+            console.log("code:", event.code);
+            console.log("reason:", event.reason);
+            console.log("wasClean:", event.wasClean);
         };
 
         socket.onerror = (e) => {
@@ -1719,12 +1715,9 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                         st.create('T040 F0019', $.create.h3(null, 'Test start time')).create.span('T041', g);
                         st.create.p('F0020', "Set the exact date and time when the test will begin. Users can start the test only after this time");
 
-                        var h = tm.call(forms, e.publish_timestamp, e.publishTimeFormat, "publish_timestamp");
-                        // var h = tm.call(forms, e.publish_timestamp, e.publishTimeFormat, "publish_timestamp");
+                        var h = tm.call(forms, e.publish_timestamp, e.publishTimeFormat, "publish_timestamp");;
                         var ge = $.create("IN0104");
                         var pco = forms.container.create("publish-time").css({ marginLeft: 16, paddingBottom: 25 });
-
-                        console.log(e.publish_timestamp, e.publishTimeFormat, h);
 
                         ge.create('T040 F0019', $.create.h3(null, 'Result Publish Time')).create.span('T041', h);
                         ge.create.p('F0020', "Set the exact date and time when your result will be published and visible to member. Once this time is reached, the result will automatically become available to everyone");
@@ -1805,8 +1798,6 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                 ES.closeAction = null;
                 r.e = true;
                 r.change();
-                console.log(r);
-
             }
             form.getForm().setDomStyle({ padding: "10px", });
         })
@@ -2587,8 +2578,6 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
 
     r.onChange(e => applyBind.call(ES, 800, null))
     applyBind.call(ES, 800, null);
-    console.log(r);
-
 
     const module = $.module.list ??= FlEXMAP();
     module.add("createTest", function createObject(a) {

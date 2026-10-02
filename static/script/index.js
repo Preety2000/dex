@@ -258,122 +258,33 @@
     }
 
     class URLState {
-        constructor(a = true, u = location.href) {
-            this.aa = new Date()
-            this.a = a;
-            this.e = true;
-            this.c = new Set;
-            this.u = new URL(u);
-            this.p = new URLSearchParams(this.u.search);
-            this.o = u;
 
-            ['popstate', 'hashchange'].forEach(e =>
-                t.addEventListener(e, () => this.check(e))
-            );
+        constructor(a = true, u = location.href) {
+            this.a = a; this.e = true; this.c = new Set; this.u = new URL(u);
+            ['popstate', 'hashchange'].forEach(e => window.addEventListener(e, () => this.navigate(location.href)));
             this.check();
         }
-
-        onChange(f) {
-            typeof f == 'function' && this.c.add(f);
-            return this;
-        }
-        offEvent(cb, o) {
-            this.e = false;
-            cb.call(this, this.u)
-            this.e = true;
-            o && this.check()
-        }
-
+        onChange(f) { typeof f == 'function' && this.c.add(f); return this; }
         check() {
-            let o = this.o;
-            this.p = new URLSearchParams(this.u.search);
-            this.o = this.u.href;
-
-            Object.assign(this, {
-                href: this.u.href,
-                host: this.u.host,
-                hostname: this.u.hostname,
-                origin: this.u.origin,
-                pathname: this.u.pathname,
-                port: this.u.port,
-                search: this.u.search,
-                protocol: this.u.protocol
-            });
-            console.log(o);
-
-
-            this.e && o != this.o &&
-                this.change();
-
-            return this;
+            let o = this.o; this.p = new URLSearchParams(this.u.search); this.o = this.u.href;
+            Object.assign(this, Object.fromEntries(['href', 'host', 'hostname', 'origin', 'pathname', 'port', 'search', 'protocol'].map(k => [k, this.u[k]])));
+            this.e && o != this.o && this.change(); return this;
         }
-        change() {
-            this.c.forEach(f => f.call(this, this.u));
-        }
+        change() { this.c.forEach(f => f.call(this, this.u)); }
+        push(x = true) { this.a && history.pushState({ u: this.href }, '', this.u); x && this.check(); return this; }
+        navigate(u, x = true) { this.u = new URL(u, location.origin); this.p = new URLSearchParams(this.u.search); return this.push(x); }
+        get(k) { return this.p.get(k); }
+        set(k, v, x = true) { this.p.set(k, v); this.u.search = this.p; return this.push(x); }
+        delete(k, x = true) { this.p.delete(k); this.u.search = this.p; return this.push(x); }
+        clear(x) { this.p = new URLSearchParams; this.u.search = ''; return x && this.push(x); }
+        back() { return history.back(); }
+        reload() { return this.a && location.reload(); }
 
-        push(x = true) {
-            this.a && t.history.pushState({ u: this.href }, '', this.u);
-            x && this.check();
-            return this;
-        }
-
-        path(p) {
-            this.u.pathname = p;
-            return this.push();
-        }
-
-        navigate(u, x = true) {
-            this.u = new URL(u, location.origin);
-            this.p = new URLSearchParams(this.u.search);
-            return this.push(x);
-        }
-
-        get(k) {
-            return this.p.get(k);
-        }
-
-        set(k, v, x = true) {
-            this.p.set(k, v);
-            this.u.search = this.p;
-            return this.push(x);
-        }
-
-        append(k, v, x = true) {
-            this.p.append(k, v);
-            this.u.search = this.p;
-            return this.push(x);
-        }
-
-        delete(k, x = true) {
-            this.p.delete(k);
-            this.u.search = this.p;
-            return this.push(x);
-        }
-        deleteAll(x = true) {
-            console.log("delete all");
-
-            this.u.search = "";
-            this.p = new URLSearchParams();
-            return this.push(x);
-        }
-
-        clear(x = true) {
-            this.p = new URLSearchParams;
-            this.u.search = '';
-            return this.push(x);
-        }
-
-        isPath(p) {
-            return this.pathname == p;
-        }
-
-        back() {
-            return history.back();
-        }
-
-        reload() {
-            return this.a && location.reload();
-        }
+        offEvent(cb, o) {this.e = false;cb.call(this, this.u); this.e = true;o && this.check()}
+        path(p) {this.u.pathname = p; return this.push();}
+        append(k, v, x = true) {this.p.append(k, v);this.u.search = this.p;return this.push(x);}
+        deleteAll(x = true) {this.u.search = "";this.p = new URLSearchParams();return this.push(x);}
+        isPath(p) {return this.pathname == p;}
     }
 
     class URLManager {

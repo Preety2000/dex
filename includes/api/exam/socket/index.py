@@ -1,35 +1,32 @@
+import asyncio
 import copy
 import json
 import random
-import asyncio
-
-from enum import IntEnum
-import time
-import uuid
 from attr import dataclass
+from enum import IntEnum
 
-from includes.core.globals.coreutils import generate_unique_uuid
-
-from includes.api.router import DynamicSokitURLRoute
-from includes.db.models.utils import TimeStamp
-from includes.api.exam.socket.teacher import exam_control_socket_handler
-from includes.core.globals.entry import app_context
-from includes.db.dataclass import ExamRqStatus
-from includes.db.models.db_exam import _ExamDetails, _ExamRecord, ExamRequestSession
-from includes.api.exam.session.es import ES
-from includes.api.exam.student import RecordType, Student
-from includes.api.exam.index import Exam, get_exam_dick
-from includes.api.exam.session.ev import ExamEventManager
 from includes.api.exam.controller import (
     get_exam_request_session,
     push_exam_event_by_joined_status,
 )
-
+from includes.api.exam.index import Exam, get_exam_dick
+from includes.api.exam.metadata import requestTimeOutMessage, testSubmitted
+from includes.api.exam.session.es import ES
+from includes.api.exam.session.ev import ExamEventManager
+from includes.api.exam.socket.student_req import StudentRequestSession
+from includes.api.exam.socket.teacher import exam_control_socket_handler
+from includes.api.exam.student import RecordType, Student
+from includes.api.router import DynamicSokitURLRoute
+from includes.core.globals.coreutils import generate_unique_uuid
+from includes.core.globals.entry import app_context
+from includes.db.dataclass import ExamRqStatus
+from includes.db.models.db_exam import ExamRequestSession, _ExamDetails, _ExamRecord
+from includes.db.models.utils import TimeStamp
 from includes.utils.exm import (
     block_exam_message,
     calculate_exam_stats,
-    exam_submitted_message,
     exam_not_started_message,
+    exam_submitted_message,
     exam_timeout_message,
     get_invalid_activity_error,
     get_session_key_and_exam_key,
@@ -38,11 +35,6 @@ from includes.utils.exm import (
     remove_exam_message,
     time_until,
 )
-
-from includes.api.exam.socket.student_req import StudentRequestSession
-from includes.api.exam.metadata import testSubmitted, requestTimeOutMessage
-
-from includes.db.models.utils import TimeStamp
 
 ACTIVE_STUDENTS = {}
 
@@ -61,21 +53,19 @@ class SessionStatus(IntEnum):
 
 
 @dataclass
-class SokiteSession:
+class SocketSession:
     status: SessionStatus
     hx_key: str
     session_id: str
     connection_id: str
 
 
-unique_uuid = []
-
-
-def get_request_session(websocket, request):
+def get_request_session(websocket, request) -> SocketSession:
+    """Retrieve or initialize socket session for websocket."""
     if not hasattr(websocket, "request_session"):
         session_id, exam_key, connection_id = get_session_key_and_exam_key(request)
 
-        websocket.request_session = SokiteSession(
+        websocket.request_session = SocketSession(
             status=SessionStatus.INITIALIZED,
             hx_key=exam_key,
             session_id=session_id,
@@ -85,47 +75,36 @@ def get_request_session(websocket, request):
     return websocket.request_session
 
 
-def is_valid_session(roll_no, socket_ses, incoming):
+def is_valid_session(roll_no: str, socket_ses: SocketSession, incoming: dict) -> bool:
     """
     Validate incoming request against stored session.
-
-    Returns:
-        True  -> valid session
-        False -> invalid session
+    Returns True if valid, False if invalid session state detected.
     """
+    request_key = incoming.get("key") if isinstance(incoming, dict) else None
+    session_key, _ = ES.get(roll_no, (None, None))
 
-    request_key = incoming.get("key")
-    session_key, timestamp = ES.get(roll_no, (None, None))
-
-    # print(
-    #     "\033[91m",
-    #     "Session start time:",
-    #     timestamp,
-    #     [request_key, session_key, socket_ses.session_id],
-    #     "\033[0m",
-    # )
-    # No session found
     if not session_key:
         return True
 
-    # Session mismatch with socket session
+    # Check if session key matches active websocket session
     if session_key != socket_ses.session_id:
-        return True
+        return False
 
-    # Request key mismatch (optional security check)
     if request_key and session_key != request_key:
-        return True
+        return False
 
-    return None
+    return True
 
 
-def return_exam_request_116(responce):
-    return {"__ac": {116: {"session": "close", "content": responce}}}
+def format_close_response(response_content):
+    """Utility to format code 116 session close payloads."""
+    return {"__ac": {116: {"session": "close", "content": response_content}}}
 
 
 async def init_exam_session(
     ser_st: ExamRequestSession, exam_details: _ExamDetails
 ) -> ExamRequestSession | None:
+    """Initialize student exam record and randomize question options."""
     async def callback(record, q):
         record.has_key = generate_unique_uuid()
         record.srec_kry = await Student.insert(
@@ -145,13 +124,13 @@ async def init_exam_session(
     return await StudentRequestSession.update(callback, id=ser_st.id)
 
 
-class ExameSokete:
+class ExamSocket:
     def __init__(self, request):
         self.request = request
         self.websocket = request
-
         self.countdown = False
-        self.tamp_store = self.websocket.state.tamp = {}
+        self.temp_store = getattr(self.websocket.state, "tamp", {})
+        self.websocket.state.tamp = self.temp_store
 
     async def incoming_data(self, incoming):
         if not incoming:
@@ -162,37 +141,36 @@ class ExameSokete:
 
         try:
             return json.loads(incoming)
-        except:
+        except (json.JSONDecodeError, TypeError):
             return {}
 
     async def get_exam_data(
-        self, sokite_ses: SokiteSession, session_query, exm, incoming
+        self, socket_ses: SocketSession, session_query, exm, incoming
     ):
-
-        # Get test websocket response
         returns = copy.deepcopy(await get_exam_dick(exm, True))
 
         just_timestamp = TimeStamp.now_timestamp()
         start_timestamp = returns["start_timestamp"]
         end_timestamp = returns["endTime"]
 
-        for i in returns["questions"].values():
-            for n in i:
-                n.pop("options", None)
-                n.pop("correct_answer", None)
+        # Strip answers from questions payload
+        for questions in returns["questions"].values():
+            for q in questions:
+                q.pop("options", None)
+                q.pop("correct_answer", None)
 
         target_time, total_seconds = time_until(start_timestamp)
         if total_seconds == 180:
             return {}
 
-        elif total_seconds > 10:
-            if self.tamp_store.get("countdown", False):
-                if not incoming:
-                    return None
+        if total_seconds > 10:
+            if self.temp_store.get("countdown", False) and not incoming:
+                return None
 
             await asyncio.sleep(1)
-            self.tamp_store["countdown"] = True
+            self.temp_store["countdown"] = True
             days = total_seconds // (60 * 60 * 24)
+            
             if days <= 0:
                 return {
                     "__ac": {
@@ -204,48 +182,48 @@ class ExameSokete:
                         }
                     }
                 }
-            else:
-                return return_exam_request_116(exam_not_started_message(target_time))
+            return format_close_response(exam_not_started_message(target_time))
 
         student = self.websocket.state.member
-        returns["option_name"] = "कखगघ"
-        returns["stu_img"] = student.get("img")
-        returns["reg_no"] = student.get("reg_no")
-        returns["roll_no"] = student.get("roll_no")
-        returns["stu_name"] = student.get("name")
-        returns["position"] = session_query.position
-        returns["pe_point"] = session_query.pe_point
-        returns["submit"] = session_query.content
+        returns.update({
+            "option_name": "कखगघ",
+            "stu_img": student.get("img"),
+            "reg_no": student.get("reg_no"),
+            "roll_no": student.get("roll_no"),
+            "stu_name": student.get("name"),
+            "position": session_query.position,
+            "pe_point": session_query.pe_point,
+            "submit": session_query.content,
+        })
 
         await ExamEventManager.update_student_status(
             session_query.exam_id, session_query.roll_no
         )
 
-        sokite_ses.status = SessionStatus.CONNECTED
-        ACTIVE_STUDENTS[session_query.roll_no] = sokite_ses.session_id
+        socket_ses.status = SessionStatus.CONNECTED
+        ACTIVE_STUDENTS[session_query.roll_no] = socket_ses.session_id
 
         return {"__ac": {115: returns}}
 
-    async def get_self_exam_data(self, sokite_ses: SokiteSession, stu_rec):
-
+    async def get_self_exam_data(self, socket_ses: SocketSession, stu_rec):
         roll_no = self.websocket.state.member.get("roll_no")
 
-        sokite_ses.status = SessionStatus.CONNECTED
-        ACTIVE_STUDENTS[roll_no] = sokite_ses.session_id
+        socket_ses.status = SessionStatus.CONNECTED
+        ACTIVE_STUDENTS[roll_no] = socket_ses.session_id
 
-        info = stu_rec.ts_info.get("info")
+        info = stu_rec.ts_info.get("info", [])
         details = stu_rec.ts_info.get("details")
-        questions = stu_rec.ts_info.get("questions")
+        questions = stu_rec.ts_info.get("questions", {})
 
-        i = 0
-        for question in questions.values():
-            for p in question:
-                i += 1
-                p["sno"] = i
+        sno = 0
+        for q_list in questions.values():
+            for q in q_list:
+                sno += 1
+                q["sno"] = sno
 
-        # TimeStamp.
-        endTime = stu_rec.timestamp + (info[0] * 60 * 1000)
+        end_time = stu_rec.timestamp + (info[0] * 60 * 1000) if info else stu_rec.timestamp
         student = self.websocket.state.member
+
         return {
             "__ac": {
                 122: {
@@ -257,7 +235,7 @@ class ExameSokete:
                     "roll_no": student.get("roll_no"),
                     "questions": questions,
                     "details": details,
-                    "endTime": endTime,
+                    "endTime": end_time,
                     "submit": stu_rec.content,
                     "position": stu_rec.position,
                     "start_timestamp": stu_rec.timestamp,
@@ -272,38 +250,29 @@ class ExameSokete:
         pe_point = incoming.get("pe_point")
         submit = incoming.get("submit")
 
-        # update simple fields
         if position is not None:
             stu_rec.position = position
 
         if pe_point is not None:
             stu_rec.pe_point = pe_point
 
-        # update content safely
         if isinstance(iex_value, list) and len(iex_value) == 3:
             _, iex, value = iex_value
 
             if isinstance(iex, int) and value is not None:
                 content = dict(getattr(stu_rec, "content", {}))
-
                 for items in content.values():
                     for i, item in enumerate(items):
                         if item and item[0] == value[0]:
                             items[i] = value
-
                 stu_rec.content = content
 
-        # single persistent callback (NO duplication)
         async def on_disconnect(record: _ExamRecord = stu_rec):
-            return (
-                await Student.update(record, RecordType.INVIGILATOR)
-                if exm
-                else await Student.update(record, RecordType.STUDENT)
-            )
+            record_type = RecordType.INVIGILATOR if exm else RecordType.STUDENT
+            return await Student.update(record, record_type)
 
         self.websocket.state.disconnect_callback["stu_rec_update"] = on_disconnect
 
-        # submission flow
         if submit is not None:
             stu_rec.is_submitted = submit
             req_sess.joined_status = ExamRqStatus.STUDENT_COMPLETED_EXAM
@@ -312,9 +281,10 @@ class ExameSokete:
 
             if exm and stu_rec.exam_id == exm.id and update_data:
                 update_d = await on_disconnect(stu_rec)
-                completed_count, joined_count, request_count = (
-                    await StudentRequestSession.get_with_is_joined(stu_rec.exam_id)
-                )
+                completed, joined, requests = await StudentRequestSession.get_with_is_joined(stu_rec.exam_id)
+
+                record = get_exam_request_session(update_data)
+                record.append(update_d.allmarks)
                 await ExamEventManager.push_exam_event(
                     stu_rec.exam_id,
                     [
@@ -327,59 +297,40 @@ class ExameSokete:
                                     req_sess.profile_image,
                                 ]
                             },
-                            "STUDENT_COMPLETED_EXAM": [
-                                get_exam_request_session(update_data),
-                                update_d.allmarks,
-                            ],
-                            "STUDENT_REQUEST_SEND_COUNT": request_count,
-                            "STUDENT_JOINED_EXAM_COUNT": joined_count,
-                            "STUDENT_COMPLETED_EXAM_COUNT": completed_count,
+                            "STUDENT_COMPLETED_EXAM": [record],
+                            "STUDENT_REQUEST_SEND_COUNT": requests,
+                            "STUDENT_JOINED_EXAM_COUNT": joined,
+                            "STUDENT_COMPLETED_EXAM_COUNT": completed,
                         },
                     ],
                 )
 
-            del self.websocket.state.disconnect_callback["stu_rec_update"]
-
+            self.websocket.state.disconnect_callback.pop("stu_rec_update", None)
             return stu_rec.key
 
         return None
 
-    async def connect_exam(self, sokite_ses):
-        """
-        Handles a student's connection to an exam session.
-        Sets a request timeout and verifies the student's session.
-        """
-
-        print("__________Student connect exam")
-
-        # Set request timeout if not already set
+    async def connect_exam(self, socket_ses: SocketSession):
+        """Handles student connection and timeout validation."""
         if not hasattr(self.websocket, "rto"):
             setattr(self.websocket, "rto", TimeStamp.now_timestamp() + 50000)
 
         request_timeout = getattr(self.websocket, "rto")
 
-        # Check timeout
-
         if request_timeout < TimeStamp.now_timestamp():
-            return return_exam_request_116(
+            return format_close_response(
                 requestTimeOutMessage.get("English", "Time’s Up!.")
             )
 
         roll_no = self.websocket.state.member.get("roll_no")
-
-        # Connect once and store result
-        ser_st = await StudentRequestSession.connect(roll_no, sokite_ses.connection_id)
+        ser_st = await StudentRequestSession.connect(roll_no, socket_ses.connection_id)
 
         if not ser_st:
-            print("Invalid connect key or session issue")
-            return return_exam_request_116(remove_exam_message("/"))
+            return format_close_response(remove_exam_message("/"))
 
-        # Verify student access
         if ser_st.roll_no != roll_no:
-            print("roll no not match")
             return None
 
-        # Handle active exam states
         if ser_st.joined_status in (
             ExamRqStatus.STUDENT_PENDING_EXAM,
             ExamRqStatus.STUDENT_JOINED_EXAM,
@@ -392,11 +343,6 @@ class ExameSokete:
             setattr(self.websocket, "PEJR", True)
             exam_details = await Exam.get(ser_st.exam_id)
 
-            """
-            Handles a student's request to join an exam session
-            and returns a response payload with a join link.
-            """
-
             if ser_st.joined_status == ExamRqStatus.STUDENT_REMOVED_FROM_EXAM:
                 return {
                     "status": "close",
@@ -406,7 +352,8 @@ class ExameSokete:
 
             record = await init_exam_session(ser_st, exam_details)
             origin = app_context.request.headers.get("origin", "")
-            ACTIVE_STUDENTS[roll_no] = sokite_ses.session_id
+            ACTIVE_STUDENTS[roll_no] = socket_ses.session_id
+
             return {
                 "status": "open",
                 "infoMessage": "Request accepted",
@@ -428,20 +375,13 @@ class ExameSokete:
             status = incoming.get("status") or getattr(self.websocket, "status", 0)
             setattr(self.websocket, "status", status)
 
-        # Process incoming data
         if roots.scope_slug == "sn":
             return await exam_control_socket_handler(roots.resource_type, incoming)
 
-        sokite_ses = get_request_session(self.websocket, self.request)
+        socket_ses = get_request_session(self.websocket, self.request)
         if roots.scope_slug == "connect":
-            return await self.connect_exam(sokite_ses)
+            return await self.connect_exam(socket_ses)
 
-        is_connect = getattr(self.websocket.state, "is_connect", time.time())
-        if (time.time() - is_connect) > 4:
-            await self.websocket.close(code=1008, reason="Access denied")
-            return
-
-        # self.websocket.state.member
         roll_no = self.websocket.state.member.get("roll_no")
         req_sess, stu_rec, exm = getattr(
             self.websocket, "exam_info", (None, None, None)
@@ -449,7 +389,7 @@ class ExameSokete:
 
         if not stu_rec:
             req_sess = await StudentRequestSession.connect(
-                roll_no, sokite_ses.connection_id
+                roll_no, socket_ses.connection_id
             )
 
             stu_rec = (
@@ -458,22 +398,19 @@ class ExameSokete:
                 )
                 if req_sess
                 else await Student.get_by_exam_key(
-                    sokite_ses.hx_key, RecordType.STUDENT
+                    socket_ses.hx_key, RecordType.STUDENT
                 )
             )
 
             if not stu_rec or stu_rec.roll_no != roll_no:
-                return return_exam_request_116(remove_exam_message("/"))
+                return format_close_response(remove_exam_message("/"))
 
             if req_sess:
                 exm = await Exam.get(stu_rec.exam_id)
                 exm_data = await get_exam_dick(exm)
 
-                if req_sess.teacher_id != exm.teacher_id:
-                    print("error cke k555")
-
                 if is_expired_exam(exm_data["endTime"]):
-                    return return_exam_request_116(
+                    return format_close_response(
                         exam_timeout_message(
                             TimeStamp.format_ts(exm_data["endTime"]), "/"
                         )
@@ -483,47 +420,38 @@ class ExameSokete:
                     if req_sess.joined_status != ExamRqStatus.STUDENT_COMPLETED_EXAM:
                         req_sess.joined_status = ExamRqStatus.STUDENT_LEFT_EXAM
                         req_sess.leave_timestamps.append(TimeStamp.now_timestamp())
-                        update = await StudentRequestSession.update(req_sess)
-                        if update:
+                        if await StudentRequestSession.update(req_sess):
                             await push_exam_event_by_joined_status(req_sess)
 
-                self.websocket.state.disconnect_callback["req_sess_update"] = (
-                    on_disconnect
-                )
+                self.websocket.state.disconnect_callback["req_sess_update"] = on_disconnect
 
                 req_sess.joined_status = ExamRqStatus.STUDENT_JOINED_EXAM
                 req_sess.join_timestamps.append(TimeStamp.now_timestamp())
-
-                print("/////////////// join_timestamps")
 
                 await push_exam_event_by_joined_status(req_sess)
                 await StudentRequestSession.update(req_sess)
 
             setattr(self.websocket, "exam_info", (req_sess, stu_rec, exm))
 
-        # Handle case when detail is a string and no session is active
-
-        if sokite_ses.status == SessionStatus.INITIALIZED:
-            if is_valid_session(roll_no, sokite_ses, incoming):
-                return return_exam_request_116(get_invalid_activity_error())
+        # Handle Initialized state
+        if socket_ses.status == SessionStatus.INITIALIZED:
+            if not is_valid_session(roll_no, socket_ses, incoming):
+                return format_close_response(get_invalid_activity_error())
 
             return (
-                await self.get_exam_data(sokite_ses, stu_rec, exm, incoming)
+                await self.get_exam_data(socket_ses, stu_rec, exm, incoming)
                 if stu_rec and exm
-                else await self.get_self_exam_data(sokite_ses, stu_rec)
+                else await self.get_self_exam_data(socket_ses, stu_rec)
             )
 
-        # Handle case when SessionStatus.CONNECTED (submission/update)
-        elif sokite_ses.status == SessionStatus.CONNECTED and incoming:
-            print("SessionStatus.CONNECTED")
-            self.websocket.state.is_connect = time.time()
-
+        # Handle Connected state
+        elif socket_ses.status == SessionStatus.CONNECTED and incoming:
             if req_sess:
                 is_valid, session = await StudentRequestSession.connect(
                     roll_no, req_sess.connect_key, True
                 )
                 if is_valid is None:
-                    return return_exam_request_116(
+                    return format_close_response(
                         {
                             "action": "fe40dt",
                             "title": session.get("title"),
@@ -531,12 +459,11 @@ class ExameSokete:
                         }
                     )
 
-            if is_valid_session(roll_no, sokite_ses, incoming):
-                return return_exam_request_116(get_invalid_activity_error())
+            if not is_valid_session(roll_no, socket_ses, incoming):
+                return format_close_response(get_invalid_activity_error())
 
             keys = await self.update_exam_status(incoming, stu_rec, exm, req_sess)
 
-            # Update student status if data exists
             if stu_rec and hasattr(stu_rec, "exam_id") and hasattr(stu_rec, "roll_no"):
                 await ExamEventManager.update_student_status(
                     stu_rec.exam_id, stu_rec.roll_no
@@ -548,8 +475,7 @@ class ExameSokete:
                     if exm
                     else exam_submitted_message(f"/exam/result/do/{keys}")
                 )
-
-                return return_exam_request_116(content)
+                return format_close_response(content)
 
             if exm:
                 exm = await Exam.get(exm.id)

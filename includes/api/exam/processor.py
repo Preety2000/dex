@@ -1,6 +1,7 @@
 from includes.api.exam.student import RecordType, Student
 from includes.api.exam.session.es import ES
 from includes.api.exam.teacher import Teachers
+from includes.core.metadata import MetaData
 from includes.utils.exm import (
     block_exam_message,
     completed_exam_message,
@@ -44,8 +45,6 @@ async def check_access(
     if exam_query.join_mode == 1:
         return True, None
 
-    print("Exame class name", exam_query.exam_category)
-
     return (
         (True, True)
         if exam_query.join_mode == 0 and link.link_status == 1
@@ -69,6 +68,11 @@ class ExamtProcessor:
             return response
 
         member = await app_context.setting.member()
+        
+        if member is None:
+            MetaData.redirect_url = "/exam"
+            return response
+            
         stu_rec = StudentRequestSession.get(
             roll_no=member.get("roll_no"), has_key=has_keys
         )

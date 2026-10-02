@@ -68,8 +68,6 @@ def get_exam_request_session(record: _ExamRequestSession):
 
 async def push_exam_event_by_joined_status(record: _ExamRequestSession):
 
-    print("=>>record.joined_status", record.joined_status)
-
     summary = await ExamController.get_exam_summary(
         record.exam_id, {}, record=record, only_count=True
     )

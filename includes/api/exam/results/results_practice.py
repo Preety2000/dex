@@ -182,8 +182,6 @@ class SELF_RESULTS:
 
         ismeta = record.ts_info.get("info")
         published, year = get_timestamp_and_year(record.submitted_on)
-
-        print(totals)
         student = await MemberCache.getrollnumber(record.roll_no)
 
         return [

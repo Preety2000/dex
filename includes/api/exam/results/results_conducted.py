@@ -181,7 +181,6 @@ class IS_RESULTS:
 
     async def index(self, key):
         record = await self.get(key)
-        print("record", record)
         if not record:
             return None
 

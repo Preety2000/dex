@@ -276,9 +276,6 @@ class ArticleService:
         db.commit()
         db.refresh(article_query)
 
-        # print(data_querys, article_query)
-        # print("data_querys=>", article_query.id)
-
         article_id = int(article_query.id)
 
         await ArticleService.other_exit_data(db, article_id, data_querys)

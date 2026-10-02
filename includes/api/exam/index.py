@@ -244,18 +244,6 @@ class Exam:
         if not exam_query:
             return {}, exam_query
 
-        student_roll_numbers = []
-
-        def add_roll_number(raw_roll):
-            """
-            Extracts and encodes a student's roll number.
-            Also appends it to the global roll number list.
-            """
-            roll_no = extract_id_from_roll(raw_roll)
-            student_roll_numbers.append(roll_no)
-            encoded = _Security.number_encode(roll_no)
-            return encoded
-
         # Convert the exam record into JSON
         response = await get_exam_dick(exam_query, True)
 
@@ -269,31 +257,8 @@ class Exam:
         student_exam_query = app_context.db.query(ExamRecord).filter(
             ExamRecord.exam_id == exam_id
         )
-        # return response
-        # Students who joined but haven’t completed
-        response["studentJoined"] = [
-            [
-                add_roll_number(item.roll_no),
-                item.timestamp,
-            ]
-            for item in student_exam_query.filter(
-                ExamRecord.is_submitted == False
-            ).all()
-        ]
+
         # Students who completed the exam
         completed_query = student_exam_query.filter(ExamRecord.is_submitted == True)
         response["STUDENT_COMPLETED_EXAM_COUNT"] = completed_query.count()
-        response["studentCompliteExam"] = [
-            [
-                add_roll_number(item.roll_no),
-                item.is_submitted,
-                item.allmarks,
-                item.timestamp,
-                item.submitted_on,
-            ]
-            for item in completed_query.order_by(desc(ExamRecord.submitted_on))
-            .limit(10)
-            .all()
-        ]
-        response["students"] = student_roll_numbers
-        return response, exam_query
+        return response

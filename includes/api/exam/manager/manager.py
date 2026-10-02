@@ -187,7 +187,7 @@ class API_EXAM_MANAGER:
     async def get(exam_id: int):
         """Fetch detailed information about an exam by its ID."""
 
-        response, exam_query = await Exam.get_with_details(exam_id)
+        response = await Exam.get_with_details(exam_id)
         await ExamController.get_exam_summary(exam_id, response)
         return response
 
