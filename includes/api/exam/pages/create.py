@@ -57,7 +57,7 @@ class ExamCreatePage:
 
                 terms = item.get("terms") or []
 
-                if max((x.get("mcq_count", 0) for x in terms), default=0) >= count:
+                if max((x.get("mcq_count", 0) for x in terms), default=0) >= 10:
                     result.append(item.get("name"))
 
             return result
