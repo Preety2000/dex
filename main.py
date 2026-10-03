@@ -293,7 +293,7 @@ async def payment(
             "app_context": app_context,
             "function": app_context.function,
             "auth_session": auth_session,
-            "device_info": app_context.client_info.get("device", {}),
+            "device_info": MetaData.device_info,
         }
     )
     response = await build_http_response(app_context.response, templates, request)

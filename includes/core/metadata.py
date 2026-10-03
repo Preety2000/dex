@@ -71,6 +71,9 @@ class Metadata:
     settings: list = field(default_factory=list)
     custom_meta: dict[str, str] = field(default_factory=dict)  # Any extra <meta> tags
 
+    device_info: dict[str, str] = field(default_factory=dict)
+    client_info: dict[str, str] = field(default_factory=dict)
+
     # Config Load Method
     def load_config(self, force_reload: bool = False) -> "Metadata":
         if force_reload:

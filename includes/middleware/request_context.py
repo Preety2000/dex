@@ -107,8 +107,8 @@ class DataBaseConnectionMiddleware(BaseHTTPMiddleware):
     async def _verify_client(self, send) -> tuple[bool, str]:
 
         reason = None
+        device = MetaData.device_info
         client_info = app_context.client_info or {}
-        device = client_info.get("device", {})
         security = client_info.get("security", {})
         classification = client_info.get("classification", {})
 

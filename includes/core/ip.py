@@ -4,6 +4,7 @@ import requests
 from datetime import datetime, timedelta
 from includes.core.client_info import collect_user_signals, get_device_info
 from includes.core.globals.entry import app_context
+from includes.core.metadata import Metadata
 
 
 def generate_fingerprint(request):
@@ -115,15 +116,20 @@ class IP:
         4. Failure par None return karta hai
         """
 
+        Metadata.device_info = get_device_info()
         fingerprint_id = generate_fingerprint(app_context.request)
         cached_data = IP.get(fingerprint_id)
+
         if cached_data:
-            cached_data["device"] = get_device_info(app_context.request)
+            cached_data["device"] = Metadata.device_info
+            Metadata.client_info = cached_data
             return cached_data
 
         try:
             info = collect_user_signals(app_context.request.ip)
-            return IP.add(fingerprint_id, info)
+            client_info = IP.add(fingerprint_id, info)
+            Metadata.client_info = client_info
+            return client_info
 
         except requests.RequestException as e:
             # Optional: logging can be added here

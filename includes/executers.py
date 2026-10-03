@@ -34,8 +34,7 @@ async def get_terms_by_resource_cached(resource_id):
 
 async def execute_home_page(roots: Any = None) -> dict[str, Any]:
     #  Device check
-    client_info = app_context.client_info or {}
-    is_mobile = client_info.get("device", {}).get("is_mobile", True)
+    is_mobile = MetaData.device_info.get("is_mobile", None)
 
     # Predicate lambda for filtering
     term_filter = lambda r: r.article_count > 0

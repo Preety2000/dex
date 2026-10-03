@@ -47,15 +47,7 @@ def collect_user_signals(ip):
     accept_language = app_context.request.headers.get("Accept-Language", "")
     client_timezone = app_context.request.headers.get("X-Timezone", "")
 
-    ua = parse(user_agent_string)
-
-    # -------------------------
-    # Device info (FULL)
-    # -------------------------
-    platform = ua.os.family
-    browser = ua.browser.family
-    device = ua.device.family
-
+    device_info = get_device_info()
     # -------------------------
     # IP APIs
     # -------------------------
@@ -119,7 +111,7 @@ def collect_user_signals(ip):
     if not isp:
         risk_score += 20
 
-    if device == "Other":
+    if device_info["device"] == "Other":
         risk_score += 10
 
     if "bot" in user_agent_string.lower():
@@ -142,21 +134,6 @@ def collect_user_signals(ip):
     fingerprint_id = generate_fingerprint(
         ip, user_agent_string, accept_language, timezone or ""
     )
-
-    device_type = "mobile" if user_agent_string.find("Mobile") != -1 else "desktop"
-
-    device_info = {
-        "device_type": device_type,
-        "platform": platform,
-        "browser": browser,
-        "device": device,
-        "platform_version": ua.os.version_string,
-        "browser_version": ua.browser.version_string,
-        "is_mobile": ua.is_mobile,
-        "is_pc": ua.is_pc,
-        "is_tablet": ua.is_tablet,
-        "is_bot": ua.is_bot,
-    }
 
     # -------------------------
     # FINAL OUTPUT (COMPLETE)
@@ -196,7 +173,7 @@ def collect_user_signals(ip):
     }
 
 
-def get_device_info(ip):
+def get_device_info():
 
     # -------------------------
     # Headers (FIXED: consistent variables)
@@ -210,8 +187,6 @@ def get_device_info(ip):
     # -------------------------
     # Device info (FULL)
     # -------------------------
-    platform = ua.os.family
-    browser = ua.browser.family
     device = ua.device.family
 
     # -------------------------
@@ -243,8 +218,8 @@ def get_device_info(ip):
     device_type = "mobile" if user_agent_string.find("Mobile") != -1 else "desktop"
     device_info = {
         "device_type": device_type,
-        "platform": platform,
-        "browser": browser,
+        "platform": ua.os.family,
+        "browser": ua.browser.family,
         "device": device,
         "platform_version": ua.os.version_string,
         "browser_version": ua.browser.version_string,

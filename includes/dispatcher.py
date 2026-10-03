@@ -145,7 +145,7 @@ class RequestDispatcher:
 
     @staticmethod
     async def handle_recent(ctx):
-        device = ctx.client_info.get("device", {})
+        device = MetaData.device_info
         if device.get("is_mobile") is False:
             configure_page(
                 template="query/parameter", title="Latest Additions", suffix=True
