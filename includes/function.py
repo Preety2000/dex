@@ -104,9 +104,7 @@ class Functions:
         return value if isinstance(value, (int, float)) else default
 
     def utc(self, string):
-        lowerString = re.sub(r"\s+", "", string.lower())
-        lowerString = self.state.request.state.menuname.get(lowerString)
-        return lowerString or string
+        return string
 
     def active_class(self, type, action):
         return "active" if type == action else "deactive"

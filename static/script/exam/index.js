@@ -3,6 +3,15 @@
 $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
     "use strict";
 
+    const connecting = e => {
+        var c = $("Ex525") || $.create("Ex525"), d = c.create("IN013");
+        d.addIcon("ic_loader");
+        d.append($.create.span(null, "Connect..."));
+        c.in(d, true); d.css({ display: "flex" })
+        document.body.appendChild(c);
+        e === true && c.remove();
+    };
+
     const { AUTH_TOKEN } = $.getClass()
         , { FlEXMAP, F, B } = $.getFunction()
         , RV = { REQUEST_VIEW: 0, JOIND_VIEW: 1 }
@@ -442,7 +451,7 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                     hover(e, b) {
                         let x = $.tooltip_menu(this, e.target, b);
                         if (!x?.executed) return;
-                        x.executed(Object.entries({ date_asc: "Oldest First", date_desc: "Newest First", name_asc: "Student Name (A–Z)", name_desc: "Student Name (Z–A)", roll_no_asc: "Roll No (Ascending)", roll_no_desc: "Roll No (Descending)" }).map(([i, n]) => ({  name: n, active: useServerConnectionData.get("reqOrder") == i, event: () => sort("reqOrder", i) })));
+                        x.executed(Object.entries({ date_asc: "Oldest First", date_desc: "Newest First", name_asc: "Student Name (A–Z)", name_desc: "Student Name (Z–A)", roll_no_asc: "Roll No (Ascending)", roll_no_desc: "Roll No (Descending)" }).map(([i, n]) => ({ name: n, active: useServerConnectionData.get("reqOrder") == i, event: () => sort("reqOrder", i) })));
                     }
                 }];
                 c.in(tb);
@@ -603,7 +612,7 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                 c.loader(true) && sendReq([[302, [5608, [null, { start_timestamp: Number(e) }]]]], res => {
                     ES.exViewRes.start_timestamp = Number(e);
                     EventHub.call('EST', e => e.in(b));
-                    if (res.update === true) c.close();
+                    if (res.update === true) c.close(), r.change();
                 })
             }, ES.exViewRes.start_timestamp);
             $.menuexitue(e).executed([
@@ -625,7 +634,8 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                 return;
 
             r.create.span("corm").addIcon("an_live");
-            doSession().finish = function (q) {
+            const ws = doSession();
+            ws.finish = function (q) {
                 const [c, e] = q;
                 const set = (el, ui, v) => {
                     el.innerText = v;
@@ -640,17 +650,17 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                 e.STUDENT_REQUEST_SEND_COUNT != null && set(studentRequestSend, ES.sr, e.STUDENT_REQUEST_SEND_COUNT);
                 e.STUDENT_JOINED_EXAM_COUNT != null && set(studentInStudent, ES.si, e.STUDENT_JOINED_EXAM_COUNT);
                 e.STUDENT_COMPLETED_EXAM_COUNT != null && set(studentsCompliteExam, ES.st, e.STUDENT_COMPLETED_EXAM_COUNT);
-                
+
 
                 for (const r of e.STUDENT_JOINED_EXAM || e.STUDENT_LEFT_EXAM || []) {
                     const i = ES.STUDENT_JOINED_EXAM.findIndex(v => v[0] === r[0]);
                     i > -1
-                    ? ES.STUDENT_JOINED_EXAM[i] = r
-                    : ES.STUDENT_JOINED_EXAM.push(r);
-                    
+                        ? ES.STUDENT_JOINED_EXAM[i] = r
+                        : ES.STUDENT_JOINED_EXAM.push(r);
+
                     ES.students[r[0]] && ES.addStudentsInExam(r[0]);
                 }
-                
+
                 for (const r of e.STUDENT_COMPLETED_EXAM || []) {
                     ES.STUDENT_COMPLETED_EXAM.push(r);
                     ES.students[r[0]] && ES.addComoletedList(r[0])
@@ -660,6 +670,7 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                     ES.students[id] && ES.addRequestList(id)
                 );
             }
+            setInterval(() => ws.export({ "log": true }), 5000);
         }
         const showWimdow = (r) => {
             const p = $.popup('Exam Code'), g = p.create("IN0104");
@@ -807,15 +818,15 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                 for (const [id, , n] of [...ES.STUDENT_COMPLETED_EXAM].sort((a, b) => a[2] - b[2])) {
                     if (!ES.students[id]) {
                         return
-                    }                    
+                    }
                     const [name, rollNo, img] = ES.students[id];
                     const card = $.create("DIS01");
                     const numb = card.create("mr-5");
                     const list = makeList(ES.st.container, rollNo, name, img, card);
-                    
+
                     for (const i of ES.si.container.childrens)
                         i.get("auth-token") == AUTH_TOKEN.encode(rollNo, true) && i.remove();
-                    
+
                     n != null && numb.create.span(null, String(n));
                     card.create.span('button', "Check Result").event.on(function () {
                         return window.open(
@@ -1184,64 +1195,54 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
     function gp() {
         return getRequestSearch("page") || 1
     }
-    function activateWebSocket(url) {
+    function activateWebSocket(a) {
+        connecting(false);
 
-        // Reuse existing socket
-        if (ES.ws?.readyState < WebSocket.CLOSING && ES.ws.url?.includes(url))
-            return ES.ws;
-
-        // Close existing socket if CONNECTING or OPEN
-        if (ES.ws && ES.ws.readyState < WebSocket.CLOSING) {
+        if (ES.ws?.readyState < WebSocket.CLOSING) {
+            connecting(true);
+            if (ES.ws.url?.includes(a)) return ES.ws;
             ES.ws.close();
         }
 
-        console.log("Activating WebSocket...", url);
-
-        const socket = $.socket(url);
-        const originalExport = socket.export;
-        ES.ws = socket;
-
-        socket.finish = async (data = {}) => {
-            const actions = data.__ac || {};
-            console.warn("WS message:", data);
-
-            for (const [id, val] of Object.entries(actions)) {
-                const fn = ES.get(+id);
-                if (typeof fn === "function") fn(val);
+        const b = ES.ws = $.socket(a), c = b.export;
+        b.finish = async a => {
+            connecting(true);
+            for (const [b, c] of Object.entries(a.__ac || {})) {
+                const d = ES.get(+b);
+                if (typeof d === "function") d(c);
             }
-
-            if (typeof data.is === "function" && data.is("session") === "close") {
-                socket.close();
-            }
+            if (a.is?.("session") === "close") b.close();
         };
 
-        socket.export = (a, b, c) => {
-            if (a && typeof a === "object" && ES.ExamSessionKey) {
+        b.export = (a, d, e) => {
+            if (a && typeof a === "object" && ES.ExamSessionKey)
                 a.key = ES.ExamSessionKey;
-            }
-            return originalExport(a, b, c);
+            return c(a, d, e);
         };
 
-        // Events
-        socket.onclose = (event) => {
-            console.log("WebSocket closed");
-            console.log("code:", event.code);
-            console.log("reason:", event.reason);
-            console.log("wasClean:", event.wasClean);
+        b.onclose = a => {
+            connecting(true);
+            console.log("WS closed:", a.code, a.reason, a.wasClean);
         };
 
-        socket.onerror = (e) => {
-            console.error("WebSocket error:", e);
+        b.onerror = a => {
+            connecting(true);
+            console.error("WS error:", a);
         };
 
-        socket.callBack = (e) => {
-            socket?.close()
+        b.onopen = () => {
+            connecting(true);
+            console.log("Connected");
         };
 
-        socket.startUrl = r.href
-        r.onChange(e => !e.href.includes(socket.startUrl) && socket.callBack(socket, e))
-        return socket;
+
+        b.callBack = () => b.close();
+        b.startUrl = r.href;
+        r.onChange(a => !a.href.includes(b.startUrl) && b.callBack());
+        addEventListener("pagehide", () => ES.ws?.close());
+        return b;
     }
+
     function doJoine(connect_key, b, c) {
         if (!connect_key) {
             console.error("Invalid exam ID provided.");
@@ -1366,7 +1367,7 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                     e.in(setting.value.find(v => v.value === value[a]).title)
                 );
 
-                res.update && dialog.pop.close();
+                res.update && dialog.pop.close(), r.change();
             });
         });
         return true;

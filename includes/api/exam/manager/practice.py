@@ -1,18 +1,28 @@
 from datetime import datetime, time
 import random
 import re
-from sqlalchemy import desc, func
+import asyncio
+
+from sqlalchemy import select, or_, desc, func
+
+from includes.db.connection import active_primary_db, active_secondary_db
 from includes.utils._sub import distribute_amount
 from includes.api.exam.results.results_practice import SELF_RESULTS
 from includes.core.config import exam_database
 from includes.core.globals.entry import app_context
-from includes.db.models.db_exam import _ExamRecord, PracticeExamRecord
+from includes.db.models.db_exam import (
+    _ExamRecord,
+    PracticeExamRecord,
+)
 from includes.function import get_unique_id
 from includes.db.models.owner import Subject
-from includes.db.models.secondary import QuizQuestion, QuizRelationships, Terms
+from includes.db.models.secondary import (
+    QuizQuestion,
+    QuizRelationships,
+    Terms,
+)
 from includes.api.exam.student import RecordType, Student
 from includes.api.exam.session.es import ES
-from includes.schemas.cache import subject
 from includes.utils.exm import (
     error_exam_message,
     exam_submitted_message,
@@ -28,10 +38,19 @@ from includes.utils.utils import (
 )
 
 # Start and end of today in milliseconds
-start_of_day = int(datetime.combine(datetime.today(), time.min).timestamp())
-end_of_day = int(datetime.combine(datetime.today(), time.max).timestamp())
+start_of_day = int(
+    datetime.combine(
+        datetime.today(),
+        time.min,
+    ).timestamp()
+)
 
-import asyncio
+end_of_day = int(
+    datetime.combine(
+        datetime.today(),
+        time.max,
+    ).timestamp()
+)
 
 
 async def build_subject_category():
@@ -49,13 +68,16 @@ async def build_subject_category():
     # Step 1: fetch all subjects
     subject_list = await SubjectCache.get_all()
 
-    # Step 2: parallel fetch of terms (IMPORTANT optimization)
+    # Step 2: parallel fetch of terms
     terms_list = await asyncio.gather(
         *(TermsCache.get_by_subject(subject.id) for subject in subject_list)
     )
 
     # Step 3: process results
-    for subject, terms in zip(subject_list, terms_list):
+    for subject, terms in zip(
+        subject_list,
+        terms_list,
+    ):
         for term in terms:
             if term.mcq_count and term.mcq_count > 5:
                 seen_subjects.add(subject.name)
@@ -64,7 +86,10 @@ async def build_subject_category():
                     {
                         "subject": subject.name,
                         "count": term.mcq_count,
-                        "entry": [term.slug, term.name],
+                        "entry": [
+                            term.slug,
+                            term.name,
+                        ],
                     }
                 )
 
@@ -75,6 +100,7 @@ async def build_subject_category():
 
 async def get_exam_json(record: _ExamRecord):
     result_data = await SELF_RESULTS.get_exam_result(record)
+
     result = {
         "result_no": result_data[0][0],
         "exam_name": result_data[0][1],
@@ -86,7 +112,7 @@ async def get_exam_json(record: _ExamRecord):
         "correct_count": result_data[1][2],
         "skipped_count": result_data[1][3],
         "attempt_questions": result_data[1][4],
-        "paper": result_data[2],
+        "paper": result_data[2][0],
         "total_marks": result_data[3][0],
         "total_obtained_marks": result_data[3][1],
         "percentage": result_data[3][2],
@@ -103,149 +129,111 @@ async def get_exam_json(record: _ExamRecord):
 
     return result
 
-    # info = await SELF_RESULTS._result_info(item)
-    # info.update({
-    #     "id": item.id,
-    #     "key": item.key,
-    #     "roll_no": item.roll_no,
-    #     "timestamp": item.timestamp,
-    #     "is_submitted": item.is_submitted,
-    #     "submitted_on": item.submitted_on,
-
-    # })
-
-    # [timing, _, _, _] = item.ts_info.get("info")
-
-    # if item.is_submitted == False:
-    #     isActive = get_expired_time(item.timestamp, timing)
-    #     info.update({"isActive": isActive})
-
-    return info
-
 
 class SELF_EXAM_MANAGER:
+
     def __init__(self):
         self.request = app_context.request
         self.function = app_context.function
 
-    async def insert_self_exam_row_data(self, roll_no, submit, ismeta):
+    async def insert_self_exam_row_data(
+        self,
+        roll_no,
+        submit,
+        ismeta,
+    ):
         with exam_database() as db:
             new_record = PracticeExamRecord(
-                roll_no=roll_no, content=submit, ismeta=ismeta
+                roll_no=roll_no,
+                content=submit,
+                ismeta=ismeta,
             )
 
             db.add(new_record)
             db.commit()
+
             return new_record.keys
 
-    async def get_exam_key(self, roll_no, exam_questions, ismeta):
+    async def get_exam_key(
+        self,
+        roll_no,
+        exam_questions,
+        ismeta,
+    ):
         query = {}
+
         for subject, questions in exam_questions.items():
             query.setdefault(subject, [])
+
             for q in questions:
                 options = q["options"][:]
                 random.shuffle(options)
-                query[subject].append([q["id"], options, None])
 
-        return await self.insert_self_exam_row_data(roll_no, query, ismeta)
+                query[subject].append(
+                    [
+                        q["id"],
+                        options,
+                        None,
+                    ]
+                )
 
-    def get_exam_question(self, subject, category, question_limit):
-        category_name = "Default"
-        quizquestion = app_context.db.query(QuizQuestion)
+        return await self.insert_self_exam_row_data(
+            roll_no,
+            query,
+            ismeta,
+        )
 
-        if category != "default":
-            terms_query = app_context.db.query(Terms).filter_by(slug=category).first()
-            category_name = terms_query.name
-            quizquestion = quizquestion.join(
-                QuizRelationships, QuizRelationships.quiz_id == QuizQuestion.id
-            ).filter(QuizRelationships.terms_id == terms_query.id)
-
-        if subject and subject != "All Subject":
-            db_subject =app_context.db.query(Subject).filter(
-                (Subject.slug == subject) | (Subject.name == subject)
-            ).first()
-
-            quizquestion = quizquestion.filter(QuizQuestion.subject_id == db_subject.id)
-
-        quizquestion = quizquestion.order_by(func.random(), desc(QuizQuestion.id))
-        quizquestion = quizquestion.limit(int(question_limit)).all()
-
-        def get_option(query):
-            # Handle incorrect answers
-            return sorted(query.incorrect_answers + [query.correct_answer])
-
-        data_querys = {}
-        for i, query in enumerate(quizquestion):
-            db_subject_one =app_context.db.query(Subject).filter(
-                Subject.id == query.subject
-            ).first()
-            subject_name = db_subject_one.name if db_subject_one else "Default"
-
-            allCategories = (
-                app_context.db.query(Terms)
-                .join(QuizRelationships, QuizRelationships.terms_id == Terms.id)
-                .filter(QuizRelationships.quiz_id == query.id)
-                .all()
-            )
-
-            if subject_name not in data_querys:
-                data_querys[subject_name] = []
-
-            data_querys[subject_name].append(
-                {
-                    "id": query.id,
-                    "status": query.status,
-                    "title": query.question,
-                    "options": get_option(query),
-                    "category": [cat.name for cat in allCategories],
-                    "sno": i,
-                }
-            )
-
-        return data_querys, category_name
-
-    def get_exam_question_by_subject(self, subject, category, question_limit):
+    async def get_exam_question_by_subject(self, subject, category, question_limit):
         subject_name = "Default"
         category_name = "Default"
-        quizquestion = app_context.db.query(QuizQuestion)
 
+        # Base SELECT
+        quiz_stmt = select(QuizQuestion)
+
+        # Category filter
+        db = await active_secondary_db()
         if category != "default":
 
-            terms_query = app_context.db.query(Terms).filter_by(slug=category).first()
+            terms_stmt = select(Terms).where(Terms.slug == category)
+            terms_query = db.execute(terms_stmt).scalar_one_or_none()
+
             if terms_query:
                 category_name = terms_query.name
-                quizquestion = quizquestion.join(
-                    QuizRelationships, QuizRelationships.quiz_id == QuizQuestion.id
-                ).filter(QuizRelationships.terms_id == terms_query.id)
 
+                quiz_stmt = quiz_stmt.join(
+                    QuizRelationships,
+                    QuizRelationships.quiz_id == QuizQuestion.id,
+                ).where(QuizRelationships.terms_id == terms_query.id)
+
+        # Subject filter
         if subject:
+
             if isinstance(subject, int) or (
                 isinstance(subject, str) and subject.isdigit()
             ):
-                db_subject = (
-                    app_context.db.query(Subject)
-                    .filter(Subject.id == int(subject))
-                    .first()
-                )
+                subject_stmt = select(Subject).where(Subject.id == int(subject))
             else:
-                db_subject = (
-                    app_context.db.query(Subject)
-                    .filter(Subject.name == subject)
-                    .first()
-                )
+                subject_stmt = select(Subject).where(Subject.name == subject)
+
+            db2 = await active_primary_db()
+            db_subject = db2.execute(subject_stmt).scalar_one_or_none()
 
             if db_subject:
                 subject_name = db_subject.name
-                quizquestion = quizquestion.filter(
-                    QuizQuestion.subject_id == db_subject.id
-                )
 
-        quizquestion = quizquestion.order_by(func.random(), desc(QuizQuestion.id))
-        quizquestion = quizquestion.limit(int(question_limit)).all()
+                quiz_stmt = quiz_stmt.where(QuizQuestion.subject_id == db_subject.id)
+
+        # Get questions
+        quiz_stmt = quiz_stmt.order_by(
+            func.random(),
+            desc(QuizQuestion.id),
+        ).limit(int(question_limit))
+
+        quizquestion = db.execute(quiz_stmt).scalars().all()
 
         def get_option(query):
-            # Handle incorrect answers
             incorrect_answers = query.incorrect_answers
+
             return sorted(incorrect_answers + [query.correct_answer])
 
         data_querys = []
@@ -253,12 +241,17 @@ class SELF_EXAM_MANAGER:
 
         for i, query in enumerate(quizquestion):
 
-            allCategories = (
-                app_context.db.query(Terms)
-                .join(QuizRelationships, QuizRelationships.terms_id == Terms.id)
-                .filter(QuizRelationships.quiz_id == query.id)
-                .all()
+            # Get categories for question
+            categories_stmt = (
+                select(Terms)
+                .join(
+                    QuizRelationships,
+                    QuizRelationships.terms_id == Terms.id,
+                )
+                .where(QuizRelationships.quiz_id == query.id)
             )
+
+            allCategories = db.execute(categories_stmt).scalars().all()
 
             data_querys.append(
                 {
@@ -268,14 +261,28 @@ class SELF_EXAM_MANAGER:
                     "sno": i,
                 }
             )
+
             option = get_option(query)
             random.shuffle(option)
-            submit.append([query.id, option, None])
 
-        return subject_name, category_name, data_querys, submit
+            submit.append(
+                [
+                    query.id,
+                    option,
+                    None,
+                ]
+            )
+
+        return (
+            subject_name,
+            category_name,
+            data_querys,
+            submit,
+        )
 
     async def index(self, response):
         post = get_post_value
+
         roll_no = await app_context.setting.member("roll_no")
 
         language = await app_context.setting.get("language")
@@ -283,8 +290,8 @@ class SELF_EXAM_MANAGER:
         daily_limit, monthly_limit = await Student.has_submission_limit_exceeded(
             roll_no
         )
-        # if daily_limit == True and language is None:
-        if daily_limit == True and language:
+
+        if daily_limit is True and language:
             response["__ac"] = 102
             response["title"] = limitStatusHtml[language]["title"]
             response["content"] = limitStatusHtml[language]["content"]
@@ -296,11 +303,17 @@ class SELF_EXAM_MANAGER:
             nim_que = await post("Nq")
 
             if subject and category and nim_que:
+
                 mcqlist_count_list = await SubjectCache.get_mcqlist_count(
                     category,
                     (
                         None
-                        if re.sub(r"\s+", "", subject).lower() == "allsubject"
+                        if re.sub(
+                            r"\s+",
+                            "",
+                            subject,
+                        ).lower()
+                        == "allsubject"
                         else subject
                     ),
                 )
@@ -310,13 +323,21 @@ class SELF_EXAM_MANAGER:
                 question = {}
 
                 for sub_id, q_length in distribute_amount(
-                    mcqlist_count_list, int(nim_que), True
+                    mcqlist_count_list,
+                    int(nim_que),
+                    True,
                 ).items():
+
                     pepar = f"pe{sub_id}"
+
                     sub_name, cotg_name, ques, content[pepar] = (
-                        self.get_exam_question_by_subject(sub_id, category, q_length)
+                        await self.get_exam_question_by_subject(
+                            sub_id, category, q_length
+                        )
                     )
+
                     question[pepar] = ques
+
                     details[pepar] = [
                         len(ques),
                         sub_name,
@@ -327,7 +348,9 @@ class SELF_EXAM_MANAGER:
                     ]
 
                 if category != "default":
+
                     category_ = await TermsCache.get_by_slug(category)
+
                     if category_:
                         category = category_.name
 
@@ -337,16 +360,23 @@ class SELF_EXAM_MANAGER:
                     {
                         "details": details,
                         "questions": question,
-                        "info": [int(timing), subject, category, nim_que],
+                        "info": [
+                            int(timing),
+                            subject,
+                            category,
+                            nim_que,
+                        ],
                     },
                 )
 
                 response["jump"] = f"/exam?hx={keys}"
 
             else:
-                response["subjects"], response["category"] = (
-                    await build_subject_category()
-                )
+                (
+                    response["subjects"],
+                    response["category"],
+                ) = await build_subject_category()
+
                 if get_referer_value("isme"):
                     response["__ac"] = 101
                 else:
@@ -356,7 +386,12 @@ class SELF_EXAM_MANAGER:
 
     async def get(self, keys):
         roll_no = await app_context.setting.member("roll_no")
-        exam = await Student.get_by_exam_key(keys, RecordType.STUDENT)
+
+        exam = await Student.get_by_exam_key(
+            keys,
+            RecordType.STUDENT,
+        )
+
         if not exam or exam.roll_no != roll_no:
             return None
 
@@ -364,17 +399,28 @@ class SELF_EXAM_MANAGER:
             return True
 
         session_key = get_unique_id()
-        ES.add(roll_no, session_key)
+
+        ES.add(
+            roll_no,
+            session_key,
+        )
 
         return {"session_key": session_key}
 
-    async def session_inject(self, response, hxs_keys):
+    async def session_inject(
+        self,
+        response,
+        hxs_keys,
+    ):
         lists = await self.get(hxs_keys)
 
-        if lists == True:
+        if lists is True:
             response["__ac"] = 116
+
             href = f"/exam/result/do/{hxs_keys}"
+
             response["content"] = exam_submitted_message(href)
+
             return response
 
         if lists:
@@ -384,4 +430,5 @@ class SELF_EXAM_MANAGER:
 
         response["content"] = error_exam_message()
         response["__ac"] = 116
+
         return response

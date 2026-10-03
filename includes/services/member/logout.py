@@ -1,3 +1,5 @@
+from sqlalchemy import update
+
 from includes.core.config import MASTER_KEY
 from includes.core.globals.entry import app_context
 from includes.core.globals.fun import random_string
@@ -13,16 +15,16 @@ class LogoutHandler:
 
     @classmethod
     async def logout_all_sessions(cls, db, member_id: int):
-        """User ke saare active sessions ko ek saath logout karta hai (Bulk Update)."""
-        db.query(MemberSession).filter(
-            MemberSession.user_id == member_id, MemberSession.is_active == True
-        ).update(
-            {
-                MemberSession.is_active: False,
-                MemberSession.logout_time: TimeStamp.now_iso(),
-            },
-            synchronize_session=False,
+        """User ke saare active sessions ko ek saath logout karta hai."""
+        stmt = (
+            update(MemberSession)
+            .where(
+                MemberSession.user_id == member_id, MemberSession.is_active.is_(True)
+            )
+            .values(is_active=False, logout_time=TimeStamp.now_iso())
         )
+
+        db.execute(stmt)
         db.commit()
 
     @classmethod
@@ -38,9 +40,7 @@ class LogoutHandler:
                 "message": "Invalid or expired session. Please login again.",
             }
 
-        member = (
-            db_session.query(Members).filter_by(email=system_user["email"]).first()
-        )
+        member = db_session.query(Members).filter_by(email=system_user["email"]).first()
 
         if not member:
             return {"session_error": True, "message": "User account not found."}

@@ -201,10 +201,7 @@ $.define(function MCQ(container, opretar, ES) {
 
         for (const button of buttons) {
             button.add("active", button.id == String(MCQ.SESSION.index) ? true : false);
-
             if (button.id == String(MCQ.SESSION.index)) {
-                console.log(button, button.p);
-
                 button.scrollIntoView({
                     block: "nearest",
                     behavior: "smooth",

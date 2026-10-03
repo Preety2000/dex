@@ -1,5 +1,6 @@
-from sqlalchemy import and_
+from sqlalchemy import and_, select
 from includes.core.globals.entry import app_context
+from includes.db.connection import active_primary_db
 from includes.db.dataclass import MemberRole, TeacherStatus
 from includes.db.models.owner import Members, VerifyIdentity
 from includes.schemas.cache.member import MemberCache
@@ -25,23 +26,25 @@ class ActionForm:
         if not verification_id or not email:
             return {"status": False, "message": "Missing required fields"}
 
-        identity = (
-            app_context.db.query(VerifyIdentity)
-            .filter(VerifyIdentity.id == verification_id)
-            .first()
-        )
+        db = await active_primary_db()
+        identity = db.execute( 
+            select(VerifyIdentity).where(
+                VerifyIdentity.id == verification_id
+            )
+        ).scalar_one_or_none()
 
         if not identity:
-            return {"status": False, "message": "Verification record not found"}
+            return {
+                "status": False,
+                "message": "Verification record not found",
+            }
 
-        member = (
-            app_context.db.query(Members)
-            .filter(
+        member = db.execute(
+            select(Members).where(
                 Members.id == identity.user_id,
                 Members.email == email,
             )
-            .first()
-        )
+        ).scalar_one_or_none()
 
         if not member:
             return {"status": False, "message": "Teacher not found"}

@@ -1,9 +1,6 @@
 
 $.DOMContentLoaded(query => $.require("worker", function (module) {
     const worker = module();
-
-    console.log("Worker module loaded successfully:", worker);
-
     // Navigation Menu 
     worker.navigation("drawerLayout", function (drawer_layout) {
         var a, c

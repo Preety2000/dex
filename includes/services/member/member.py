@@ -23,14 +23,16 @@ from includes.utils.utils import get_post_value, json_null_response, json_respon
 from includes.db.models.utils import TimeStamp
 
 
+from typing import Union
+
+from sqlalchemy import or_, select
+
 def get_member(query: Union[str, int]):
     print("\033[91mget method call member get_member\033[0m")
 
-    # db = await active_secondary_db()
-
-    session_member = (
-        app_context.db.query(Members)
-        .filter(
+    stmt = (
+        select(Members)
+        .where(
             or_(
                 Members.id == query,
                 Members.email == query,
@@ -38,12 +40,17 @@ def get_member(query: Union[str, int]):
                 Members.secret == query,
             )
         )
-        .first()
+        .limit(1)
     )
 
+    session_member = app_context.db.execute(stmt).scalar_one_or_none()
+
     return (
-        serialize_member(MemberCache._cache(session_member)) if session_member else None
+        serialize_member(MemberCache._cache(session_member))
+        if session_member
+        else None
     )
+
 
 
 def filter_member_by_device(member: dict, device_key: str) -> dict:
@@ -92,8 +99,6 @@ class ClassUser:
         db_session = await active_primary_db()
         return
 
-    # def get(self, query: Union[str, int]):
-    #     return get_member(query)
 
     async def getrollnumber(self, rollnumber: int):
         userid = extract_id_from_roll(rollnumber)

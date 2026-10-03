@@ -1,4 +1,5 @@
-from sqlalchemy import or_
+from sqlalchemy import or_, select
+
 from includes.utils._sub import configure_page
 from includes.core.config import main_database
 from includes.core.globals.entry import app_context
@@ -14,14 +15,20 @@ class Login:
 
     @staticmethod
     def get_member(db, username: str):
-        return (
-            db.query(Members)
-            .filter(or_(Members.username == username, Members.email == username))
-            .first()
+        stmt = select(Members).where(
+            or_(
+                Members.username == username,
+                Members.email == username,
+            )
         )
 
+        return db.execute(stmt).scalar_one_or_none()
+
     @staticmethod
-    def validate_credentials(username: str, password: str):
+    def validate_credentials(
+        username: str,
+        password: str,
+    ):
         errors = {}
 
         if not username:
@@ -33,7 +40,11 @@ class Login:
         return errors
 
     @staticmethod
-    def log_failed_login(db, member, device_id):
+    def log_failed_login(
+        db,
+        member,
+        device_id,
+    ):
         db.add(
             MemberSession(
                 user_id=member.id,
@@ -41,10 +52,14 @@ class Login:
                 ip_address=app_context.request.ip,
             )
         )
+
         db.commit()
 
     @staticmethod
-    def create_logout_url(member, device_id):
+    def create_logout_url(
+        member,
+        device_id,
+    ):
         sep = "&" if "?" in app_context.request.full_path else "?"
 
         return (
@@ -60,33 +75,57 @@ class Login:
             return None
 
         with main_database() as db:
-            member = db.query(Members).filter_by(tk_id=access_token).first()
+
+            stmt = select(Members).where(Members.tk_id == access_token)
+
+            member = db.execute(stmt).scalar_one_or_none()
+
             if not member:
                 return None
 
-            await LogoutHandler.logout_all_sessions(db, member.id)
+            await LogoutHandler.logout_all_sessions(
+                db,
+                member.id,
+            )
+
             member.device = []
 
             db.commit()
-            return complete_login(member, db)
+
+            return complete_login(
+                member,
+                db,
+            )
 
     @staticmethod
     async def authenticate():
-        configure_page( title="Login", suffix=True)
+        configure_page(
+            title="Login",
+            suffix=True,
+        )
 
         # Device Logout Login
         login_token = get_query_value("nq")
+
         if login_token:
             return await Login.login_for_token(login_token)
 
         template = "member/login"
+
         device_id = app_context.client_info.get("device_id")
 
         if not app_context.function.is_post():
             return template
 
-        username = await get_post_value("username", "")
-        password = await get_post_value("password", "")
+        username = await get_post_value(
+            "username",
+            "",
+        )
+
+        password = await get_post_value(
+            "password",
+            "",
+        )
 
         app_context.response.update(
             {
@@ -101,7 +140,10 @@ class Login:
         )
 
         # Validation
-        errors = Login.validate_credentials(username, password)
+        errors = Login.validate_credentials(
+            username,
+            password,
+        )
 
         if errors.get("username"):
             app_context.response["username_class"] = "error"
@@ -114,15 +156,23 @@ class Login:
 
         with main_database() as db:
 
-            member = Login.get_member(db, username)
+            member = Login.get_member(
+                db,
+                username,
+            )
 
             if not member:
                 app_context.response["message_username"] = "Couldn’t find your account"
+
                 return template
 
             if not member.check_password(password):
 
-                Login.log_failed_login(db, member, device_id)
+                Login.log_failed_login(
+                    db,
+                    member,
+                    device_id,
+                )
 
                 app_context.response["message_password"] = app_context.function.utc(
                     "Wrong password. Try again or click " "Forgot password to reset it."
@@ -133,22 +183,34 @@ class Login:
             # Device Limit Check
             if len(member.device) >= Login.MAX_DEVICES:
 
-                logout_url = Login.create_logout_url(member, device_id)
+                logout_url = Login.create_logout_url(
+                    member,
+                    device_id,
+                )
 
                 MetaData.redirect_url = None
+
                 msg_template = app_context.function.utc(
-                    "This account is already active on two another device. Continuing will log you out from all other devices. To continue logging in, {start_tag}click here{end_tag}."
+                    "This account is already active on two "
+                    "another device. Continuing will log you "
+                    "out from all other devices. To continue "
+                    "logging in, {start_tag}click here{end_tag}."
                 )
+
                 app_context.response.update(
                     {
                         "email": "",
                         "password": "",
                         "message": msg_template.format(
-                            start_tag=f"<a href='{logout_url}'>", end_tag="</a>"
+                            start_tag=f"<a href='{logout_url}'>",
+                            end_tag="</a>",
                         ),
                     }
                 )
 
                 return template
 
-            return complete_login(member, db)
+            return complete_login(
+                member,
+                db,
+            )

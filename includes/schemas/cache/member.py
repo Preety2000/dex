@@ -1,6 +1,8 @@
-from sqlalchemy import or_
+from sqlalchemy import or_, select
+
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
+from includes.db.connection import active_primary_db
 from includes.db.dataclass import serialize
 from includes.db.models.owner import Members
 from includes.utils.meb import (
@@ -18,6 +20,7 @@ class MemberCache:
     @staticmethod
     def _cache(record: Members) -> dict:
         print("[call MemberCache]")
+
         _record = serialize(record)
 
         MemberCacheData.ById[record.id] = _record
@@ -49,7 +52,8 @@ class MemberCache:
 
         return {
             k: (
-                f"/media/u/{get_email_folder_info(record["id"])}/{record.get('image_src', _Security.short_encode('image.png'))}"
+                f"/media/u/{get_email_folder_info(record['id'])}/"
+                f"{record.get('image_src', _Security.short_encode('image.png'))}"
                 if k == "img"
                 else record.get(k)
             )
@@ -58,36 +62,58 @@ class MemberCache:
 
     @staticmethod
     async def get_with_secret(secret: str) -> dict:
+        cached_id = MemberCacheData.BySecret.get(secret)
 
-        if MemberCacheData.BySecret.get(secret):
-            return await MemberCache.get_with_id(MemberCacheData.BySecret[secret])
+        if cached_id:
+            return await MemberCache.get_with_id(cached_id)
 
-        record = app_context.db.query(Members).filter(Members.secret == secret).first()
+        stmt = select(Members).where(Members.secret == secret).limit(1)
+        db = await active_primary_db()
+        result = db.execute(stmt)
+        record = result.scalar_one_or_none()
+
         return MemberCache._cache(record) if record else None
 
-
     @staticmethod
-    async def get_with_id(id: int, keys: list[str] = None) -> dict:
+    async def get_with_id(
+        id: int,
+        keys: list[str] = None,
+    ) -> dict:
 
-        record = MemberCacheData.ById.get(int(id))
+        id = int(id)
+
+        record = MemberCacheData.ById.get(id)
+
         if record:
             return MemberCache.filters(record, keys)
 
-        record = app_context.db.query(Members).filter(Members.id == int(id)).first()
-        return MemberCache.filters(MemberCache._cache(record), keys) if record else None
+        stmt = select(Members).where(Members.id == id).limit(1)
+        db = await active_primary_db()
+        result = db.execute(stmt)
+        record = result.scalar_one_or_none()
+
+        if not record:
+            return None
+
+        return MemberCache.filters(
+            MemberCache._cache(record),
+            keys,
+        )
 
     @staticmethod
     async def getrollnumber(rollnumber: int):
         userid = extract_id_from_roll(rollnumber)
+
         record = await MemberCache.get_with_id(userid)
-        return serialize_member(record)
+
+        return serialize_member(record) if record else None
 
     @staticmethod
     async def get(query: int | str) -> dict:
 
-        record = (
-            app_context.db.query(Members)
-            .filter(
+        stmt = (
+            select(Members)
+            .where(
                 or_(
                     Members.id == query,
                     Members.email == query,
@@ -95,8 +121,11 @@ class MemberCache:
                     Members.secret == query,
                 )
             )
-            .first()
+            .limit(1)
         )
+        db = await active_primary_db()
+        result = db.execute(stmt)
+        record = result.scalar_one_or_none()
 
         if not record:
             return None
@@ -104,24 +133,36 @@ class MemberCache:
         return MemberCache._cache(record)
 
     @staticmethod
-    async def get_many(id_list: list[int], keys: list[str] = None):
+    async def get_many(
+        id_list: list[int],
+        keys: list[str] = None,
+    ):
         records = []
         missing = []
 
         for qid in id_list or []:
+            qid = int(qid)
+
             record = MemberCacheData.ById.get(qid)
-            (
+
+            if record:
                 records.append(MemberCache.filters(record, keys))
-                if record
-                else missing.append(qid)
-            )
+            else:
+                missing.append(qid)
 
         if missing:
+            stmt = select(Members).where(Members.id.in_(missing))
+
+            db = await active_primary_db()
+            result = db.execute(stmt)
+            db_records = result.scalars().all()
+
             records.extend(
-                MemberCache.filters(MemberCache._cache(record), keys)
-                for record in app_context.db.query(Members)
-                .filter(Members.id.in_(missing))
-                .all()
+                MemberCache.filters(
+                    MemberCache._cache(record),
+                    keys,
+                )
+                for record in db_records
             )
 
         return records

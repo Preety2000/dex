@@ -39,7 +39,7 @@ def build_order_by(key):
             "roll_no": ExamRequestSession.roll_no,
             "date": ExamRequestSession.started_at,
         }[field]
-      
+
     except (ValueError, KeyError):
         return asc(ExamRequestSession.started_at)  # default
 
@@ -182,6 +182,11 @@ async def exam_control_socket_handler(detail, incoming):
         return
 
     if incoming:
+        log = incoming.get("log")
+
+        if log:
+            return {"status": True}
+
         payload = incoming.get("payload")
         req_route = incoming.get("reqRoute")
         use_filter = incoming.get("useFilter")

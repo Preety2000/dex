@@ -30,8 +30,6 @@ class QS:
         try:
             if root == "result":
                 exam_id = get_exam_id(d)
-                await initialize_database()
-
                 record = await Student.get_by_exam(c, exam_id, RecordType.INVIGILATOR)
                 result_data = await IS_RESULTS.get_result(record, True, True)
                 if result_data:
@@ -78,7 +76,7 @@ class QS:
                     )
         except:
             return "Error code: Ex_85858"
-        
+
         return templates.TemplateResponse(
             f"qs/error.html", {"request": request}, status_code=403
         )
