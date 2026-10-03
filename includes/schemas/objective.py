@@ -5,15 +5,14 @@ from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import format_view_count
 from sqlalchemy import asc, desc, func, or_, select
 from includes.core.pagination import Pagination
-from includes.core.query_paginator import QueryPaginator
-from includes.core.new_query_paginator import NewQueryPaginator
+from includes.core.paginator import NewQueryPaginator
 from includes.core.request_filter import RequestFilter
 from includes.db.connection import active_secondary_db
 from includes.db.dataclass import _QuizQuestion, serialize, to_dict
 from includes.db.models.secondary import QuizQuestion, QuizRelationships, Terms
 
 
-from typing import  Tuple, Optional, List
+from typing import Tuple, Optional, List
 from includes.schemas.cache.subject import SubjectCache
 from includes.schemas.cache.terms import TermsCache
 from includes.schemas.subject import ClassSubject
@@ -25,7 +24,7 @@ async def get_mcq_json(
     subject=None,
     title=None,
     **more,
-) -> Tuple[ object]:
+) -> Tuple[object]:
     response = {}
 
     if not item:
@@ -65,7 +64,7 @@ async def get_mini_mcq_json(
     subject=None,
     title=None,
     **more,
-) -> Tuple[ object]:
+) -> Tuple[object]:
     response = {}
 
     if not item:
@@ -94,30 +93,6 @@ async def get_mini_mcq_json(
         response["subject"] = to_dict(await SubjectCache.get_by_id(item.subject_id))
 
     return response
-
-
-async def get_mcq_by_terms_id__(*, terms_id, limit=4, **more):
-
-    practice = (
-        app_context.db.query(QuizQuestion)
-        .join(QuizRelationships, QuizRelationships.quiz_id == QuizQuestion.id)
-        .filter(QuizRelationships.terms_id == terms_id)
-    )
-
-    practice = practice.filter(QuizQuestion.status == "Publish")
-
-    if not more:
-        return [item.to_dict() for item in practice.limit(limit).all()]
-
-    data = await QueryPaginator.paginate(
-        types="query",
-        query=practice,
-        model=QuizQuestion,
-        transform=lambda item: item.to_dict(),
-        limit=limit,
-        **more,
-    )
-    return data.records
 
 
 @staticmethod
@@ -187,41 +162,6 @@ class ClassObjective:
         questions = questions.filter(QuizQuestion.status == "Publish")
         record = questions.first()
         return await get_mcq_json(record, subject=True) if record else None
-
-    @staticmethod
-    async def getmcq_list__(term_slug=None, *, limit=10, **more):
-
-        if not term_slug or term_slug == "default":
-            data = await QueryPaginator.paginate(
-                types="query",
-                query=app_context.db.query(QuizQuestion),
-                model=QuizQuestion,
-                transform=lambda item: get_mini_mcq_json(item),
-                limit=limit,
-                **more,
-            )
-            return data.records, {"name": "Default"}
-
-        terms_query = await TermsCache.get_by_slug(term_slug)
-        if terms_query:
-            quizquestion = (
-                app_context.db.query(QuizQuestion)
-                .join(QuizRelationships, QuizRelationships.quiz_id == QuizQuestion.id)
-                .filter(QuizRelationships.terms_id == terms_query.id)
-            )
-
-            quizquestion = quizquestion.filter(QuizQuestion.status == "Publish")
-            data = await QueryPaginator.paginate(
-                types="query",
-                query=quizquestion,
-                model=QuizQuestion,
-                transform=lambda item: get_mini_mcq_json(item),
-                limit=limit,
-                **more,
-            )
-            return data.records, serialize(terms_query)
-
-        return None, None
 
     @staticmethod
     async def getmcq_list(term_slug=None, *, limit=10, **more):

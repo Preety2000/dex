@@ -130,7 +130,7 @@ async def build_http_response(result, templates, request):
         # ---------------------------------------------------------
         template_name = template_context.get("template")
 
-        print("template_name", template_name)
+        print("////template_name////", template_name)
         if not isinstance(template_name, str) or not template_name.strip():
             template_name = "error"
 
@@ -156,8 +156,6 @@ async def build_http_response(result, templates, request):
         # request must be present in context
         template_context["request"] = request
         template_context["device_info"] = DeviceInfo.to_dict()
-
-        print(f"Rendering template: {MetaData}")
         # ---------------------------------------------------------
         # Render template
         # ---------------------------------------------------------
@@ -202,6 +200,7 @@ async def handle_request_with_cache(*, allow_catch: bool = True, **binds):
 
     route_type = app_context.route.scope_type
     app_context.response["resource"] = route_type
+
     MetaData.template = "error"
 
     # Pehle static routes check karein
@@ -214,17 +213,21 @@ async def handle_request_with_cache(*, allow_catch: bool = True, **binds):
     encrypted_url = _Security.short_encode(request_url_str)
 
     # Cache Check & Fallback Handler Execution
-    metadata, session = AppCache.get(encrypted_url, (None, None))
+    metadata, session, response = AppCache.get(encrypted_url, (None, None, None))
 
     if session and metadata:
         # Cache me se mile metadata se MetaData class ko update karein
         MetaData.update_from_dict(metadata)
+        app_context.response.update(response)
     else:
         # Request execute karein aur updated MetaData.to_dict() ke saath cache karein
         handler = binds.get("callback", execute_request)
         session = await handler(app_context.route)
+
         if allow_catch is True:
-            AppCache.add(encrypted_url, (MetaData.to_dict(), session))
+            AppCache.add(
+                encrypted_url, (MetaData.to_dict(), session, app_context.response)
+            )
 
     # Response Enrichment & Processing
     app_context.response = await enrich_request_response(app_context.response)

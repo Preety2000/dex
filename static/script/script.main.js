@@ -1,6 +1,8 @@
 
-$.DOMContentLoaded(query => $.require("Worker", function (module) {
+$.DOMContentLoaded(query => $.require("worker", function (module) {
     const worker = module();
+
+    console.log("Worker module loaded successfully:", worker);
 
     // Navigation Menu 
     worker.navigation("drawerLayout", function (drawer_layout) {
@@ -113,7 +115,7 @@ $.DOMContentLoaded(query => $.require("Worker", function (module) {
         });
 
         x((name, cb) => $.module({
-            page_worker: ["subMenu", "accountWindow", "likes", "navigation"],
+            worker: ["subMenu", "accountWindow", "likes", "navigation"],
             worker: ["createTest", "createObject", "testDashbord", "testList"],
             quits: ["functionQuedt", "LogMetel", "SourceBuffer"]
         }, name, cb));

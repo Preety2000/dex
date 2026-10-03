@@ -6,13 +6,13 @@ from deep_translator import GoogleTranslator
 from langdetect import DetectorFactory
 from sqlalchemy import or_
 
+from includes.core.paginator import NewQueryPaginator
 from includes.db.models.owner import Subject
 from includes.utils._sub import configure_page
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import format_datetime, format_view_count
 from includes.core.metadata import MetaData
 from includes.core.pagination import Pagination
-from includes.core.query_paginator import QueryPaginator
 from includes.db.connection import db
 from includes.db.models.secondary import (
     Article,
@@ -610,7 +610,8 @@ class Search:
                     .filter(TermsRelationship.terms_id == category.id)
                 )
 
-                data = await QueryPaginator.paginate(
+                data = await NewQueryPaginator.paginate(
+                    db=db,
                     types="query",
                     query=articles,
                     model=Article,

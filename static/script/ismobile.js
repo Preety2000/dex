@@ -92,7 +92,7 @@ $.define("mobile", function Mobile(documentbody) {
             ev.preventDefault();
             d.addIcon("ic_close", true);
             s.addIcon("ice_search", true);
-            if (window.innerWidth < 650 && !$("IN059")) {
+            if (window.innerWidth < 980 && !$("IN059")) {
                 var w = $.windows(null, { container: m, functions: g, noremove: true }, m.p);
                 console.log(documentbody, a, d);
                 documentbody.add(a);

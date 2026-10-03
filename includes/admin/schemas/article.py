@@ -1,15 +1,15 @@
 import copy
 from datetime import datetime
-from typing import Any,  List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
-from sqlalchemy import delete, desc, func, select, update
+from sqlalchemy import case, delete, desc, func, select, update
 
 from includes.admin.modals import checked, emptyMessage
 from includes.admin.schemas.backup import ClassBeckup
 from includes.core.globals.coreutils import is_empty, slugify
 from includes.core.globals.entry import app_context
 from includes.core.metadata import MetaData
-from includes.core.query_paginator import QueryPaginator
+from includes.core.paginator import NewQueryPaginator
 from includes.db.connection import active_secondary_db
 from includes.db.dataclass import _Terms, serialize
 from includes.db.models.secondary import (
@@ -129,22 +129,31 @@ class ArticleService:
 
     @staticmethod
     async def gets(limit: int) -> List[dict[str, Any]]:
-        def callback(records):
-            set_response("total", records.count())
-            set_response("draft", records.filter(Article.status == "Draft").count())
-            set_response("publish", records.filter(Article.status == "Publish").count())
-            return records
-
         db = await active_secondary_db()
+        stmt = select(
+            func.count(Article.id).label("total"),
+            func.count(case((Article.status == "Draft", 1))).label("draft"),
+            func.count(case((Article.status == "Publish", 1))).label("publish")
+        )
+        
+        # Single query execution
+        result = db.execute(stmt).one()
+        
+        # Response set karein
+        set_response("total", result.total)
+        set_response("draft", result.draft)
+        set_response("publish", result.publish)
 
-        data = await QueryPaginator.paginate(
+
+        data = await NewQueryPaginator.paginate(
+            db=db,
             limit=limit,
             types="query",
             model=Article,
-            callback=callback,
-            query=db.query(Article),
+            query=select(Article),
             transform=lambda item: json(item),
         )
+
         return data.records
 
     @staticmethod

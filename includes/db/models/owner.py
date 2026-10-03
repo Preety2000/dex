@@ -105,17 +105,6 @@ class Members(BaseOwner):
         uselist=False,
     )
 
-    def add_last_login(self):
-        last_login = self.login_info.first()
-        self.last_login = last_login.to_dataclass() if last_login else None
-
-        print("add_last_login", self.id)
-
-    def add_active_divice(self):
-        last_login = self.login_info.first()
-        self.last_login = last_login.to_dataclass() if last_login else None
-
-        print("add_active_divice", self.id)
 
     def generate_password(self, password, option):
         query = "pbkdf2:sha256:600000$"

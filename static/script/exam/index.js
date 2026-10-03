@@ -2579,7 +2579,7 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
     r.onChange(e => applyBind.call(ES, 800, null))
     applyBind.call(ES, 800, null);
 
-    const module = $.module.list ??= FlEXMAP();
+    const module = $.module.list ??= $(function Module() { return this; });
     module.add("createTest", function createObject(a) {
         const getActionMethod = (string) => this.get(string) == "True";
 

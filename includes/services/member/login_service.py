@@ -64,6 +64,6 @@ def complete_login(member: Members, db) -> str | None:
     except:
         pass
 
-    MetaData.redirect_url = get_query_value("redirect", "/")
+    MetaData.redirect_url = get_query_value("redirect", "/?refresh=true")
     return
     # return "redirect"

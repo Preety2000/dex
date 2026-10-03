@@ -4,8 +4,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy import desc, func, select
 from includes.core.config import app_context
 from includes.db.connection import active_secondary_db
-from includes.core.new_query_paginator import NewQueryPaginator
-from includes.core.query_paginator import QueryPaginator
+from includes.core.paginator import NewQueryPaginator
 from includes.db.dataclass import _Article, _Terms, serialize, to_dict
 from includes.db.models.secondary import (
     Article,

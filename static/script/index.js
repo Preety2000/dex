@@ -280,11 +280,11 @@
         back() { return history.back(); }
         reload() { return this.a && location.reload(); }
 
-        offEvent(cb, o) {this.e = false;cb.call(this, this.u); this.e = true;o && this.check()}
-        path(p) {this.u.pathname = p; return this.push();}
-        append(k, v, x = true) {this.p.append(k, v);this.u.search = this.p;return this.push(x);}
-        deleteAll(x = true) {this.u.search = "";this.p = new URLSearchParams();return this.push(x);}
-        isPath(p) {return this.pathname == p;}
+        offEvent(cb, o) { this.e = false; cb.call(this, this.u); this.e = true; o && this.check() }
+        path(p) { this.u.pathname = p; return this.push(); }
+        append(k, v, x = true) { this.p.append(k, v); this.u.search = this.p; return this.push(x); }
+        deleteAll(x = true) { this.u.search = ""; this.p = new URLSearchParams(); return this.push(x); }
+        isPath(p) { return this.pathname == p; }
     }
 
     class URLManager {
@@ -1509,7 +1509,7 @@
             get(a, b = null) { return Object.hasOwn(this, a) ? this[a] : a === true ? this.cookie.get() : b }
             update(a, b) { if (!(a in this)) return false; this[a] = b; this.config(true); this.cookie.insert(d.encode(this.data)); return true }
             reset() { return this.cookie.insert(e.DEFAULT_TOKEN), true }
-            logout(e) { return $.loader(true) && exports("fch", "logout", { method: "post", body: { session: e, option: !1 }, callback(a) { $.loader(false); a.is("logout") && (t.location.href = location.origin) } }) }
+            logout(e) { return $.loader(true) && exports("fch", "logout", { method: "post", body: { session: e, option: !1 }, callback(a) { $.loader(false); a.is("logout") && (t.location.href = location.origin + "?refresh=true") } }) }
         }
         return new e(a || "5DB6lIE")
     }
@@ -1529,7 +1529,7 @@
     })
     isdefine("module", function Module(a, b, c) {
         var g;
-        $.module.list ??= FlEXMAP();
+        $.module.list ??= $(function Module() { return this; })
         var Cb = function (e) {
             console.log("module not load edite function plese");
         }

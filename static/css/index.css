@@ -1543,18 +1543,10 @@ button *,
   }
 }
 
-@media screen and (max-width: 650px) {
-  .header .IN020 .IN048 {
-    display: none;
-  }
-
+@media screen and (max-width: 980px) {
   .header .IN020 .search {
     width: 40px;
     height: 40px;
-  }
-
-  .header .IN020 .search input {
-    display: none !important;
   }
 
   .header .IN020 .IN047 {
@@ -1563,6 +1555,18 @@ button *,
     cursor: pointer;
     left: 0;
     margin: 0;
+  }
+
+  .header .IN020 .search input {
+    display: none !important;
+  }
+
+  .header .IN020 .IN048 {
+    display: none;
+  }
+
+  .IN057 .IN033 {
+    background: var(--bg-soft);
   }
 
   .IN049 {
@@ -1620,9 +1624,7 @@ button *,
     justify-content: center;
   }
 
-  .IN057 .IN033 {
-    background: var(--bg-soft);
-  }
+
 
   .IN057 .IN020 .IN047 {
     left: auto;

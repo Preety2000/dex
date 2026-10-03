@@ -1,19 +1,20 @@
 from collections import defaultdict
-from typing import Any,  List, Optional
+from typing import Any, List, Optional
 
 from includes.admin.modals import checked
 from includes.admin.schemas.backup import ClassBeckup
 from includes.core.globals.coreutils import is_empty, slugify
 from includes.core.globals.entry import GlobleCatch, app_context
 from includes.core.metadata import MetaData
-from includes.core.query_paginator import QueryPaginator
+from includes.core.paginator import NewQueryPaginator
+from includes.db.connection import active_secondary_db
 from includes.db.dataclass import serialize
 from includes.db.models.owner import Subject
 from includes.db.models.secondary import Terms
 from includes.schemas.cache.subject import SubjectCache
 from includes.schemas.router_schema import DynamicURLRoute
 from includes.utils.utils import get_next_id, get_post_value
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, select
 
 
 def empty_message(message: str, types: Optional[str] = None) -> str:
@@ -73,8 +74,10 @@ class AdminClassTerms:
             )
             return data_item
 
-        all_query = app_context.db.query(Terms).order_by(desc(Terms.id))
-        data = await QueryPaginator.paginate(
+        all_query = select(Terms)
+        db = await active_secondary_db()
+        data = await NewQueryPaginator.paginate(
+            db=db,
             limit=limit,
             types="query",
             model=Terms,

@@ -2,9 +2,8 @@ import inspect
 from dataclasses import dataclass
 from typing import Any, Callable, Optional
 from sqlalchemy import asc, desc
-
-from includes.core.new_pagination import Pagination
-from includes.core.new_request_filter import RequestFilter
+from includes.core.pagination import Pagination
+from includes.core.request_filter import RequestFilter
 from includes.utils.utils import _resolve_request_getter, set_response
 
 
@@ -76,7 +75,6 @@ class NewQueryPaginator:
         query: Any = None,
         types: Optional[str] = "query",
         columns: Optional[dict] = None,
-        callback: Optional[Callable] = None,
         transform: Optional[Callable] = None,
         orders: Any = None,
         search_columns: Optional[list] = None,
@@ -84,12 +82,6 @@ class NewQueryPaginator:
         **otherinfo,
     ) -> PaginatorRecord:
         otherinfo = otherinfo.copy() if otherinfo else {}
-
-        # 1. Execute Callback (if provided)
-        if callable(callback):
-            query = callback(query)
-            if inspect.isawaitable(query):
-                query = await query
 
         # 2. Apply Global Search Filter
         global_conditions = await cls._global_filter(type=types, model=model)

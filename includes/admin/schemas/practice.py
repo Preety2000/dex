@@ -1,10 +1,12 @@
+from sqlalchemy import case, func, select
+
 from includes.admin.api.schemas.practice import AdminApiMCQ
 from includes.admin.modals import checked, emptyMessage
 from includes.admin.schemas.backup import ClassBeckup
 from includes.core.globals.coreutils import is_empty
 from includes.core.globals.entry import app_context
 from includes.core.metadata import MetaData
-from includes.core.query_paginator import QueryPaginator
+from includes.core.paginator import NewQueryPaginator
 from includes.db.connection import active_secondary_db
 from includes.db.dataclass import serialize
 from includes.db.models.secondary import QuizQuestion, QuizRelationships
@@ -22,23 +24,29 @@ class ClassObjective:
 
     @staticmethod
     async def get_list(limit=None):
-        def callback(records):
-            set_response("total", records.count())
-            set_response(
-                "draft", records.filter(QuizQuestion.status == "Draft").count()
-            )
-            set_response(
-                "publish", records.filter(QuizQuestion.status == "Publish").count()
-            )
-            return records
-
         db = await active_secondary_db()
-        data = await QueryPaginator.paginate(
+        
+        stmt = select(
+            func.count(QuizQuestion.id).label("total"),
+            func.count(case((QuizQuestion.status == "Draft", 1))).label("draft"),
+            func.count(case((QuizQuestion.status == "Publish", 1))).label("publish")
+        )
+        
+        # Single query execution
+        result = db.execute(stmt).one()
+        
+        # Response set karein
+        set_response("total", result.total)
+        set_response("draft", result.draft)
+        set_response("publish", result.publish)
+         
+
+        data = await NewQueryPaginator.paginate(
+            db=db,
             limit=limit,
             types="query",
-            callback=callback,
             model=QuizQuestion,
-            query=db.query(QuizQuestion),
+            query=select(QuizQuestion),
             transform=lambda item: item.to_dict(),
         )
         return data.records

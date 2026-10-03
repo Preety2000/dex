@@ -105,7 +105,7 @@
         }
     </script>
     <script type="text/javascript">// Main Script     {% include 'index.js' %}</script>
-    <script type="text/javascript"> $.module.list ??= $.getFunction().FlEXMAP();</script>
+    <script type="text/javascript"> $.module.list ??= $(function Module() { return this; });</script>
 </head>
 
 <body theme="{{app_context.preferences.theme}}" class="{{device_info.device_type}} {{response.page_type}}">
@@ -289,7 +289,7 @@
     {% set lsc = security.short_encode(response.languageCode) %}
     {% set lt = security.short_encode(response.language) %}
 
-    <script type="text/javascript">// All PageWorker  {% include 'page_worker.js' %}</script>
+    <script type="text/javascript">// All PageWorker  {% include 'worker.js' %}</script>
     <script type="text/javascript">// Nagivation      {% include 'navigation.js' %}</script>
     <script type="text/javascript">// Main Script     {% include 'script.main.js' %}</script>
 

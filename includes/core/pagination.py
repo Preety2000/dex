@@ -1,25 +1,23 @@
 import inspect
 from dataclasses import is_dataclass
-from typing import Any, Callable
+from typing import Any, Callable, Optional, Tuple
 from urllib.parse import parse_qs, urlencode
+from sqlalchemy import func, select
 
 from includes.core.globals.entry import app_context
+from includes.db.connection import active_secondary_db
 from includes.db.dataclass import serialize
-from includes.db.models.owner import Members
-from includes.src.request import RequestContext
 from includes.utils.utils import (
-    get_referer,
     get_post_value,
     get_query_value,
+    get_referer,
     get_referer_value,
 )
 
 
 def parse_int(value: int | str | None, default: int | None = None) -> int | None:
-    """Safely convert a value to int."""
     if value is None or value == "":
         return default
-
     try:
         return int(value)
     except (TypeError, ValueError):
@@ -27,46 +25,49 @@ def parse_int(value: int | str | None, default: int | None = None) -> int | None
 
 
 def set_serial_number(item: dict | Any, number: int):
-    """Set serial number on a dict or dataclass instance."""
     if isinstance(item, dict):
         item["sno"] = number
-
     elif is_dataclass(item):
         item.sno = number
-
     else:
         raise TypeError(f"item must be dict or dataclass, got {type(item).__name__}")
-
     return item
 
 
 def build_pagination_url(
-    name: str,
+    name: Any,
     css_class: str,
     page: int,
-    request: RequestContext,
+    request: Any,
 ) -> dict:
-    """Build pagination item with the requested page number."""
+    if not request:
+        return {
+            "name": str(name),
+            "clas": css_class,
+            "slug": f"?page={page}",
+            "page": page,
+        }
 
     base_url = (
-        request.host_url + "resent"
-        if request.host_url == request.base_uri
-        else request.base_uri
+        getattr(request, "host_url", "") + "resent"
+        if getattr(request, "host_url", None) == getattr(request, "base_uri", None)
+        else getattr(request, "base_uri", "")
     )
 
-    query_params = parse_qs(request.query)
+    raw_query = getattr(request, "query", "")
+    if isinstance(raw_query, str):
+        query_params = parse_qs(raw_query)
+    elif isinstance(raw_query, dict):
+        query_params = raw_query.copy()
+    else:
+        query_params = {}
 
-    # Remove existing page parameter.
-    query_params.pop("page", None)
-
-    # Add requested page.
     query_params["page"] = [page]
-
     query_string = urlencode(query_params, doseq=True)
-    url = f"{base_url}?{query_string}"
+    url = f"{base_url}?{query_string}" if base_url else f"?{query_string}"
 
     return {
-        "name": name,
+        "name": str(name),
         "clas": css_class,
         "slug": url,
         "page": page,
@@ -74,23 +75,18 @@ def build_pagination_url(
 
 
 class Pagination:
-    """Reusable pagination handler for query, API and referer requests."""
-
     def __init__(self, request_type: str | None = None):
         request_type = request_type or "query"
 
         if request_type == "query":
             self.url = app_context.request
             self.callback = get_query_value
-
         elif request_type == "api":
             self.url = app_context.request
             self.callback = get_post_value
-
         elif request_type == "referer":
             self.url = get_referer()
             self.callback = get_referer_value
-
         else:
             raise ValueError(
                 f"Invalid request_type: {request_type!r}. "
@@ -106,11 +102,8 @@ class Pagination:
         limit: int | None = None,
         page: int | None = None,
     ) -> None:
-        """Set valid page and limit values."""
-
         if isinstance(limit, int) and limit > 0:
             self.limit = limit
-
         if isinstance(page, int) and page > 0:
             self.page = page
 
@@ -120,27 +113,24 @@ class Pagination:
         limit: int | None = None,
         page: int | None = None,
     ):
-        """Load page and limit values from the configured request source."""
-
         self.set_page_limit(limit=limit, page=page)
 
-        page = self.callback("page")
-        limit = self.callback("limit")
+        page_val = self.callback("page")
+        limit_val = self.callback("limit")
 
-        if inspect.isawaitable(page):
-            page = await page
+        if inspect.isawaitable(page_val):
+            page_val = await page_val
+        if inspect.isawaitable(limit_val):
+            limit_val = await limit_val
 
-        if inspect.isawaitable(limit):
-            limit = await limit
+        page_val = parse_int(page_val)
+        limit_val = parse_int(limit_val)
 
-        page = parse_int(page)
-        limit = parse_int(limit)
+        if isinstance(page_val, int) and page_val > 0:
+            self.page = page_val
 
-        if isinstance(page, int):
-            self.page = page
-
-        if isinstance(limit, int):
-            self.limit = limit
+        if isinstance(limit_val, int) and limit_val > 0:
+            self.limit = limit_val
 
         return self
 
@@ -150,14 +140,10 @@ class Pagination:
         limit: int | None = None,
         page: int | None = None,
     ) -> int:
-        """Return database offset for the current page."""
-
         self.set_page_limit(limit=limit, page=page)
-
-        if self.page is None or self.limit is None:
-            return 0
-
-        return (self.page - 1) * self.limit
+        p = self.page if (self.page and self.page > 0) else 1
+        l = self.limit if (self.limit and self.limit > 0) else 10
+        return (p - 1) * l
 
     async def paginate(
         self,
@@ -167,51 +153,26 @@ class Pagination:
         data: list | None = None,
         transform: Callable | None = None,
     ):
-        """
-        Generate paginated data and pagination navigation.
-
-        Returns:
-            If data is provided:
-                (processed_data, pagination, total)
-
-            Otherwise:
-                (pagination, total)
-        """
-
-        # Use supplied limit only when no limit was loaded from request.
-        if self.limit is None:
+        if self.limit is None or self.limit <= 0:
             self.limit = limit
-
-        if self.page is None:
+        if self.page is None or self.page <= 0:
             self.page = 1
 
-        # Protect against invalid values.
-        if self.limit <= 0:
-            self.limit = limit
-
-        if self.page <= 0:
-            self.page = 1
-
-        total_pages = (total + self.limit - 1) // self.limit
-
+        total_pages = max(1, (total + self.limit - 1) // self.limit)
         pagination = []
-
-        # Process data and assign serial numbers.
         processed_data = None
 
         if data is not None:
             offset = self.get_offset()
-
             processed_data = []
 
             for index, item in enumerate(data):
                 if callable(transform):
                     item = transform(item)
-
                     if inspect.isawaitable(item):
                         item = await item
 
-                if not isinstance(item, dict):
+                if not isinstance(item, dict) and not is_dataclass(item):
                     item = serialize(item)
 
                 processed_data.append(
@@ -221,18 +182,12 @@ class Pagination:
                     )
                 )
 
-        # Previous page.
+        # Navigation Links
         if self.page > 1:
             pagination.append(
-                build_pagination_url(
-                    "Prev",
-                    "deactive",
-                    self.page - 1,
-                    self.url,
-                )
+                build_pagination_url("Prev", "deactive", self.page - 1, self.url)
             )
 
-        # Page number range.
         start_page = max(1, self.page - 2)
         end_page = min(total_pages, self.page + 2)
 
@@ -246,26 +201,14 @@ class Pagination:
                 )
             )
 
-        # Next page.
         if self.page < total_pages:
             pagination.append(
-                build_pagination_url(
-                    "Next",
-                    "deactive",
-                    self.page + 1,
-                    self.url,
-                )
+                build_pagination_url("Next", "deactive", self.page + 1, self.url)
             )
 
-        # Last page.
         if total_pages > 1 and self.page < total_pages:
             pagination.append(
-                build_pagination_url(
-                    "Last",
-                    "deactive",
-                    total_pages,
-                    self.url,
-                )
+                build_pagination_url("Last", "deactive", total_pages, self.url)
             )
 
         if data is not None:
@@ -278,28 +221,64 @@ class Pagination:
         cls,
         *,
         limit: int = 10,
-        query: Any | None = None,
-        transform: callable = None,
+        query: Any = None,
+        transform: Optional[Callable] = None,
         order_by: Any | None = None,
         request_type: str | None = None,
-    ):
-        total_count = query.count()
+        db: Any | None = None,
+    ) -> Tuple[list, list, int]:
+        """SQLAlchemy select() compatible async paginator execution."""
+
+        # 1. Resolve DB Session safely
+        db = db or active_secondary_db()
+        if inspect.isawaitable(db):
+            db = await db
+
+        # 2. Total Count Calculation for select()
+        if hasattr(query, "subquery"):
+            count_stmt = select(func.count()).select_from(
+                query.order_by(None).subquery()
+            )
+
+            # Safe Execution (Handles both Sync and Async DB drivers)
+            result = db.execute(count_stmt)
+            if inspect.isawaitable(result):
+                result = await result
+
+            total_count = result.scalar() or 0
+        else:
+            # Fallback for legacy query objects
+            total_count = query.count()
+            if inspect.isawaitable(total_count):
+                total_count = await total_count
+
+        # 3. Paginator Setup
         paginator = cls(request_type)
         await paginator.load(limit=limit)
         offset = paginator.get_offset()
 
+        # 4. Order By & Offset/Limit Application
         if order_by is not None:
             query = query.order_by(order_by)
 
-        # print("BEFORE pagination:", query.count())
+        query = query.offset(offset).limit(paginator.limit)
 
-        records = query.offset(offset).limit(paginator.limit).all()
+        # 5. Fetch Records safely
+        if hasattr(query, "subquery"):
+            res = db.execute(query)
+            if inspect.isawaitable(res):
+                res = await res
+            records = res.scalars().all()
+        else:
+            records = query.all()
+            if inspect.isawaitable(records):
+                records = await records
 
-        # print("AFTER pagination:", len(records))
-
-        data, paginator, results = await paginator.paginate(
+        # 6. Process Paginated Result
+        data, pagination, results = await paginator.paginate(
             total=total_count,
             data=records,
             transform=transform,
         )
-        return data, paginator, results
+
+        return data, pagination, results

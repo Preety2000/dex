@@ -1,7 +1,10 @@
+from sqlalchemy import select
+
+from includes.core.paginator import NewQueryPaginator
+from includes.db.connection import active_secondary_db
 from includes.utils._sub import configure_page
 from includes.core.globals.entry import app_context
 from includes.db.models.secondary import Syllabus
-from includes.core.query_paginator import QueryPaginator
 from includes.schemas.subject import ClassSubject
 from includes.schemas.university import ClassUniversity
 
@@ -38,11 +41,14 @@ class ClassSyllabus:
     @classmethod
     async def get(cls, query=None, **more):
 
-        syllabus = app_context.db.query(Syllabus)
+        syllabus = select(Syllabus)
+
+        db = await active_secondary_db()
 
         # If no query, return all syllabuses
         if query is True and isinstance(query, bool):
-            data = await QueryPaginator.paginate(
+            data = await NewQueryPaginator.paginate(
+                db=db,
                 types="query",
                 model=Syllabus,
                 query=syllabus,

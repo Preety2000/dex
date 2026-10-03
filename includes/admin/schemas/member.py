@@ -1,17 +1,13 @@
-import base64
-import os
 import json
-import uuid
+import base64
 
-from fastapi import UploadFile
-from sqlalchemy import asc, desc, or_
+from sqlalchemy import asc, desc, or_, select
 from includes.core.config import app_context, main_database
 from datetime import datetime
-from PIL import Image
-from werkzeug.utils import secure_filename
 from sqlalchemy.orm import selectinload
 
-from includes.core.query_paginator import QueryPaginator
+from includes.core.paginator import NewQueryPaginator
+from includes.db.connection import active_primary_db
 from includes.db.dataclass import MemberRole
 from includes.db.models.owner import Members, VerifyIdentity
 from includes.core.security import _Security
@@ -165,7 +161,6 @@ class IsMember:
 
     @classmethod
     async def get_member_list(cls):
-        msb = await app_context.db.configure_main()
 
         def transform(record):
             data = MemberCache._cache(record)
@@ -174,15 +169,17 @@ class IsMember:
             )
             return data
 
-        data = await QueryPaginator.paginate(
+        db = active_primary_db()
+        data = await NewQueryPaginator.paginate(
+            db=db,
             limit=10,
             types="query",
             model=Members,
             transform=transform,
-            query=msb.query(Members).options(
+            query=(select(Members).options(
                 selectinload(Members.identity),
                 selectinload(Members.last_login),
-            ),
+            )),
         )
         return data.records
 

@@ -1,5 +1,5 @@
 from sqlalchemy import func, select
-from includes.core.new_query_paginator import NewQueryPaginator
+from includes.core.paginator import NewQueryPaginator
 from includes.db.connection import active_secondary_db
 from includes.db.models.secondary import Article, ArticleView
 from includes.utils.arti import get_mini_article_json
