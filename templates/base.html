@@ -88,9 +88,9 @@
         "description": "{%if response.excerpt %}{{response.excerpt | safe}}{% else %} {{response.site_name  | safe}} | The World’s Largest Online Community for Developers{% endif %}",
         "headline": "{{response.title}}"
     }</script>{% endif %}
-    <link rel="stylesheet" id="main_style" href="/static/css/index.css?m={{device_info.device_type}}">{% block head %}{%
-    endblock %}{%if device_info.device_type == "mobile"%}
-    <link rel="stylesheet" id="main_style" href="/static/css/mobile.css?m={{device_info.device_type}}">{%endif%}
+    <link rel="stylesheet" id="main_style" href="/static/css/index.css?m={{device_info.device_type}}">
+    {% block head %}{%endblock %}
+
     <script type="application/json" data-sjs data-content-len="4">
         {"require":["bess", null, null, ["7512725961844105", "splash_load"]]}
     </script>
@@ -111,9 +111,7 @@
 <body theme="{{app_context.preferences.theme}}" class="{{device_info.device_type}} {{response.page_type}}">
     <div class="IN010"></div>
     <!-- start_time: {{app_context.start_time}}</br>end_time: {{app_context.end_time}}</br>fetch_timing: {{response.fetch_time}}</br> -->
-    <div
-        style="position: absolute;top: 0;left: 50%;transform: translateX(-50%);height: 30px;width: 80px;z-index: 99999;text-wrap-mode: nowrap;">
-        RT : {{response.fetch_time}}</div>
+    <!-- <div style="position: absolute;top: 0;left: 50%;transform: translateX(-50%);height: 30px;width: 80px;z-index: 99999;text-wrap-mode: nowrap;">RT : {{response.fetch_time}}</div> -->
     <div class="__dom">
         <div class="IN001">
             <div class="progress"><span class="IN002"></span></div>
@@ -183,47 +181,6 @@
         <!-- Main Session  -->
         <div class="IN016 clear">{% block body %}{% endblock %}</div>
         <!-- Footer Session  -->
-        {%if device_info.device_type == "mobile"%}
-        <div class="navigation-session button-navigation">
-            <div class="IN0104 width DIS01">
-                <a href="/?action=mobile_navigation"
-                    class="button {{function.active_class(response.resource, 'widget')}}">
-                    <div class="squer">
-                        <icon class="IN065">{{svg.ib_home | safe}}</icon>
-                        <span class="IN040-title">{{function.utc("Home")}}</span>
-                    </div>
-                </a>
-                <a href="/questions?action=mobile_navigation"
-                    class="button {{function.active_class(response.resource, 'questions')}}">
-                    <div class="squer">
-                        <icon class="IN065">{{svg.ib_question | safe}}</icon>
-                        <span class="IN040-title">{{function.utc("Questions")}}</span>
-                    </div>
-                </a>
-                <a href="/practice?action=mobile_navigation"
-                    class="button {{function.active_class(response.resource, 'practice')}}">
-                    <div class="squer">
-                        <icon class="IN065">{{svg.ib_bulb | safe}}</icon>
-                        <span class="IN040-title">{{function.utc("MCQ")}}</span>
-                    </div>
-                </a>
-                <a href="/exam?action=mobile_navigation"
-                    class="button {{function.active_class(response.resource, 'exam')}}">
-                    <div class="squer">
-                        <icon class="IN065">{{svg.ib_evaluation | safe}}</icon>
-                        <span class="IN040-title">{{function.utc("Exam")}}</span>
-                    </div>
-                </a>
-                <!-- <a href="/inbox?action=mobile_navigation" class="button {{function.active_class(response.resource, 'inbox')}}">
-                    <div class="squer">
-                        <icon class="IN065">{{svg.inbox | safe}}</icon>
-                        <span class="IN040-title">{{function.utc("Inbox")}}</span>
-                    </div>
-                </a> -->
-            </div>
-        </div>
-        <script src="/script/ismobile"></script>
-        {%else%}
 
         {%if footer_hide != True %}
         <div class="IN052">

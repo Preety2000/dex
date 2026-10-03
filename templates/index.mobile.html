@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" id="main_style" href="/static/css/mobile.css?m={{device_info.device_type}}">
+{% endblock %}
 {% block body %}
 <style>
     .IN038 {
@@ -95,4 +98,41 @@
     <div class='ads_container'><ins class='adsbywseditor' style='display:inline-block;width: auto;height:auto'></ins>
     </div>
 </div>
+<div class="navigation-session button-navigation">
+    <div class="IN0104 width DIS01">
+        <a href="/?action=mobile_navigation" class="button {{function.active_class(response.resource, 'widget')}}">
+            <div class="squer">
+                <icon class="IN065">{{svg.ib_home | safe}}</icon>
+                <span class="IN040-title">{{function.utc("Home")}}</span>
+            </div>
+        </a>
+        <a href="/questions?action=mobile_navigation"
+            class="button {{function.active_class(response.resource, 'questions')}}">
+            <div class="squer">
+                <icon class="IN065">{{svg.ib_question | safe}}</icon>
+                <span class="IN040-title">{{function.utc("Questions")}}</span>
+            </div>
+        </a>
+        <a href="/practice?action=mobile_navigation"
+            class="button {{function.active_class(response.resource, 'practice')}}">
+            <div class="squer">
+                <icon class="IN065">{{svg.ib_bulb | safe}}</icon>
+                <span class="IN040-title">{{function.utc("MCQ")}}</span>
+            </div>
+        </a>
+        <a href="/exam?action=mobile_navigation" class="button {{function.active_class(response.resource, 'exam')}}">
+            <div class="squer">
+                <icon class="IN065">{{svg.ib_evaluation | safe}}</icon>
+                <span class="IN040-title">{{function.utc("Exam")}}</span>
+            </div>
+        </a>
+        <!-- <a href="/inbox?action=mobile_navigation" class="button {{function.active_class(response.resource, 'inbox')}}">
+                    <div class="squer">
+                        <icon class="IN065">{{svg.inbox | safe}}</icon>
+                        <span class="IN040-title">{{function.utc("Inbox")}}</span>
+                    </div>
+                </a> -->
+    </div>
+</div>
+<script src="/script/ismobile"></script>
 {% endblock %}
