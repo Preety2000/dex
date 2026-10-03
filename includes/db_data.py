@@ -3,9 +3,14 @@ from fastapi.responses import FileResponse
 from flask import Request
 from sqlalchemy import inspect, text
 
-from includes.db.connection import active_primary_db
+from includes.db.connection import (
+    active_exam_db,
+    active_primary_db,
+    active_secondary_db,
+)
 from includes.db.models.owner import Members
 from includes.core.globals.entry import app_context
+from includes.utils.utils import get_query_value, get_referer_value
 
 
 async def export_database(db):
@@ -25,7 +30,18 @@ async def export_database(db):
 
 async def import_database(root, result):
 
-    db = await active_primary_db()
+    db_count = get_query_value("db", get_referer_value("db", None))
+
+    db = await {
+        "1": active_primary_db,
+        "2": active_secondary_db,
+        "3": active_exam_db,
+    }.get(str(db_count), active_primary_db)()
+
+    inserted = 0
+    updated = 0
+    skipped = 0
+
     try:
         inspector = inspect(db.bind)
         existing_tables = inspector.get_table_names()
@@ -33,36 +49,34 @@ async def import_database(root, result):
         for table_name, table_data in result.items():
 
             if table_name not in existing_tables:
+                skipped += 1
                 continue
 
             columns = table_data["columns"]
             rows = table_data["rows"]
 
             if not rows or "id" not in columns:
+                skipped += 1
                 continue
 
-            # id ko chhodkar update hone wale columns
             update_columns = [column for column in columns if column != "id"]
 
             for row in rows:
 
                 row_id = row["id"]
 
-                # Check ID exists
                 check_query = text(f"""
                     SELECT 1
                     FROM "{table_name}"
                     WHERE "id" = :id
                     LIMIT 1
-                    """)
+                """)
 
                 existing = (db.execute(check_query, {"id": row_id})).first()
 
                 if existing:
 
-                    # UPDATE
                     if update_columns:
-
                         set_clause = ", ".join(
                             f'"{column}" = :{column}' for column in update_columns
                         )
@@ -71,13 +85,13 @@ async def import_database(root, result):
                             UPDATE "{table_name}"
                             SET {set_clause}
                             WHERE "id" = :id
-                            """)
+                        """)
 
                         db.execute(update_query, row)
+                        updated += 1
 
                 else:
 
-                    # INSERT
                     column_names = ", ".join(f'"{column}"' for column in columns)
 
                     placeholders = ", ".join(f":{column}" for column in columns)
@@ -86,11 +100,20 @@ async def import_database(root, result):
                         INSERT INTO "{table_name}"
                         ({column_names})
                         VALUES ({placeholders})
-                        """)
+                    """)
 
                     db.execute(insert_query, row)
+                    inserted += 1
 
         db.commit()
+
+        return {
+            "success": True,
+            "inserted": inserted,
+            "updated": updated,
+            "skipped": skipped,
+            "total": inserted + updated,
+        }
 
     except Exception:
         db.rollback()
@@ -104,11 +127,18 @@ async def download_db_data(root, templates, request: Request):
             name="upload_db.html",
         )
 
-    db = await active_primary_db()
+    db_count = get_query_value("db")
+
+    db = await {
+        "1": active_primary_db,
+        "2": active_secondary_db,
+        "3": active_exam_db,
+    }.get(str(db_count), active_primary_db)()
+
     result = await export_database(db)
 
     if "download" == app_context.route.scope_slug:
-        file_path = "backup.json"
+        file_path = "database_backup.json"
 
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2, default=str)

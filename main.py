@@ -324,9 +324,9 @@ async def upload_json(root: str = None):
         import json
 
         result = json.loads(content)
-        await import_database(root, result)
+        stats = await import_database(root, result)
 
-        return {"success": True, "message": "JSON imported successfully"}
+        return {"success": True, "message": "JSON imported successfully", **stats}
 
     except json.JSONDecodeError as e:
         raise HTTPException(status_code=400, detail=f"Invalid JSON file: {e}")
