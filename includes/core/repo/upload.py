@@ -240,8 +240,8 @@ class FileUpload:
             resize = (300, 120)
 
             async def bind(image):
-                session = new_session("isnet-general-use")
-                image = remove(image, session=session)
+                # session = new_session("isnet-general-use")
+                # image = remove(image, session=session)
                 return image
 
         file = await extract_uploaded_files("image")
