@@ -150,13 +150,15 @@ async def download_db_data(root, templates, request: Request):
     result = await export_database(db)
 
     if "download" == app_context.route.scope_slug:
-        file_path = "database_backup.json"
+        file_path = f"database_backup_{db_count}.json"
 
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2, default=str)
 
         return FileResponse(
-            path=file_path, filename="database.json", media_type="application/json"
+            path=file_path,
+            filename=f"database_{db_count}.json",
+            media_type="application/json",
         )
 
     if "view" == app_context.route.scope_slug:
