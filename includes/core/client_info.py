@@ -3,6 +3,7 @@ import socket
 from user_agents import parse
 
 from includes.core.device_encoder import encode_device
+from includes.core.deviceinfo import DeviceInfo
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
 
@@ -47,7 +48,8 @@ def collect_user_signals(ip):
     accept_language = app_context.request.headers.get("Accept-Language", "")
     client_timezone = app_context.request.headers.get("X-Timezone", "")
 
-    device_info = get_device_info()
+    DeviceInfo.reset(app_context.request)
+    device_info = DeviceInfo.to_dict()
     # -------------------------
     # IP APIs
     # -------------------------
@@ -111,7 +113,7 @@ def collect_user_signals(ip):
     if not isp:
         risk_score += 20
 
-    if device_info["device"] == "Other":
+    if DeviceInfo.device == "Other":
         risk_score += 10
 
     if "bot" in user_agent_string.lower():
@@ -139,7 +141,6 @@ def collect_user_signals(ip):
     # FINAL OUTPUT (COMPLETE)
     # -------------------------
     return {
-        "device": device_info,
         "device_id": encode_device(device_info),
         "fingerprint_id": fingerprint_id,
         "client": {
@@ -171,65 +172,3 @@ def collect_user_signals(ip):
             ),
         },
     }
-
-
-def get_device_info():
-
-    # -------------------------
-    # Headers (FIXED: consistent variables)
-    # -------------------------
-    user_agent_string = app_context.request.headers.get("User-Agent", "")
-    accept_language = app_context.request.headers.get("Accept-Language", "")
-    client_timezone = app_context.request.headers.get("X-Timezone", "")
-
-    ua = parse(user_agent_string)
-
-    # -------------------------
-    # Device info (FULL)
-    # -------------------------
-    device = ua.device.family
-
-    # -------------------------
-    # Connection classification
-    # -------------------------
-    score = {"mobile": 0, "broadband": 0, "vpn": 0, "datacenter": 0}
-
-    result = max(score, key=score.get)
-    confidence = (score[result] / 5) * 100 if score[result] > 0 else 0
-
-    # -------------------------
-    # Risk score (FIXED SAFE)
-    # -------------------------
-    risk_score = 0
-
-    if device == "Other":
-        risk_score += 10
-
-    if "bot" in user_agent_string.lower():
-        risk_score += 40
-
-    if not accept_language:
-        risk_score += 10
-
-    if result == "datacenter":
-        risk_score += 25
-
-    risk_score = min(risk_score, 100)
-    device_type = "mobile" if user_agent_string.find("Mobile") != -1 else "desktop"
-    device_info = {
-        "device_type": device_type,
-        "platform": ua.os.family,
-        "browser": ua.browser.family,
-        "device": device,
-        "platform_version": ua.os.version_string,
-        "browser_version": ua.browser.version_string,
-        "is_mobile": ua.is_mobile,
-        "is_pc": ua.is_pc,
-        "is_tablet": ua.is_tablet,
-        "is_bot": ua.is_bot,
-    }
-
-    # -------------------------
-    # FINAL OUTPUT (COMPLETE)
-    # -------------------------
-    return device_info

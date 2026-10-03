@@ -2,9 +2,10 @@ import hashlib
 import requests
 
 from datetime import datetime, timedelta
-from includes.core.client_info import collect_user_signals, get_device_info
+from includes.core.client_info import collect_user_signals
+from includes.core.deviceinfo import DeviceInfo
 from includes.core.globals.entry import app_context
-from includes.core.metadata import Metadata
+from includes.core.metadata import MetaData
 
 
 def generate_fingerprint(request):
@@ -116,22 +117,24 @@ class IP:
         4. Failure par None return karta hai
         """
 
-        Metadata.device_info = get_device_info()
         fingerprint_id = generate_fingerprint(app_context.request)
         cached_data = IP.get(fingerprint_id)
 
         if cached_data:
-            cached_data["device"] = Metadata.device_info
-            Metadata.client_info = cached_data
+            cached_data["device"] = DeviceInfo.to_dict()
+            MetaData.client_info = cached_data
+            app_context.client_info = cached_data
             return cached_data
 
         try:
             info = collect_user_signals(app_context.request.ip)
             client_info = IP.add(fingerprint_id, info)
-            Metadata.client_info = client_info
+            MetaData.client_info = client_info
+            app_context.client_info = cached_data
             return client_info
 
         except requests.RequestException as e:
             # Optional: logging can be added here
             # print(f"[IPINFO ERROR] {e}")
+            app_context.client_info = {}
             return {}

@@ -1,6 +1,7 @@
 import os
 import json
 
+from includes.core.deviceinfo import DeviceInfo
 from includes.schemas.trending import ArticleTrendingService
 from includes.utils._sub import configure_page
 from includes.core.metadata import MetaData
@@ -145,8 +146,7 @@ class RequestDispatcher:
 
     @staticmethod
     async def handle_recent(ctx):
-        device = MetaData.device_info
-        if device.get("is_mobile") is False:
+        if DeviceInfo.is_mobile is False:
             configure_page(
                 template="query/parameter", title="Latest Additions", suffix=True
             )

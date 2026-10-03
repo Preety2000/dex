@@ -3,6 +3,7 @@ import copy
 import datetime as dt
 from typing import Any
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
+from includes.core.deviceinfo import DeviceInfo
 from includes.utils._sub import apply_session_updates, configure_page
 from includes.db.dataclass import serialize, to_dict
 
@@ -33,22 +34,9 @@ async def get_terms_by_resource_cached(resource_id):
 
 
 async def execute_home_page(roots: Any = None) -> dict[str, Any]:
-    #  Device check
-    is_mobile = MetaData.device_info.get("is_mobile", None)
 
     # Predicate lambda for filtering
     term_filter = lambda r: r.article_count > 0
-
-    # Mobile Execution (Single DB Query)
-    if is_mobile:
-        configure_page(template="index.mobile", title="Welcome", suffix=True)
-        all_term_list = await ClassTerms.get_all_record(
-            limit=16, topic=1, bind=term_filter
-        )
-        return {
-            "resource": "widget",
-            "category": to_dict(all_term_list),
-        }
 
     # Desktop Execution (Parallel DB Queries for Maximum Speed)
     configure_page(template="index", title="Welcome", suffix=True)
@@ -148,37 +136,6 @@ async def build_http_response(result, templates, request):
 
         template_name = template_name.strip()
 
-
-        # ---------------------------------------------------------
-        # Allowed templates
-        # ---------------------------------------------------------
-        allowed_templates = (
-            "index",
-            "index.mobile",
-            "query/exam",
-            "/admin/login",
-            "admin/add_mcq",
-            "admin/dashboard",
-            "admin/practice",
-            "admin/member",
-            "admin/teacher_verify_identity",
-            "admin/terms",
-            "admin/articles",
-            "query/setting",
-            "member/login",
-            "member/signup_animation",
-            "member/forgot_password",
-            "query/login_required",
-            "widget/results_index",
-            "widget/answer_sheet",
-            "widget/get_results",
-            "member/teacher_verify_identity",
-        )
-
-        # if not get_query_value("isme"):
-        #     if template_name not in allowed_templates:
-        #         template_name = "mdftr"
-
         # ---------------------------------------------------------
         # HTTP status code
         # ---------------------------------------------------------
@@ -198,7 +155,9 @@ async def build_http_response(result, templates, request):
 
         # request must be present in context
         template_context["request"] = request
+        template_context["device_info"] = DeviceInfo.to_dict()
 
+        print(f"Rendering template: {MetaData}")
         # ---------------------------------------------------------
         # Render template
         # ---------------------------------------------------------
@@ -232,17 +191,12 @@ async def build_http_response(result, templates, request):
 
 async def enrich_request_response(response):
     auth_session = await app_context.setting.member()
-    response.update(
-        {
-            "auth_session": auth_session,
-            "device_info": app_context.client_info.get("device", {}),
-        }
-    )
+    response.update({"auth_session": auth_session})
 
     return response
 
 
-async def handle_request_with_cache(*, allow_catch:bool=True, **binds):
+async def handle_request_with_cache(*, allow_catch: bool = True, **binds):
     # Base initialization
     await initialize_database()
 

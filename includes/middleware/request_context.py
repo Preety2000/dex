@@ -2,6 +2,7 @@ import datetime as dt
 from fastapi import Request, WebSocket
 
 
+from includes.core.deviceinfo import DeviceInfo
 from includes.function import load_svg_files
 from includes.core.ip import IP
 from includes.core.globals.entry import app_context
@@ -28,11 +29,14 @@ class DataBaseConnectionMiddleware(BaseHTTPMiddleware):
         app_context.request = Requests(request_or_ws)
         app_context.cookie = Cookie(request_or_ws)
         app_context.setting = Setting(request_or_ws)
-        app_context.client_info = IP.get_info()
 
         await MetaData.reset()
+
         await self._load_app_context()
         await self._load_setup_context()
+
+        IP.get_info()
+        DeviceInfo.reset(request_or_ws)
 
     async def _load_app_context(self):
         app_context.cookie.start()
@@ -107,17 +111,14 @@ class DataBaseConnectionMiddleware(BaseHTTPMiddleware):
     async def _verify_client(self, send) -> tuple[bool, str]:
 
         reason = None
-        device = MetaData.device_info
         client_info = app_context.client_info or {}
         security = client_info.get("security", {})
         classification = client_info.get("classification", {})
 
         risk_score = security.get("risk_score", 0)
 
-        # print(device)
-
         # Known bot
-        if device.get("is_bot"):
+        if DeviceInfo.is_bot:
             reason = "Bot detected"
 
         # High risk traffic

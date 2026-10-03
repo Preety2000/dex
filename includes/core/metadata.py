@@ -71,7 +71,6 @@ class Metadata:
     settings: list = field(default_factory=list)
     custom_meta: dict[str, str] = field(default_factory=dict)  # Any extra <meta> tags
 
-    device_info: dict[str, str] = field(default_factory=dict)
     client_info: dict[str, str] = field(default_factory=dict)
 
     # Config Load Method
@@ -94,6 +93,22 @@ class Metadata:
 
         # Fresh config load karna
         self.load_config(force_reload=reload_json)
+        return self
+
+    async def update(self, data: dict[str, Any]) -> "Metadata":
+        """
+        Metadata instance ko update karta hai using provided dictionary.
+        Sirf valid attributes ko update karega.
+        """
+        if not data or not isinstance(data, dict):
+            return self
+
+        valid_fields = {f.name for f in fields(self)}
+
+        for key, value in data.items():
+            if key in valid_fields:
+                setattr(self, key, value)
+
         return self
 
     def to_dict(self) -> dict:
@@ -132,3 +147,4 @@ async def set_article_context(data: dict) -> None:
     for field in asdict(MetaData):
         if field in data:
             setattr(MetaData, field, data[field])
+

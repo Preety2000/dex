@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
+
+{% if device_info.device_type == "desktop" %}
 <style>
     .IN038 {
         background: transparent;
@@ -86,8 +88,11 @@
         </div>
     </main>
 </div>
-
 <div class='adscontainer clear'>
-    <div class='ads_container'><ins class='adsbywseditor' style='display:inline-block;width: auto;height:auto'></ins>
+    <div class='ads_container'>
+        <ins class='adsbywseditor' style='display:inline-block;width: auto;height:auto'></ins>
     </div>
-</div>{% endblock %}
+</div>
+
+{% else %}{% include "index.mobile.html" %}{% endif %}
+{% endblock %}

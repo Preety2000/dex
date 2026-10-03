@@ -21,6 +21,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
+from includes.core.deviceinfo import DeviceInfo
 from includes.core.repo.upload import extract_uploaded_files
 from includes.db_data import SHUTDOWN, STARTUP, download_db_data, import_database
 from includes.executers import (
@@ -293,7 +294,7 @@ async def payment(
             "app_context": app_context,
             "function": app_context.function,
             "auth_session": auth_session,
-            "device_info": MetaData.device_info,
+            "device_info": DeviceInfo.to_dict(),
         }
     )
     response = await build_http_response(app_context.response, templates, request)
