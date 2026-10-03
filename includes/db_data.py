@@ -2,6 +2,8 @@ import json
 from fastapi.responses import FileResponse
 from flask import Request
 from sqlalchemy import inspect, text
+from sympy import root
+from includes.core.repo.dir_manager import folder
 
 from includes.db.connection import (
     active_exam_db,
@@ -39,8 +41,11 @@ async def import_database(root, result):
     }.get(str(db_count), active_primary_db)()
 
     inserted = 0
+    inserteds = []
     updated = 0
+    updateds = []
     skipped = 0
+    skippeds = []
 
     try:
         inspector = inspect(db.bind)
@@ -50,6 +55,7 @@ async def import_database(root, result):
 
             if table_name not in existing_tables:
                 skipped += 1
+                skippeds.append(f"{table_name}")
                 continue
 
             columns = table_data["columns"]
@@ -57,6 +63,7 @@ async def import_database(root, result):
 
             if not rows or "id" not in columns:
                 skipped += 1
+                skippeds.append(f"{table_name}")
                 continue
 
             update_columns = [column for column in columns if column != "id"]
@@ -88,6 +95,7 @@ async def import_database(root, result):
                         """)
 
                         db.execute(update_query, row)
+                        updateds.append(table_name)
                         updated += 1
 
                 else:
@@ -104,6 +112,7 @@ async def import_database(root, result):
 
                     db.execute(insert_query, row)
                     inserted += 1
+                    inserteds.append(table_name)
 
         db.commit()
 
@@ -112,6 +121,9 @@ async def import_database(root, result):
             "inserted": inserted,
             "updated": updated,
             "skipped": skipped,
+            "inserteds": inserteds,
+            "updateds": updateds,
+            "skippeds": skippeds,
             "total": inserted + updated,
         }
 
@@ -152,3 +164,41 @@ async def download_db_data(root, templates, request: Request):
 
     else:
         return "File not found or invalid route. Please check the URL and try again."
+
+
+async def STARTUP():
+    paths = [
+        folder._get_path("database", "exam.json"),
+        folder._get_path("database", "primary.json"),
+        folder._get_path("database", "secondary.json"),
+    ]
+
+    for path in paths:
+        content = await path.read()
+
+        if content:
+            result = json.loads(content)
+            await import_database(root, result)
+
+    return "STARTUP"
+
+
+async def SHUTDOWN():
+    path_exam = folder._get_path("database", "exam.json")
+    path_primary = folder._get_path("database", "primary.json")
+    path_secondary = folder._get_path("database", "secondary.json")
+
+    exam = await export_database(await active_exam_db())
+    primary = await export_database(await active_primary_db())
+    secondary = await export_database(await active_secondary_db())
+
+    with open(path_exam, "w", encoding="utf-8") as f:
+        json.dump(exam, f, ensure_ascii=False, indent=2, default=str)
+
+    with open(path_primary, "w", encoding="utf-8") as f:
+        json.dump(primary, f, ensure_ascii=False, indent=2, default=str)
+
+    with open(path_secondary, "w", encoding="utf-8") as f:
+        json.dump(secondary, f, ensure_ascii=False, indent=2, default=str)
+
+    return "SHUTDOWN"

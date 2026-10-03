@@ -22,7 +22,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from includes.core.repo.upload import extract_uploaded_files
-from includes.db_data import download_db_data, import_database
+from includes.db_data import SHUTDOWN, STARTUP, download_db_data, import_database
 from includes.executers import (
     execute_home_page,
     handle_request_with_cache,
@@ -104,11 +104,13 @@ app.include_router(payment_router)
 
 @app.on_event("startup")
 async def startup_event():
+    await STARTUP()
     print("Application is starting...")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
+    await SHUTDOWN()
     print("Application is shutting down...")
 
 
@@ -116,7 +118,7 @@ async def shutdown_event():
 async def index(request: Request):
     response = await handle_request_with_cache(callback=execute_home_page)
     response = await build_http_response(response, templates, request)
-    # response.headers["Cache-Control"] = "public, max-age=3000"
+    response.headers["Cache-Control"] = "public, max-age=3000"
     return response
 
 
