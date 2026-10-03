@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Upload JSON</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            width: 400px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        #message {
+            margin-top: 20px;
+            padding: 10px;
+            display: none;
+            border-radius: 6px;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+    <script src="/script/index.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Upload JSON File</h2>
+        <form id="uploadForm">
+            <input type="file" id="jsonFile" name="file" accept=".json,application/json" required>
+            <button type="submit">Upload JSON</button>
+        </form>
+        <div id="message"></div>
+    </div>
+
+
+    <script>
+
+        const f = $("uploadForm", true);
+        const i = $("jsonFile", true);
+        const m = $("message", true);
+
+        f.addEventListener("submit", async e => {
+            e.preventDefault();
+            const x = i.files[0];
+            if (!x) return showMessage("Please select a JSON file.", false);
+
+            if (!x.name.toLowerCase().endsWith(".json"))
+                return showMessage("Only JSON files are allowed.", false);
+
+            const d = new FormData();
+            d.append("file", x);
+
+            try {
+                showMessage("Uploading...", true);
+
+                const r = await fetch("/stro/upload/qs", {
+                    method: "POST",
+                    body: d
+                });
+                const j = await r.json();
+                if (!r.ok) throw new Error(j.detail || "Upload failed");
+                showMessage(j.message || "JSON imported successfully!", true);
+                f.reset();
+
+            } catch (e) {
+                showMessage(e.message || "Something went wrong", false);
+            }
+        });
+
+        function showMessage(t, s) {
+            m.style.display = "block";
+            m.textContent = t;
+            m.className = s ? "success" : "error";
+        }
+
+
+    </script>
+
+</body>
+
+</html>

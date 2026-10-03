@@ -21,6 +21,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
+from includes.core.repo.upload import extract_uploaded_files
+from includes.db_data import download_db_data, import_database
 from includes.executers import (
     execute_home_page,
     handle_request_with_cache,
@@ -294,6 +296,55 @@ async def payment(
     )
     response = await build_http_response(app_context.response, templates, request)
     return response
+
+
+@app.post("/stro/upload/{root:path}")
+async def upload_json(root: str = None):
+
+    form = await app_context.request.form()
+    file = await extract_uploaded_files("file")
+
+    print("Uploaded file:", file)
+
+    if file is None:
+        raise HTTPException(status_code=400, detail="JSON file is required")
+
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Filename is missing")
+
+    if not file.filename.lower().endswith(".json"):
+        raise HTTPException(status_code=400, detail="Only JSON files are allowed")
+
+    try:
+        content = await file.read()
+
+        if not content:
+            raise HTTPException(status_code=400, detail="Uploaded file is empty")
+
+        import json
+
+        result = json.loads(content)
+        await import_database(root, result)
+
+        return {"success": True, "message": "JSON imported successfully"}
+
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid JSON file: {e}")
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+
+        raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
+
+
+@app.get("/stro/{root:path}")
+async def download_data(root: str | None = None, request: Request = None):
+    return await download_db_data(root, templates, request)
 
 
 @app.api_route("/{roots:path}", methods=["GET"], response_class=HTMLResponse)
