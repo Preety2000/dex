@@ -1,6 +1,6 @@
 from includes.api.exam.stlinks import StLinksHendlar
 from includes.core.globals.entry import app_context
-from includes.db.models.db_exam import _TeacherProfile
+from includes.database.models.db_exam import _TeacherProfile
 from includes.schemas.subject import ClassSubject
 from includes.src.request import RequestContext
 from includes.api.exam.index import Exam

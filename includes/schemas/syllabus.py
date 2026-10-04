@@ -1,10 +1,10 @@
 from sqlalchemy import select
 
 from includes.core.paginator import NewQueryPaginator
-from includes.db.connection import active_secondary_db
+from includes.database.connection import active_secondary_db
 from includes.utils._sub import configure_page
 from includes.core.globals.entry import app_context
-from includes.db.models.secondary import Syllabus
+from includes.database.models.secondary import Syllabus
 from includes.schemas.subject import ClassSubject
 from includes.schemas.university import ClassUniversity
 

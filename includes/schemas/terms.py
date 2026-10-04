@@ -1,7 +1,7 @@
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import matches_filters
-from includes.db.dataclass import serialize
-from includes.db.models.secondary import (
+from includes.database.dataclass.dataclass import serialize
+from includes.database.models.secondary import (
     Article,
     QuizQuestion,
     QuizRelationships,

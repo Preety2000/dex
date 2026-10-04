@@ -17,7 +17,7 @@ from includes.services.member.member import ClassUser
 from includes.schemas.conversation import Conversation
 from includes.core.repo.media import Media
 from includes.schemas.search import Search
-from includes.db.models.secondary import Article
+from includes.database.models.secondary import Article
 from PIL import Image, ImageDraw, ImageFont
 
 from includes.utils.utils import get_post_value, json_response

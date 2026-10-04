@@ -19,9 +19,9 @@ from includes.api.exam.student import RecordType, Student
 from includes.api.router import DynamicSokitURLRoute
 from includes.core.globals.coreutils import generate_unique_uuid
 from includes.core.globals.entry import app_context
-from includes.db.dataclass import ExamRqStatus
-from includes.db.models.db_exam import ExamRequestSession, _ExamDetails, _ExamRecord
-from includes.db.models.utils import TimeStamp
+from includes.database.dataclass.dataclass import ExamRqStatus
+from includes.database.models.db_exam import ExamRequestSession, _ExamDetails, _ExamRecord
+from includes.database.models.utils import TimeStamp
 from includes.utils.exm import (
     block_exam_message,
     calculate_exam_stats,

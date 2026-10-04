@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import  Optional
+from typing import Optional
 from contextlib import contextmanager
 
 from pydantic import BaseModel
@@ -9,36 +9,18 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 from includes.core.globals.entry import app_context
-from includes.db.models.db_exam import ExamDb
-from includes.db.models.owner import BaseOwner
-from includes.db.models.secondary import BaseSecondary
+from includes.database.models.db_exam import ExamDb
+from includes.database.models.owner import BaseOwner
+from includes.database.models.secondary import BaseSecondary
+
+from includes.database.dir import (
+    EXAM_DB_URL,
+    MAIN_DB_URL,
+    SECONDARY_DB_URLS,
+)
 
 
-# ============================================================
-# DATABASE CONFIGURATION
-# ============================================================
-
-BASE_DIR = Path(__file__).resolve().parent
-
-# SQLite files will be created here:
-# includes/core/sqlite/
-DB_DIR = BASE_DIR / "sqlite"
-DB_DIR.mkdir(parents=True, exist_ok=True)
-
-
-MAIN_DB_URL = f"sqlite:///{DB_DIR / 'db_vidya.db'}"
-
-EXAM_DB_URL = f"sqlite:///{DB_DIR / 'db_exam.db'}"
-
-SECONDARY_DB_URLS: dict[str, str] = {
-    "hindi": f"sqlite:///{DB_DIR / 'db_hindi.db'}"
-}
-
-
-# ============================================================
 # SQLAlchemy SESSION FACTORY
-# ============================================================
-
 def create_session_factory(db_url: str, base):
     """
     Create SQLAlchemy engine and scoped session factory.
@@ -80,30 +62,21 @@ def create_session_factory(db_url: str, base):
     return engine, Session
 
 
-# ============================================================
 # MAIN DATABASE
-# ============================================================
-
 main_engine, MainSession = create_session_factory(
     MAIN_DB_URL,
     BaseOwner,
 )
 
 
-# ============================================================
 # EXAM DATABASE
-# ============================================================
-
 exam_engine, ExamSession = create_session_factory(
     EXAM_DB_URL,
     ExamDb,
 )
 
 
-# ============================================================
 # SECONDARY DATABASES
-# ============================================================
-
 SecondarySessionList: dict[str, scoped_session] = {}
 
 for db_key, db_url in SECONDARY_DB_URLS.items():
@@ -116,10 +89,7 @@ for db_key, db_url in SECONDARY_DB_URLS.items():
     SecondarySessionList[db_key] = Session
 
 
-# ============================================================
 # DATABASE CONTEXT MANAGERS
-# ============================================================
-
 @contextmanager
 def main_database():
     """Main database session."""
@@ -165,10 +135,7 @@ def secondary_database(db_key: str = app_context.db_key):
     factory = SecondarySessionList.get(db_key)
 
     if not factory:
-        raise ValueError(
-            f"[Secondary DB Error] "
-            f"No session factory for '{db_key}'"
-        )
+        raise ValueError(f"[Secondary DB Error] " f"No session factory for '{db_key}'")
 
     session = factory()
 
@@ -185,10 +152,7 @@ def secondary_database(db_key: str = app_context.db_key):
         session.close()
 
 
-# ============================================================
 # LOCATION MODEL
-# ============================================================
-
 class Location(BaseModel):
 
     # GPS
@@ -224,24 +188,11 @@ async def receive_location(location: Location):
     }
 
 
-# ============================================================
 # SECURITY / COOKIE
-# ============================================================
-
-MASTER_KEY = (
-    "qh5DB6lIEAkPk48e7KwVEJOkcQVAngkuy8_5O8y2tGu0tPyo2fulAbhaRGjyIMWzxY"
-)
-
-DEFAULT_COOKIE = (
-    "Em4FYvhv.0.0."
-    "qh5DB6lIEAkPk48e7KwVEJOkcQVAngkuy8_5O8y2tGu0tPyo2fulAbhaRGjyIMWzxY"
-)
+MASTER_KEY = "qh5DB6lIEAkPk48e7KwVEJOkcQVAngkuy8_5O8y2tGu0tPyo2fulAbhaRGjyIMWzxY"
 
 
-# ============================================================
 # APPLICATION SETTINGS
-# ============================================================
-
 class Settings(BaseSettings):
 
     APP_NAME: str = "PhonePe FastAPI Payment"
@@ -286,15 +237,9 @@ class Settings(BaseSettings):
     def phonepe_auth_url(self) -> str:
 
         if self.PHONEPE_ENV.upper() == "PRODUCTION":
-            return (
-                "https://api.phonepe.com/"
-                "apis/identity-manager/v1/oauth/token"
-            )
+            return "https://api.phonepe.com/" "apis/identity-manager/v1/oauth/token"
 
-        return (
-            "https://api-preprod.phonepe.com/"
-            "apis/pg-sandbox/v1/oauth/token"
-        )
+        return "https://api-preprod.phonepe.com/" "apis/pg-sandbox/v1/oauth/token"
 
     # --------------------------------------------------------
     # PhonePe Base URL
@@ -309,8 +254,6 @@ class Settings(BaseSettings):
         return "https://api-preprod.phonepe.com/apis/pg-sandbox"
 
 
-# ============================================================
 # GLOBAL SETTINGS INSTANCE
-# ============================================================
 
 settings = Settings()

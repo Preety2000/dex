@@ -5,8 +5,8 @@ from urllib.parse import parse_qs, urlencode
 from sqlalchemy import func, select
 
 from includes.core.globals.entry import app_context
-from includes.db.connection import active_secondary_db
-from includes.db.dataclass import serialize
+from includes.database.connection import active_secondary_db
+from includes.database.dataclass.dataclass import serialize
 from includes.utils.utils import (
     get_post_value,
     get_query_value,

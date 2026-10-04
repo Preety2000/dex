@@ -2,7 +2,7 @@ from sqlalchemy import asc
 
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import slugify
-from includes.db.models.secondary import Courses
+from includes.database.models.secondary import Courses
 from includes.schemas.router_schema import DynamicURLRoute
 
 

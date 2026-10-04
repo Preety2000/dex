@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 from includes.core.globals.entry import app_context
 from includes.core.metadata import MetaData
-from includes.db.models.secondary import Article, QuizQuestion, Terms
+from includes.database.models.secondary import Article, QuizQuestion, Terms
 from includes.utils.arti import get_artical_url
 
 

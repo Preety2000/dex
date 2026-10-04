@@ -1,9 +1,11 @@
-from sqlalchemy import func
+from sqlalchemy import func, select
+
 from includes.core.globals.entry import app_context
-from includes.db.models.owner import Subject
-from includes.db.dataclass import _Subject
-from includes.db.models.secondary import QuizQuestion, QuizRelationships, Terms
+from includes.database.models.owner import Subject
+from includes.database.dataclass.dataclass import _Subject
+from includes.database.models.secondary import QuizQuestion, QuizRelationships, Terms
 from includes.schemas.cache.dataclass import _SubjectCache
+from includes.database.connection import active_primary_db
 
 SubjectCacheData = _SubjectCache()
 
@@ -24,42 +26,60 @@ class SubjectCache:
         if record:
             return record
 
-        record = app_context.db.query(Subject).filter(Subject.id == id).first()
+        db = await active_primary_db()
+        stmt = select(Subject).where(Subject.id == id)
+        record = db.execute(stmt).scalar_one_or_none()
+
         if not record:
             return None
+
         return SubjectCache._cache(record.to_dataclass())
 
     @staticmethod
-    async def get_by_slug(slug: int) -> _Subject:
+    async def get_by_slug(slug: str) -> _Subject:
         if SubjectCacheData.BySlug.get(slug):
             return await SubjectCache.get_by_id(SubjectCacheData.BySlug[slug])
 
-        record = app_context.db.query(Subject).filter(Subject.slug == slug).first()
+        stmt = select(Subject).where(Subject.slug == slug)
+        db = await active_primary_db()
+        record = db.execute(stmt).scalar_one_or_none()
+
         if not record:
             return None
+
         return SubjectCache._cache(record.to_dataclass())
 
     @staticmethod
-    async def get_by_name(name: int) -> _Subject:
+    async def get_by_name(name: str) -> _Subject:
         if SubjectCacheData.ByName.get(name):
             return await SubjectCache.get_by_id(SubjectCacheData.ByName[name])
 
-        record = app_context.db.query(Subject).filter(Subject.name == name).first()
+        stmt = select(Subject).where(Subject.name == name)
+        db = await active_primary_db()
+        record = db.execute(stmt).scalar_one_or_none()
+
         if not record:
             return None
+
         return SubjectCache._cache(record.to_dataclass())
 
     @staticmethod
     async def get_all():
+        db = await active_primary_db()
+        count = db.execute(select(func.count()).select_from(Subject)).scalar_one()
+        
+        if len(SubjectCacheData.ById) == count:
+            return list(SubjectCacheData.ById.values())
+            
+        SubjectCacheData.ById.clear()
+        SubjectCacheData.BySlug.clear()
+        SubjectCacheData.ByName.clear()
 
-        if SubjectCacheData.allList:
-            return SubjectCacheData.allList
-
-        SubjectCacheData.allList = [
-            SubjectCache._cache(record.to_dataclass())
-            for record in app_context.db.query(Subject).order_by(Subject.name).all()
+        records = db.execute(select(Subject).order_by(Subject.name)).scalars().all()
+        return [
+            SubjectCache._cache(record.to_dataclass()) 
+            for record in records
         ]
-        return SubjectCacheData.allList
 
     @staticmethod
     async def get_mcqlist_count(category: str, subject=None):
@@ -70,20 +90,29 @@ class SubjectCache:
             if not subject or record.name == subject
         ]
 
-        query = (
-            app_context.secondary_session.query(
-                Terms.subject_id, func.count(QuizQuestion.id)
+        stmt = (
+            select(
+                Terms.subject_id,
+                func.count(QuizQuestion.id),
             )
-            .join(QuizRelationships, QuizRelationships.terms_id == Terms.id)
-            .join(QuizQuestion, QuizQuestion.id == QuizRelationships.quiz_id)
-            .filter(Terms.subject_id.in_(ids))
+            .join(
+                QuizRelationships,
+                QuizRelationships.terms_id == Terms.id,
+            )
+            .join(
+                QuizQuestion,
+                QuizQuestion.id == QuizRelationships.quiz_id,
+            )
+            .where(Terms.subject_id.in_(ids))
         )
 
         if category != "default":
-            query = query.filter((Terms.slug == category) | (Terms.name == category))
-        query = query.group_by(Terms.subject_id).all()
-        counts = dict(query)
-        return counts
+            stmt = stmt.where((Terms.slug == category) | (Terms.name == category))
+
+        stmt = stmt.group_by(Terms.subject_id)
+
+        rows = app_context.secondary_session.execute(stmt).all()
+        return dict(rows)
 
     @staticmethod
     async def get_many(id_list: list[int]):
@@ -92,14 +121,19 @@ class SubjectCache:
 
         for qid in id_list or []:
             record = SubjectCacheData.ById.get(qid)
-            records.append(record) if record else missing.append(qid)
+
+            if record:
+                records.append(record)
+            else:
+                missing.append(qid)
 
         if missing:
+            stmt = select(Subject).where(Subject.id.in_(missing))
+            db = await active_primary_db()
+            db_records = db.execute(stmt).scalars().all()
+
             records.extend(
-                SubjectCache._cache(r.to_dataclass())
-                for r in app_context.db.query(Subject)
-                .filter(Subject.id.in_(missing))
-                .all()
+                SubjectCache._cache(record.to_dataclass()) for record in db_records
             )
 
         return records

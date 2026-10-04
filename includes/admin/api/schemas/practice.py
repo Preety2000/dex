@@ -1,6 +1,6 @@
 from includes.core.globals.entry import app_context, GlobleCatch
-from includes.db.models.owner import Subject
-from includes.db.models.secondary import QuizQuestion, QuizRelationships
+from includes.database.models.owner import Subject
+from includes.database.models.secondary import QuizQuestion, QuizRelationships
 from includes.utils.utils import create_slug, get_post_value
 
 
@@ -80,7 +80,6 @@ class AdminApiMCQ:
             incorrect_answers=data["incorrect_answer"],
             subject_id=subject.id,
             status=data["s-status"],
-            views=0,
         )
         db.add(question)
         db.flush()

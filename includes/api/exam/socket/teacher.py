@@ -6,9 +6,9 @@ from includes.api.exam.controller import ExamController, get_exam_request_sessio
 from includes.utils.exm import get_exam_id
 from includes.api.exam.request.exam_setting import CreateStore
 from includes.api.exam.session.ev import ExamEventManager
-from includes.db.connection import active_exam_db
-from includes.db.dataclass import ExamRqStatus
-from includes.db.models.db_exam import ExamRequestSession
+from includes.database.connection import active_exam_db
+from includes.database.dataclass.dataclass import ExamRqStatus
+from includes.database.models.db_exam import ExamRequestSession
 
 
 def get_exam_ids(detail):

@@ -4,7 +4,7 @@ from includes.core.globals.fun import random_string
 from includes.utils.utils import json_response
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
-from includes.db.models.secondary import UserRelationships
+from includes.database.models.secondary import UserRelationships
 
 LikesCatchd: set[tuple[int, int]] = set()
 

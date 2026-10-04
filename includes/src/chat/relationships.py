@@ -2,16 +2,16 @@ import copy
 import json
 import logging
 from sqlalchemy import and_, asc, desc, or_
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 from includes.api.chat.utils import ChatAction
 from includes.core.globals.coreutils import generate_unique_uuid
-from includes.database.chatModel import (
+from includes.database.chait.chatModel import (
     chatBase,
     ChatBoxDatabace,
     FriendShip,
     UserSetting,
 )
-from includes.database.sql import LocalDB
+from includes.database.chait.sql import LocalDB
 from includes.services.member.chcuser import CHCUSER
 
 # __m = frind donm data-id

@@ -16,8 +16,8 @@ from sqlalchemy import asc, desc
 from includes.api.exam.student import RecordType, Student
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
-from includes.db.dataclass import ExamRqStatus
-from includes.db.models.db_exam import _ExamRequestSession, ExamRequestSession
+from includes.database.dataclass.dataclass import ExamRqStatus
+from includes.database.models.db_exam import _ExamRequestSession, ExamRequestSession
 from includes.api.exam.session.ev import ExamEventManager
 from includes.api.exam.socket.student_req import StudentRequestSession
 from includes.schemas.cache.member import MemberCache

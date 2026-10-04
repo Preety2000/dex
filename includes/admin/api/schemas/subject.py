@@ -1,7 +1,8 @@
 from includes.core.globals.entry import app_context
-from includes.db.connection import active_primary_db
-from includes.db.dataclass import serialize
-from includes.db.models.owner import Subject
+from includes.database.connection import active_primary_db
+from includes.database.dataclass.dataclass import serialize
+from includes.database.models.owner import Subject
+from includes.schemas.cache.subject import SubjectCache
 from includes.utils.utils import (
     create_slug,
     get_next_id,
@@ -15,12 +16,7 @@ class AdminApiSubject:
     async def insert():
 
         data = {
-            field: await get_post_value(field)
-            for field in (
-                "name",
-                "content",
-                "slug",
-            )
+            field: await get_post_value(field) for field in ("name", "content", "slug")
         }
 
         name = (data.get("name") or "").strip()
@@ -31,7 +27,6 @@ class AdminApiSubject:
         db = await active_primary_db()
 
         slug = create_slug((data.get("slug") or name).strip())
-
         existing = db.query(Subject).filter(Subject.slug == slug).first()
 
         if existing:
@@ -54,16 +49,14 @@ class AdminApiSubject:
         )
 
         subject = Subject(
-            id=subject_id,
-            slug=slug,
-            name=name,
-            content=data.get("content"),
+            id=subject_id, slug=slug, name=name, content=data.get("content")
         )
 
         try:
 
             db.add(subject)
             db.commit()
+            SubjectCache._cache(subject.to_dataclass())
 
             return {
                 "success": True,

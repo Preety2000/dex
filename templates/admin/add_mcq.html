@@ -138,16 +138,17 @@
                                     </div>
                                 </div>
 
-                                <div class="misc-pub-section DIS01" id="visibility">
-                                    Subject: <b><span id="subject-display">{{data_querys.subject_name}} </span></b>
-
-                                    <select name="subject_id" id="subjects" jsname="ACSTC">
+                                <div class="misc-pub-section" id="visibility">
+                                    Subject:
+                                    <a href="#ACANS" jsname="ACANS">+Add new Subject</a>
+                                    </br>
+                                    <select class="width" name="subject_id" id="subjects" jsname="ACSTC">
                                         <option value="">Select Subject</option>
-                                        {% for subject in subjects %}<option value="{{subject.id}}"
+                                        {% for subject in subjects %}<option value="{{subject.id}}" {% if
+                                            data_querys.subject_id|string==subject.id|string %}selected{% endif %}
                                             sub-id="{{subject.id}}">{{subject.name}}</option>{%endfor%}
                                     </select>
                                 </div>
-
 
                                 <div class="misc-pub-section misc-pub-post-status" id="status">
                                     Status: <b><span id="status-display">{{data_querys.status or 'Publish'}} </span></b>

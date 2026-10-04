@@ -1,6 +1,6 @@
 from sqlalchemy import asc
 from includes.core.globals.entry import app_context
-from includes.db.models.secondary import Courses, Syllabus, University
+from includes.database.models.secondary import Courses, Syllabus, University
 
 
 class ClassUniversity:

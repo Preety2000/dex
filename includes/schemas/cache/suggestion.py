@@ -1,6 +1,6 @@
 from includes.core.config import secondary_database
-from includes.db.models.secondary import Suggestion
-from includes.db.dataclass import _Suggestion
+from includes.database.models.secondary import Suggestion
+from includes.database.dataclass.dataclass import _Suggestion
 from includes.schemas.cache.dataclass import _SuggestionCache
 
 SuggestionCacheData = _SuggestionCache()

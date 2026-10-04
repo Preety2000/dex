@@ -1,7 +1,13 @@
-from includes.core.globals.entry import app_context
-from includes.db.dataclass import _QuizQuestion
+from sqlalchemy import select
+
+from includes.database.dataclass.dataclass import _QuizQuestion
 from includes.schemas.cache.dataclass import QuizQuesCache
-from includes.db.models.secondary import QuizQuestion, QuizRelationships
+from includes.database.connection import active_secondary_db
+from includes.database.models.secondary import (
+    QuizQuestion,
+    QuizRelationships,
+)
+
 
 QuizQuestionCacheData = QuizQuesCache()
 
@@ -9,8 +15,9 @@ QuizQuestionCacheData = QuizQuesCache()
 class QuizQuestionCache:
 
     @staticmethod
-    def _cache(record: QuizQuestion) -> _QuizQuestion:
-        _record = record.to_dict()
+    async def _cache(record: QuizQuestion) -> _QuizQuestion:
+        _record = await record.to_dict()
+
         QuizQuestionCacheData.ById[record.id] = _record
 
         return _record
@@ -18,13 +25,25 @@ class QuizQuestionCache:
     @staticmethod
     async def get(id: int) -> _QuizQuestion:
         record = QuizQuestionCacheData.ById.get(id)
+
         if record:
             return record
 
-        record = app_context.db.query(QuizQuestion).filter_by(id=id).first()
+        db = await active_secondary_db()
+
+        stmt = (
+            select(QuizQuestion)
+            .where(QuizQuestion.id == id)
+            .limit(1)
+        )
+
+        result = db.execute(stmt)
+        record = result.scalar_one_or_none()
+
         if not record:
             return None
-        return QuizQuestionCache._cache(record)
+
+        return await QuizQuestionCache._cache(record)
 
     @staticmethod
     async def get_many(id_list: list[int]):
@@ -33,32 +52,70 @@ class QuizQuestionCache:
 
         for qid in id_list or []:
             record = QuizQuestionCacheData.ById.get(qid)
-            records.append(record) if record else missing.append(qid)
 
-        if missing:
-            records.extend(
-                QuizQuestionCache._cache(r)
-                for r in app_context.db.query(QuizQuestion)
-                .filter(QuizQuestion.id.in_(missing))
-                .all()
+            if record:
+                records.append(record)
+            else:
+                missing.append(qid)
+
+        if not missing:
+            return records
+
+        db = await active_secondary_db()
+
+        stmt = (
+            select(QuizQuestion)
+            .where(QuizQuestion.id.in_(missing))
+        )
+
+        result = db.execute(stmt)
+        db_records = result.scalars().all()
+
+        # Cache + preserve requested order
+        cached_records = {}
+
+        for record in db_records:
+            cached_records[record.id] = (
+                await QuizQuestionCache._cache(record)
             )
+
+        records.extend(
+            cached_records[qid]
+            for qid in missing
+            if qid in cached_records
+        )
 
         return records
 
     @staticmethod
-    async def get_first_by_terms_id(terms_id: int):
-        if QuizQuestionCacheData.ByTermId.get(terms_id):
-            return await QuizQuestionCache.get(QuizQuestionCacheData.ByTermId[terms_id])
+    async def get_first_by_terms_id(
+        terms_id: int,
+    ):
+        cached_id = QuizQuestionCacheData.ByTermId.get(terms_id)
 
-        record = (
-            app_context.db.query(QuizQuestion)
-            .join(QuizRelationships, QuizRelationships.quiz_id == QuizQuestion.id)
-            .filter(QuizRelationships.terms_id == terms_id)
-            .first()
+        if cached_id:
+            return await QuizQuestionCache.get(cached_id)
+
+        db = await active_secondary_db()
+
+        stmt = (
+            select(QuizQuestion)
+            .join(
+                QuizRelationships,
+                QuizRelationships.quiz_id == QuizQuestion.id,
+            )
+            .where(
+                QuizRelationships.terms_id == terms_id
+            )
+            .limit(1)
         )
+
+        result = db.execute(stmt)
+        record = result.scalar_one_or_none()
 
         if not record:
             return None
 
         QuizQuestionCacheData.ByTermId[terms_id] = record.id
-        return QuizQuestionCache._cache(record)
+
+        return await QuizQuestionCache._cache(record)

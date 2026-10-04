@@ -1,11 +1,11 @@
 from sqlalchemy import select, func, desc
 
 from includes.core.globals.entry import app_context
-from includes.db.connection import active_exam_db
+from includes.database.connection import active_exam_db
 from includes.api.exam.index import get_exam_dick
-from includes.db.dataclass import serialize
-from includes.db.models.utils import TimeStamp
-from includes.db.models.db_exam import (
+from includes.database.dataclass.dataclass import serialize
+from includes.database.models.utils import TimeStamp
+from includes.database.models.db_exam import (
     ExamDetails,
     ExamRecord,
     ExamRequestSession,

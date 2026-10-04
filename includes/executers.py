@@ -1,11 +1,12 @@
 import asyncio
 import copy
+import inspect
 import datetime as dt
 from typing import Any
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from includes.core.deviceinfo import DeviceInfo
 from includes.utils._sub import apply_session_updates, configure_page
-from includes.db.dataclass import serialize, to_dict
+from includes.database.dataclass.dataclass import serialize, to_dict
 
 from includes.core.cache import AppCache
 from includes.core.config import app_context
@@ -21,7 +22,18 @@ from includes.schemas.objective import get_mcq_by_terms_id
 from includes.schemas.cache.terms import TermsCache
 from includes.services.member.member import ClassUser
 from includes.route_handler import StaticRouteHandler
-from includes.utils.utils import get_query_value
+
+
+def find_coroutines(data, path="root"):
+    if inspect.iscoroutine(data):
+        print(f"❌ Coroutine found at: {path}")
+        return
+    if isinstance(data, dict):
+        for key, value in data.items():
+            find_coroutines(value, f"{path}[{key!r}]")
+    elif isinstance(data, (list, tuple)):
+        for index, value in enumerate(data):
+            find_coroutines(value, f"{path}[{index}]")
 
 
 async def get_terms_by_resource_cached(resource_id):
@@ -218,22 +230,29 @@ async def handle_request_with_cache(*, allow_catch: bool = True, **binds):
     if session and metadata:
         # Cache me se mile metadata se MetaData class ko update karein
         MetaData.update_from_dict(metadata)
+        response.pop("start_time", None)
         app_context.response.update(response)
     else:
         # Request execute karein aur updated MetaData.to_dict() ke saath cache karein
         handler = binds.get("callback", execute_request)
         session = await handler(app_context.route)
 
-        if allow_catch is True:
-            AppCache.add(
-                encrypted_url, (MetaData.to_dict(), session, app_context.response)
-            )
+        # if allow_catch is True:
+        #     AppCache.add(
+        #         encrypted_url, (MetaData.to_dict(), session, app_context.response)
+        #     )
 
     # Response Enrichment & Processing
     app_context.response = await enrich_request_response(app_context.response)
 
     # Deepcopy ki jagah shallow copy ya lightweight dictionary copy try karein agar session safe ho
-    session_data = copy.deepcopy(session) if isinstance(session, dict) else session
+    try:
+        session_data = copy.deepcopy(session) if isinstance(session, dict) else session
+    except:
+        find_coroutines(session)
+
+        session_data = {}
+
     processed_response = await apply_session_updates(session_data)
 
     await set_article_context(processed_response)
@@ -298,9 +317,11 @@ async def execute_request(roots=None):
 
         # Article Session
         response = await ArticleService.find_article(
-            slug=app_context.route.scope_slug, parameter=resource_query.id
+            slug=app_context.route.scope_slug,
+            parameter=resource_query.id,
         )
         if response:
+            response.pop("mdata", None)
             types = response.get("type")
             response["reseant_parameter"] = await ArticleService.get_filtered_articles(
                 parameter=resource_query.id, limit=10

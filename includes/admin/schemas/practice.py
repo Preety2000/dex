@@ -7,9 +7,9 @@ from includes.core.globals.coreutils import is_empty
 from includes.core.globals.entry import app_context
 from includes.core.metadata import MetaData
 from includes.core.paginator import NewQueryPaginator
-from includes.db.connection import active_secondary_db
-from includes.db.dataclass import serialize
-from includes.db.models.secondary import QuizQuestion, QuizRelationships
+from includes.database.connection import active_secondary_db
+from includes.database.dataclass.dataclass import serialize
+from includes.database.models.secondary import QuizQuestion, QuizRelationships
 from includes.schemas.cache.subject import SubjectCache
 from includes.schemas.cache.terms import TermsCache
 from includes.schemas.router_schema import DynamicURLRoute
@@ -158,7 +158,6 @@ class ClassObjective:
             incorrect_answers=data_querys.get("incorrect_answers"),
             subject_id=int(data_querys.get("subject_id", 0)),
             status=data_querys.get("status"),
-            views=0,
         )
 
         db = await active_secondary_db()

@@ -2,7 +2,7 @@ import json
 import time
 
 from includes.core.globals.entry import app_context
-from includes.db.models.secondary import Terms
+from includes.database.models.secondary import Terms
 from includes.core.security import _Security
 from includes.schemas.terms import get_terms_json
 

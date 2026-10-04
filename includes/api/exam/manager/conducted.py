@@ -1,7 +1,7 @@
 from includes.api.exam.index import Exam
 from includes.api.exam.results.results_conducted import IS_RESULTS
-from includes.db.connection import active_exam_db
-from includes.db.models.db_exam import _ExamRecord, ExamDetails
+from includes.database.connection import active_exam_db
+from includes.database.models.db_exam import _ExamRecord, ExamDetails
 
 
 async def get_id_exam_json(record: _ExamRecord):

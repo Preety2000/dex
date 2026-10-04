@@ -1,9 +1,9 @@
 from sqlalchemy import select
 
 from includes.core.globals.entry import app_context
-from includes.db.connection import active_secondary_db
-from includes.db.models.secondary import Terms
-from includes.db.dataclass import _Terms, serialize
+from includes.database.connection import active_secondary_db
+from includes.database.models.secondary import Terms
+from includes.database.dataclass.dataclass import _Terms, serialize
 from includes.schemas.cache.dataclass import _TermsCache
 
 

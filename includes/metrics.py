@@ -3,8 +3,8 @@ from sqlalchemy import select
 from typing import Any,  Iterable
 
 from includes.core.globals.coreutils import format_view_count
-from includes.db.connection import active_secondary_db, get_contry
-from includes.db.models.secondary import ArticleView, QuizView
+from includes.database.connection import active_secondary_db, get_contry
+from includes.database.models.secondary import ArticleView, QuizView
 
 
 

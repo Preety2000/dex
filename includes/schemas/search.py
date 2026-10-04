@@ -1,4 +1,3 @@
-import os
 import re
 from urllib.parse import urlparse
 
@@ -9,17 +8,17 @@ from langdetect import DetectorFactory
 from sqlalchemy import select, or_, desc
 
 from includes.core.paginator import NewQueryPaginator
-from includes.db.models.owner import Subject
+from includes.database.models.owner import Subject
+from includes.database.models.utils import TimeStamp
 from includes.utils._sub import configure_page
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import (
-    format_datetime,
     format_view_count,
 )
 from includes.core.metadata import MetaData
 from includes.core.pagination import Pagination
-from includes.db.connection import db
-from includes.db.models.secondary import (
+from includes.database.connection import db
+from includes.database.models.secondary import (
     Article,
     ArticleMetadata,
     QuizQuestion,
@@ -31,7 +30,8 @@ from includes.db.models.secondary import (
 from includes.schemas.terms import get_terms_json
 from includes.utils.arti import get_mini_article_json
 from includes.utils.utils import get_post_value
-from includes.metrics import MetricsManager
+from includes.schemas.word.hindi_stopwords import HINDI_STOP_WORDS
+from includes.schemas.word.english_stopwords import ENGLISH_STOP_WORDS
 
 # भाषा की पहचान के लिए सीड
 DetectorFactory.seed = 0
@@ -40,141 +40,6 @@ DetectorFactory.seed = 0
 # OpenAI API
 OPENAI_URL = "https://api.openai.com/v1/completions"
 
-
-# Hindi stop words
-HINDI_STOP_WORDS = {
-    "में",
-    "पर",
-    "के",
-    "से",
-    "साथ",
-    "के लिए",
-    "को",
-    "जैसे",
-    "क्योंकि",
-    "जब",
-    "अगर",
-    "और",
-    "या",
-    "लेकिन",
-    "तो",
-    "अधिक",
-    "कम",
-    "सभी",
-    "कुछ",
-    "बिना",
-    "किसी",
-    "किस",
-    "यह",
-    "वह",
-    "ये",
-    "वे",
-    "जो",
-    "कहा",
-    "कब",
-    "कैसे",
-    "कितना",
-    "कौन",
-    "अपने",
-    "हम",
-    "आप",
-    "तुम",
-    "मैं",
-    "है",
-    "था",
-    "हुई",
-    "होगा",
-    "होगी",
-    "होगे",
-    "रहा",
-    "रही",
-    "रहे",
-    "थी",
-    "थे",
-    "किया",
-    "करें",
-    "करना",
-    "चलना",
-    "आना",
-    "जाना",
-    "खाना",
-    "पीना",
-    "लाना",
-    "देना",
-    "सुनना",
-    "देखना",
-    "सोचना",
-    "बोलना",
-    "पढ़ना",
-    "लिखना",
-    "करते",
-    "करती",
-    "करेंगे",
-    "करतीं",
-}
-
-
-# English stop words
-ENGLISH_STOP_WORDS = {
-    "in",
-    "on",
-    "for",
-    "with",
-    "to",
-    "like",
-    "because",
-    "when",
-    "if",
-    "and",
-    "or",
-    "but",
-    "then",
-    "more",
-    "less",
-    "all",
-    "some",
-    "without",
-    "any",
-    "which",
-    "this",
-    "that",
-    "these",
-    "those",
-    "said",
-    "how",
-    "how much",
-    "who",
-    "your",
-    "we",
-    "you",
-    "they",
-    "I",
-    "is",
-    "was",
-    "were",
-    "be",
-    "been",
-    "will",
-    "shall",
-    "have",
-    "had",
-    "do",
-    "does",
-    "doing",
-    "go",
-    "come",
-    "eat",
-    "drink",
-    "bring",
-    "give",
-    "hear",
-    "see",
-    "think",
-    "say",
-    "read",
-    "write",
-    "can",
-}
 
 
 def postsmetatags_json(query):
@@ -661,7 +526,7 @@ class Search:
 
         dictionary.update(
             {
-                "date": format_datetime(dictionary.get("timestamp")),
+                "date": TimeStamp.format_datetime(dictionary.get("timestamp")),
                 "views": format_view_count(dictionary.get("views")),
             }
         )

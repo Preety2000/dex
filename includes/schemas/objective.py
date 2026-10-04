@@ -7,9 +7,9 @@ from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import format_view_count
 from includes.core.paginator import NewQueryPaginator
 from includes.core.request_filter import RequestFilter
-from includes.db.connection import active_secondary_db
-from includes.db.dataclass import serialize, to_dict
-from includes.db.models.secondary import (
+from includes.database.connection import active_secondary_db
+from includes.database.dataclass.dataclass import serialize, to_dict
+from includes.database.models.secondary import (
     QuizQuestion,
     QuizRelationships,
     Terms,
@@ -30,9 +30,9 @@ async def get_mcq_json(
     if not item:
         return {}
 
-    item.next_prev_question()
+    await item.next_prev_question()
 
-    response = to_dict(item.to_dict(**more))
+    response = to_dict(await item.to_dict(**more))
 
     response.update(
         {
@@ -72,7 +72,7 @@ async def get_mini_mcq_json(
     if not item:
         return {}
 
-    response = to_dict(item.to_dict(**more))
+    response = to_dict(await item.to_dict(**more))
 
     response.update(
         {
@@ -141,13 +141,16 @@ async def get_mcq_by_terms_id(
         else:
             remaining_kwargs[key] = value
 
+    async def transform_quiz(item):
+        return await item.to_dict()
+
     data = await NewQueryPaginator.paginate(
         types="query",
         query=query,
         model=QuizQuestion,
         limit=limit,
         db=db,
-        transform=lambda item: item.to_dict(),
+        transform=lambda item: get_mini_mcq_json(item),
         **remaining_kwargs,
     )
 

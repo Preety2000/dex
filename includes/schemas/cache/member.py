@@ -2,9 +2,9 @@ from sqlalchemy import or_, select
 
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
-from includes.db.connection import active_primary_db
-from includes.db.dataclass import serialize
-from includes.db.models.owner import Members
+from includes.database.connection import active_primary_db
+from includes.database.dataclass.dataclass import serialize
+from includes.database.models.owner import Members
 from includes.utils.meb import (
     extract_id_from_roll,
     get_email_folder_info,
@@ -18,11 +18,10 @@ MemberCacheData = _MemberCache()
 class MemberCache:
 
     @staticmethod
-    def _cache(record: Members) -> dict:
+    async def _cache(record: Members) -> dict:
         print("[call MemberCache]")
 
-        _record = serialize(record)
-
+        _record = await record.to_dataclass()
         MemberCacheData.ById[record.id] = _record
         MemberCacheData.ByEmail[record.email] = record.id
         MemberCacheData.BySecret[record.secret] = record.id
@@ -72,7 +71,7 @@ class MemberCache:
         result = db.execute(stmt)
         record = result.scalar_one_or_none()
 
-        return MemberCache._cache(record) if record else None
+        return await MemberCache._cache(record) if record else None
 
     @staticmethod
     async def get_with_id(
@@ -96,7 +95,7 @@ class MemberCache:
             return None
 
         return MemberCache.filters(
-            MemberCache._cache(record),
+            await MemberCache._cache(record),
             keys,
         )
 
@@ -130,7 +129,7 @@ class MemberCache:
         if not record:
             return None
 
-        return MemberCache._cache(record)
+        return await MemberCache._cache(record)
 
     @staticmethod
     async def get_many(
@@ -159,7 +158,7 @@ class MemberCache:
 
             records.extend(
                 MemberCache.filters(
-                    MemberCache._cache(record),
+                    await MemberCache._cache(record),
                     keys,
                 )
                 for record in db_records

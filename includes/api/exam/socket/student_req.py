@@ -6,14 +6,14 @@ from sqlalchemy import delete, func, select
 
 from includes.utils.exm import get_exam_status_message
 from includes.core.globals.entry import app_context
-from includes.db.connection import active_exam_db
-from includes.db.dataclass import ExamRqStatus
-from includes.db.models.db_exam import (
+from includes.database.connection import active_exam_db
+from includes.database.dataclass.dataclass import ExamRqStatus
+from includes.database.models.db_exam import (
     _ExamRequestSession,
     ExamRequestSession,
 )
 from includes.api.exam.session.ev import ExamEventManager
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 
 user_id = []
 student_request_session = {}

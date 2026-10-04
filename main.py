@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-import posixpath
 import random
 import string
 from typing import Optional
@@ -197,8 +196,7 @@ async def script(filename: str, request: Request):
     if not filename.endswith(".js"):
         filename += ".js"
 
-    file_path = posixpath.join(folder.static_js, filename)
-
+    file_path = folder._get_file_path("static", "script", filename)
     print(f"Requesting JS file: {filename}, " f"Full path: {file_path}")
 
     if not os.path.isfile(file_path):

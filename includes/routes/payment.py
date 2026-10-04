@@ -23,7 +23,7 @@ from fastapi import (
 from sqlalchemy.orm import Session
 from includes.core.config import settings
 from includes.services.phonepe import PhonePeError, phonepe_service
-from includes.db.models.payment import Payment
+from includes.database.models.payment import Payment
 
 # from app.app_context.db.database import get_db
 

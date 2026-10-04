@@ -1,7 +1,7 @@
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
-from includes.db.dataclass import serialize
-from includes.db.models.owner import Beckup
+from includes.database.dataclass.dataclass import serialize
+from includes.database.models.owner import Beckup
 
 
 class ClassBeckup:

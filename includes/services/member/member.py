@@ -3,9 +3,9 @@ from sqlalchemy import or_, select
 from includes.schemas.captcha import captcha_verification
 from includes.utils._sub import configure_page
 from includes.core.config import MASTER_KEY, app_context
-from includes.db.connection import active_primary_db
-from includes.db.dataclass import serialize
-from includes.db.models.owner import Members, MemberSession, VerifyIdentity
+from includes.database.connection import active_primary_db
+from includes.database.dataclass.dataclass import serialize
+from includes.database.models.owner import Members, MemberSession, VerifyIdentity
 from includes.schemas.articles import ArticleService
 from includes.schemas.cache.member import MemberCache
 from includes.services.member.identity import Identity
@@ -20,7 +20,7 @@ from includes.utils.meb import (
     serialize_member,
 )
 from includes.utils.utils import get_post_value, json_null_response, json_response
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 
 
 from typing import Union
@@ -67,7 +67,7 @@ async def update_member_profile_image(user_id: int, file_name: str):
     member.image_src = encoded_name
     db_session.commit()
     db_session.refresh(member)
-    MemberCache._cache(member)
+    await MemberCache._cache(member)
     return True
 
 
@@ -128,7 +128,7 @@ class ClassUser:
                 setattr(member, name, value)
 
         db_session.commit()
-        MemberCache._cache(member)
+        await MemberCache._cache(member)
 
         return member
 

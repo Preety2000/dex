@@ -69,7 +69,7 @@
                     </div>
                 </th>
                 <th class="manage-column column-parameter">{{content.parameters.name}}</th>
-                <th class="manage-column column-subject"> {{content.subject.name or "Default"}}</th>
+                <th class="manage-column column-subject"> {{ content.subject.name if content.subject else "Default" }}</th>
                 <th class="manage-column column-category">
                     <a href="javascript:void(0)" class="sowing-data" title="category" jsname="shodetails"
                         aria-label="{{ content.category | map(attribute='name') | join(',') }}">{{ content.category |

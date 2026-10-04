@@ -5,18 +5,18 @@ import asyncio
 
 from sqlalchemy import select, or_, desc, func
 
-from includes.db.connection import active_primary_db, active_secondary_db
+from includes.database.connection import active_primary_db, active_secondary_db
 from includes.utils._sub import distribute_amount
 from includes.api.exam.results.results_practice import SELF_RESULTS
 from includes.core.config import exam_database
 from includes.core.globals.entry import app_context
-from includes.db.models.db_exam import (
+from includes.database.models.db_exam import (
     _ExamRecord,
     PracticeExamRecord,
 )
 from includes.function import get_unique_id
-from includes.db.models.owner import Subject
-from includes.db.models.secondary import (
+from includes.database.models.owner import Subject
+from includes.database.models.secondary import (
     QuizQuestion,
     QuizRelationships,
     Terms,

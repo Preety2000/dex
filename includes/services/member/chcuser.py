@@ -1,7 +1,7 @@
 from includes.core.config import main_database
 from includes.core.security import _Security
-from includes.db.models.owner import Members
-from includes.db.connection import active_primary_db
+from includes.database.models.owner import Members
+from includes.database.connection import active_primary_db
 from includes.utils.meb import get_email_folder_info
 
 

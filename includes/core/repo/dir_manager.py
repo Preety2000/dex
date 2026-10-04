@@ -16,6 +16,11 @@ class Folders:
         full_path.mkdir(parents=True, exist_ok=True)  # Auto-create directory if not exists
         return full_path
     
+    def _get_file_path(self, *path_segments) -> Path:
+        """Path ko join karta hai aur agar folder maujood nahi hai toh automatically bana deta hai."""
+        full_path = self._root.joinpath(*path_segments)
+        return full_path
+    
     # Root & Base Folders
     @property
     def root(self) -> Path:

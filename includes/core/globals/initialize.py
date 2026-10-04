@@ -1,7 +1,7 @@
-from includes.db.connection import db
+from includes.database.connection import db
 from includes.core.globals.entry import app_context
-from includes.db.models.owner import bindOwnerModelsToSession
-from includes.db.models.secondary import bindBaseSecondaryModelsToSession
+from includes.database.models.owner import bindOwnerModelsToSession
+from includes.database.models.secondary import bindBaseSecondaryModelsToSession
 
 
 async def initialize_database():

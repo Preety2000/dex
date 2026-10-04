@@ -7,9 +7,9 @@ from typing import Any,  List, Optional
 from sqlalchemy import select
 from includes.core.device_encoder import decode_device
 from includes.core.repo.dir_manager import folder
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 from includes.core.security import _Security
-from includes.db.models.owner import MemberSession
+from includes.database.models.owner import MemberSession
 
 GENDER = ["Prefer not to say", "Female", "Male"]
 

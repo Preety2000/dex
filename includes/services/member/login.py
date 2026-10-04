@@ -4,7 +4,7 @@ from includes.utils._sub import configure_page
 from includes.core.config import main_database
 from includes.core.globals.entry import app_context
 from includes.core.metadata import MetaData
-from includes.db.models.owner import Members, MemberSession
+from includes.database.models.owner import Members, MemberSession
 from includes.utils.utils import get_post_value, get_query_value
 from includes.services.member.logout import LogoutHandler
 from includes.services.member.login_service import complete_login
@@ -92,7 +92,7 @@ class Login:
 
             db.commit()
 
-            return complete_login(
+            return await complete_login(
                 member,
                 db,
             )
@@ -210,7 +210,7 @@ class Login:
 
                 return template
 
-            return complete_login(
+            return await complete_login(
                 member,
                 db,
             )

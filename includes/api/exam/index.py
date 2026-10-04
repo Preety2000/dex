@@ -2,13 +2,13 @@ from sqlalchemy import and_, desc, select, func
 
 from includes.api.exam.socket.student_req import StudentRequestSession
 from includes.api.exam.student import Student
-from includes.db.connection import active_exam_db
-from includes.db.models.utils import TimeStamp
+from includes.database.connection import active_exam_db
+from includes.database.models.utils import TimeStamp
 from includes.core.globals.entry import app_context
 from includes.core.pagination import Pagination
 from includes.core.request_filter import RequestFilter
-from includes.db.dataclass import serialize
-from includes.db.models.db_exam import (
+from includes.database.dataclass.dataclass import serialize
+from includes.database.models.db_exam import (
     _ExamDetails,
     ExamDetails,
     ExamRecord,

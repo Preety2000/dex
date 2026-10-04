@@ -1,6 +1,8 @@
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
-# Base defined globally for all tables
-BaseTeachers = declarative_base()  
+
+ExamDb = declarative_base()
+BaseOwner = declarative_base()
+BaseSecondary = declarative_base()
 
 

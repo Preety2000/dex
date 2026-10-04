@@ -3,10 +3,10 @@ from typing import Optional
 from bs4 import BeautifulSoup
 from sqlalchemy import desc, func, select
 from includes.core.config import app_context
-from includes.db.connection import active_secondary_db
+from includes.database.connection import active_secondary_db
 from includes.core.paginator import NewQueryPaginator
-from includes.db.dataclass import _Article, _Terms, serialize, to_dict
-from includes.db.models.secondary import (
+from includes.database.dataclass.dataclass import _Article, _Terms, serialize, to_dict
+from includes.database.models.secondary import (
     Article,
     TermsRelationship,
     Trending,
@@ -109,7 +109,7 @@ class ArticleService:
         article = article_query.filter(Article.status == "Publish").first()
         return (
             await ArticleService.serialize_article(
-                await article.to_dataclass(category=True, like=True)
+                await article.to_dataclass(category=True, like=True, tags=True)
             )
             if article
             else None

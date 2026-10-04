@@ -13,7 +13,7 @@ from includes.core.globals.fun import random_string
 from includes.core.globals.entry import app_context
 from includes.core.metadata import MetaData
 from includes.core.security import _Security
-from includes.db.models.owner import Members
+from includes.database.models.owner import Members
 from includes.services.member.login_service import complete_login
 from includes.utils.utils import get_post_value
 
@@ -183,7 +183,7 @@ class SineUp:
 
             MetaData.redirect_url = f"/success?token={token_xeper}"
 
-            return complete_login(
+            return await complete_login(
                 new_member,
                 db,
             )

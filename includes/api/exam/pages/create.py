@@ -7,7 +7,7 @@ from includes.api.exam.manager.practice import build_subject_category
 from includes.core.globals.entry import app_context
 from includes.api.exam.metadata import exam_category
 from includes.core.security import _Security
-from includes.db.models.db_exam import ExamDetails, TeacherProfile
+from includes.database.models.db_exam import ExamDetails, TeacherProfile
 from includes.schemas.cache.subject import SubjectCache
 from includes.schemas.cache.terms import TermsCache
 from includes.schemas.objective import ClassObjective

@@ -2,7 +2,7 @@ from includes.api.exam.student import RecordType, Student
 from includes.api.exam.session.es import ES
 from includes.api.exam.teacher import Teachers
 from includes.core.metadata import MetaData
-from includes.db.connection import active_exam_db
+from includes.database.connection import active_exam_db
 from includes.utils.exm import (
     block_exam_message,
     completed_exam_message,
@@ -20,8 +20,8 @@ from includes.api.exam.socket.index import init_exam_session
 from includes.api.exam.socket.student_req import StudentRequestSession
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
-from includes.db.dataclass import ExamRqStatus
-from includes.db.models.db_exam import _ExamDetails, StudentTeacherAssociation
+from includes.database.dataclass.dataclass import ExamRqStatus
+from includes.database.models.db_exam import _ExamDetails, StudentTeacherAssociation
 from includes.function import get_unique_id
 from includes.utils.utils import json_response
 

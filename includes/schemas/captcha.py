@@ -23,8 +23,6 @@ def generate_cookie_value() -> str:
     return "Ent.5." + "".join(
         random.choice(string.ascii_letters + string.digits) for _ in range(40)
     )
-    
-    
 
 
 class Captcha:
@@ -42,13 +40,15 @@ class Captcha:
         captcha_data = await self.get({})
         if not captcha_data:
             return False
-        
-        if captcha_data["code"] == code and captcha_data["max_age"] > int(datetime.now().timestamp()):
+
+        if captcha_data["code"] == code and captcha_data["max_age"] > int(
+            datetime.now().timestamp()
+        ):
             if self.cookie in self.storage:
                 del self.storage[self.cookie]
                 await self.session.save(self.storage)
             return True
-        
+
         return False
 
     async def insert(self, code):
@@ -93,8 +93,6 @@ class Captcha:
 
     async def update(self, code):
         return await self.insert(code)
-    
-    
 
     @staticmethod
     async def create() -> StreamingResponse | FileNotFoundError:
@@ -105,8 +103,7 @@ class Captcha:
         draw = ImageDraw.Draw(base_image)
 
         # Font path
-        font_folder = folder._get_path("static", "font")
-        font_path = os.path.join(font_folder, "captcha.ttf")
+        font_path = folder._get_file_path("static", "font", "captcha.ttf")
 
         if not os.path.exists(font_path):
             raise FileNotFoundError(f"CAPTCHA font not found: {font_path}")
@@ -224,4 +221,3 @@ async def captcha_verification():
 
     captcha_storage = Captcha(cookie_catutm)
     return await captcha_storage.verify(captcha_code)
-

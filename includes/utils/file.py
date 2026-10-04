@@ -15,7 +15,7 @@ from fastapi import UploadFile
 import numpy as np
 
 from includes.core.globals.entry import app_context
-from includes.database.media_asset_model import MediaAsset
+from includes.database.chait.media_asset_model import MediaAsset
 from includes.utils.utils import get_query_value, json_null_response, json_response
 
 

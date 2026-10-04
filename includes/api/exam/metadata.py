@@ -2,9 +2,9 @@ from typing import List
 from includes.core.security import AUTH_TOKEN, _Security
 from includes.utils.exm import get_folder_key
 from includes.core.globals.entry import app_context
-from includes.db.models.db_exam import _ExamDetails, _TeacherProfile
+from includes.database.models.db_exam import _ExamDetails, _TeacherProfile
 from includes.utils.utils import get_post_value
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 
 
 def get_selected_classes(selected_ids: List[str]) -> List[List[str]]:

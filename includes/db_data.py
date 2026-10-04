@@ -5,12 +5,12 @@ from sqlalchemy import inspect, text
 from sympy import root
 from includes.core.repo.dir_manager import folder
 
-from includes.db.connection import (
+from includes.database.connection import (
     active_exam_db,
     active_primary_db,
     active_secondary_db,
 )
-from includes.db.models.owner import Members
+from includes.database.models.owner import Members
 from includes.core.globals.entry import app_context
 from includes.utils.utils import get_query_value, get_referer_value
 

@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
 from num2words import num2words
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 from includes.core.globals.entry import app_context
-from includes.db.connection import active_exam_db
-from includes.db.models.db_exam import ExamDetails, ExamRecord, TeacherProfile
+from includes.database.connection import active_exam_db
+from includes.database.models.db_exam import ExamDetails, ExamRecord, TeacherProfile
 from includes.schemas.cache.member import MemberCache
 from includes.utils.exm import (
     calculate_exam_score,

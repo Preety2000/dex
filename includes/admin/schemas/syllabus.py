@@ -2,8 +2,8 @@ from includes.admin.modals import checked, emptyMessage
 from includes.core.globals.coreutils import is_empty, slugify
 from includes.core.globals.entry import app_context
 from includes.core.metadata import MetaData
-from includes.db.models.owner import Subject
-from includes.db.models.secondary import Syllabus, University
+from includes.database.models.owner import Subject
+from includes.database.models.secondary import Syllabus, University
 from includes.schemas.router_schema import DynamicURLRoute
 from includes.utils.utils import get_post_value
 

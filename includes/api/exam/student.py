@@ -5,8 +5,8 @@ from includes.core.pagination import Pagination
 from includes.core.request_filter import RequestFilter
 from includes.utils.exm import convert_int_values
 from includes.api.exam.results.results_conducted import IS_RESULTS
-from includes.db.connection import active_exam_db
-from includes.db.models.db_exam import (
+from includes.database.connection import active_exam_db
+from includes.database.models.db_exam import (
     _ExamRecord,
     ExamDetails,
     ExamRecord,
@@ -14,7 +14,7 @@ from includes.db.models.db_exam import (
     TeacherProfile,
 )
 
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 
 
 class RecordType:

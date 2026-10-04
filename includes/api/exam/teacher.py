@@ -7,8 +7,8 @@ from includes.api.exam.metadata import (
     s_meta_value,
 )
 from includes.core.globals.entry import app_context
-from includes.db.connection import active_exam_db
-from includes.db.models.db_exam import _TeacherProfile, TeacherProfile
+from includes.database.connection import active_exam_db
+from includes.database.models.db_exam import _TeacherProfile, TeacherProfile
 from includes.utils.utils import get_post_value, json_response
 
 

@@ -7,9 +7,9 @@ from datetime import datetime
 from sqlalchemy.orm import selectinload
 
 from includes.core.paginator import NewQueryPaginator
-from includes.db.connection import active_primary_db
-from includes.db.dataclass import MemberRole
-from includes.db.models.owner import Members, VerifyIdentity
+from includes.database.connection import active_primary_db
+from includes.database.dataclass.dataclass import MemberRole
+from includes.database.models.owner import Members, VerifyIdentity
 from includes.core.security import _Security
 from includes.schemas.cache.member import MemberCache
 from includes.schemas.router_schema import DynamicURLRoute
@@ -162,8 +162,8 @@ class IsMember:
     @classmethod
     async def get_member_list(cls):
 
-        def transform(record):
-            data = MemberCache._cache(record)
+        async def transform(record):
+            data = await MemberCache._cache(record)
             data["img"] = (
                 f"/media/u/{get_email_folder_info(data["id"])}/{data.get('image_src', _Security.short_encode('image.png'))}"
             )
@@ -176,10 +176,7 @@ class IsMember:
             types="query",
             model=Members,
             transform=transform,
-            query=(select(Members).options(
-                selectinload(Members.identity),
-                selectinload(Members.last_login),
-            )),
+            query=(select(Members).options(selectinload(Members.identity))),
         )
         return data.records
 

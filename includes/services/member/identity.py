@@ -7,8 +7,8 @@ from sqlalchemy import MetaData
 from dataclasses import dataclass, fields
 
 from includes.core.globals.entry import app_context
-from includes.db.connection import active_primary_db
-from includes.db.models.owner import VerifyIdentity
+from includes.database.connection import active_primary_db
+from includes.database.models.owner import VerifyIdentity
 from includes.schemas.cache.member import MemberCache
 from includes.core.repo.dir_manager import folder
 from werkzeug.utils import secure_filename

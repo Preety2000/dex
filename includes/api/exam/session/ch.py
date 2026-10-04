@@ -2,10 +2,10 @@ import json
 import os
 from pathlib import Path
 from dataclasses import dataclass, field
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import generate_unique_uuid
-from includes.db.dataclass import serialize
+from includes.database.dataclass.dataclass import serialize
 
 
 @dataclass

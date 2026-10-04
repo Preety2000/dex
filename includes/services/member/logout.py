@@ -4,9 +4,9 @@ from includes.core.config import MASTER_KEY
 from includes.core.globals.entry import app_context
 from includes.core.globals.fun import random_string
 from includes.core.security import _Security
-from includes.db.connection import active_primary_db
-from includes.db.models.owner import Members, MemberSession
-from includes.db.models.utils import TimeStamp
+from includes.database.connection import active_primary_db
+from includes.database.models.owner import Members, MemberSession
+from includes.database.models.utils import TimeStamp
 from includes.schemas.cache.member import MemberCache
 from includes.utils.utils import get_post_value
 
@@ -83,7 +83,7 @@ class LogoutHandler:
         app_context.setting.update_cookie()
 
         # Cache
-        MemberCache._cache(member)
+        await MemberCache._cache(member)
         db_session.commit()
 
         return {

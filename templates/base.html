@@ -11,20 +11,20 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
     <link rel="image_src" href="/img/{{response.hasTitle if response.hasTitle else security.short_encode(title)}}">
-    <link rel="search" type="application/opensearchdescription+xml" title="{{response.site_name  | safe}}"
+    <link rel="search" type="application/opensearchdescription+xml" title="{{site_name  | safe}}"
         href="/opensearch.xml">
     <link rel="canonical" href="{{request.url}}">
     <!-- Meta data session  -->
     <meta name="title" property="title" itemprop="name" content="{{title}}">
     <meta name="description" property="description" itemprop="description" content='{{ response.excerpt | safe }}'>
-    <meta name="keywords" content="{{ response.keywords|join(',') }}">
+    <meta name="keywords" content="{{ keywords|join(',') }}">
     <meta name="index:query" content="{{response.id}}/{{response.slug}}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{request.url}}">
-    <meta property="og:site_name " content="{{response.site_name  | safe}}">
-    <meta property="og:image" itemprop="image primaryImageOfPage" content="/static/apple-touch-icon@2.png">{%if
-    response.keywords %} {% for item in response.keywords %}
-    <meta property="og:tag" content="{{item}}">{% endfor %}{% endif %}
+    <meta property="og:site_name " content="{{site_name  | safe}}">
+    <meta property="og:image" itemprop="image primaryImageOfPage" content="/static/apple-touch-icon@2.png">{% for item
+    in tags %}
+    <meta property="og:tag" content="{{item}}">{% endfor %}
 
     <!-- Twitter meta session  -->
     <meta name="twitter:card" content="summary">
@@ -32,7 +32,38 @@
     <meta name="twitter:title" property="og:title" itemprop="name" content="{{title}}">
     <meta name="twitter:description" property="og:description" itemprop="description"
         content='{{ response.excerpt |safe }}'>
-    <meta content='#1e1e1e' name='theme-color' />
+    <meta content='#1e1e1e' name='theme-color' />{%if parameter %}
+    <script type="application/ld+json">{
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "publisher": {
+            "@type": "{{site_name  | safe}}",
+            "name": "{{site_domain}}",
+            "url": "{{request.base_url}}",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "/static/logo.png",
+                "width": 40,
+                "height": 100
+            }
+        },
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://gp.png",
+            "width": 1600,
+            "height": 900
+        },
+        "url": "{{request.url}}",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{request.base_url}}{{parameter.slug}}"
+        },
+        "datePublished": "{{timestamp}}",
+        "tags": "{{ tags |join(',') }}",
+        "keywords": "{{ keywords|join(',') }}",
+        "description": "{%if excerpt %}{{excerpt | safe}}{% else %} {{site_name  | safe}} | The World’s Largest Online Community for Developers{% endif %}",
+        "headline": "{{title}}"
+    }</script>{% endif %}
     <style>
         body {
             overflow: hidden;
@@ -57,37 +88,6 @@
             width: -webkit-fill-available;
         }
     </style>
-    {%if response.data_querys and response.parameter%}
-    <script type="application/ld+json">{
-        "@context": "https://schema.org",
-        "@type": "Article",
-        "publisher": {
-            "@type": "{{response.site_name  | safe}}",
-            "name": "{{response.site_domain}}",
-            "url": "{{request.base_url}}",
-            "logo": {
-                "@type": "ImageObject",
-                "url": "/static/logo.png",
-                "width": 40,
-                "height": 100
-            }
-        },
-        "image": {
-            "@type": "ImageObject",
-            "url": "https://gp.png",
-            "width": 1600,
-            "height": 900
-        },
-        "url": "{{request.url}}",
-        "mainEntityOfPage": {
-            "@type": "WebPage",
-            "@id": "{{request.base_url}}{{response.parameter.slug}}"
-        },
-        "datePublished": "{{response.timestamp}}",
-        "keywords": "{{ response.keywords|join(',') }}",
-        "description": "{%if response.excerpt %}{{response.excerpt | safe}}{% else %} {{response.site_name  | safe}} | The World’s Largest Online Community for Developers{% endif %}",
-        "headline": "{{response.title}}"
-    }</script>{% endif %}
     <link rel="stylesheet" id="main_style" href="/static/css/index.css?m={{device_info.device_type}}">{% block head %}{%
     endblock %}{%if device_info.device_type == "mobile"%}
     <link rel="stylesheet" id="main_style" href="/static/css/mobile.css?m={{device_info.device_type}}">{%endif%}
@@ -166,7 +166,7 @@
                         jsname="subMenu">{{svg.menu_nine | safe}}</a>{%if auth_session %}
                     <a href="#accountWindow" js-name="button" role='button' class='member button icon'
                         jsname="accountWindow"
-                        aria-label="{{response.site_name  | safe}} खाता: {{auth_session.name}}  {{auth_session.email}}">
+                        aria-label="{{site_name  | safe}} खाता: {{auth_session.name}}  {{auth_session.email}}">
                         <img loading='eager' height="34" width="34"
                             src="{{auth_session.img or 'icon/member.png'}}?size=50x50" alt="User Profile Image">
                     </a>{% else %}
@@ -277,7 +277,7 @@
                 </div>
             </footer>
         </div>{%endif%}
-        <div class="IN053">{% set site_link = '<a href="/" title="' ~ response.site_name ~ '">' ~ response.site_name ~
+        <div class="IN053">{% set site_link = '<a href="/" title="' ~ site_name ~ '">' ~ site_name ~
                 '</a>' %}
             <p class="copyright">{{function.utc("Copyright © 2021-2025 | {0} | All Rights
                 Reserved").format(site_link) | safe}}</p>

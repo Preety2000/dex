@@ -1,5 +1,4 @@
 import os
-import posixpath
 import re
 import uuid
 import base64
@@ -80,21 +79,6 @@ def slugify(text: str) -> str:
     return re.sub(r"[\s-]+", "-", text).strip("-")
 
 
-def format_datetime(
-    dt_input: Union[int, float, str, datetime], fmt: str = "%d %B, %Y at %H:%M"
-) -> str:
-    """Formats an ISO string, epoch integer, or datetime object into a clean string."""
-    if isinstance(dt_input, (int, float)):
-        dt = datetime.fromtimestamp(dt_input)
-    elif isinstance(dt_input, str):
-        dt = datetime.fromisoformat(dt_input)
-    elif isinstance(dt_input, datetime):
-        dt = dt_input
-    else:
-        raise ValueError("Unsupported datetime input type.")
-    return dt.strftime(fmt)
-
-
 def format_view_count(num: Union[int, float, str]) -> str:
     """Formats large numbers into human-readable compact strings (e.g., 1.5k, 2M)."""
     if not num:
@@ -119,11 +103,9 @@ def process_image(
     """
     Processes an image (resizing, converting to WebP) and returns Base64 or StreamingResponse.
     """
-    image_path = posixpath.join(folder.static_folder, image_relative_path)
+    image_path = folder._get_file_path("static", image_relative_path)
 
-    print(
-        f"Processing image at: {image_path} with width={width}, height={height}, output_type={output_type}"
-    )
+    print(f"Processing image at: {image_path} with width={width}, height={height}, output_type={output_type}")
     if not os.path.exists(image_path):
         return "Image unavailable."
     try:

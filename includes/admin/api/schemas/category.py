@@ -1,6 +1,6 @@
 from includes.core.globals.entry import app_context
-from includes.db.models.owner import Subject
-from includes.db.models.secondary import Terms
+from includes.database.models.owner import Subject
+from includes.database.models.secondary import Terms
 from includes.schemas.cache.terms import TermsCache, TermsCacheData
 from includes.utils.utils import create_slug, get_next_id, get_post_value
 

@@ -1,10 +1,10 @@
 from sqlalchemy import and_, select
 from includes.core.globals.entry import app_context
-from includes.db.connection import active_primary_db
-from includes.db.dataclass import MemberRole, TeacherStatus
-from includes.db.models.owner import Members, VerifyIdentity
+from includes.database.connection import active_primary_db
+from includes.database.dataclass.dataclass import MemberRole, TeacherStatus
+from includes.database.models.owner import Members, VerifyIdentity
 from includes.schemas.cache.member import MemberCache
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 
 from sqlalchemy.orm.attributes import flag_modified
 

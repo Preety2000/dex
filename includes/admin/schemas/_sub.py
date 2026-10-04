@@ -1,8 +1,8 @@
 from sqlalchemy import asc
 
 from includes.core.globals.entry import app_context
-from includes.db.dataclass import _Article
-from includes.db.models.secondary import UserRelationships
+from includes.database.dataclass.dataclass import _Article
+from includes.database.models.secondary import UserRelationships
 
 
 def populate_article_likes(record: _Article) -> list[int]:

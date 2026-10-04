@@ -4,8 +4,8 @@ from includes.utils._sub import get_code_to_subject
 from includes.api.exam.student import RecordType, Student
 from includes.core.config import exam_database
 from includes.core.globals.entry import app_context
-from includes.db.models.db_exam import _ExamRecord, PracticeExamRecord
-from includes.db.models.secondary import QuizQuestion, QuizRelationships, Terms
+from includes.database.models.db_exam import _ExamRecord, PracticeExamRecord
+from includes.database.models.secondary import QuizQuestion, QuizRelationships, Terms
 from includes.schemas.cache.member import MemberCache
 from includes.utils.exm import (
     calculate_exam_score,

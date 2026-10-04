@@ -2,7 +2,7 @@ import copy
 from datetime import datetime
 from typing import Any, List, Optional, Tuple, Union
 
-from sqlalchemy import case, delete, desc, func, select, update
+from sqlalchemy import case, delete, desc, func, select, text, update
 
 from includes.admin.modals import checked, emptyMessage
 from includes.admin.schemas.backup import ClassBeckup
@@ -10,9 +10,9 @@ from includes.core.globals.coreutils import is_empty, slugify
 from includes.core.globals.entry import app_context
 from includes.core.metadata import MetaData
 from includes.core.paginator import NewQueryPaginator
-from includes.db.connection import active_secondary_db
-from includes.db.dataclass import _Terms, serialize
-from includes.db.models.secondary import (
+from includes.database.connection import active_secondary_db
+from includes.database.dataclass.dataclass import _Terms, serialize
+from includes.database.models.secondary import (
     Article,
     ArticleMetadata,
     ArticleView,
@@ -22,7 +22,7 @@ from includes.db.models.secondary import (
     Trending,
     UserRelationships,
 )
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 from includes.metrics import MetricsManager
 from includes.schemas.cache.subject import SubjectCache
 from includes.schemas.cache.terms import TermsCache
@@ -91,8 +91,8 @@ async def json(query: Article) -> Optional[dict[str, Any]]:
             "secret_key": mdata.secret_key,
         }
 
-    metadata_dict = await _fetch_metadata(query.mdata)
-    views_count = await MetricsManager.get_article_view(article.id)
+    metadata_dict = await _fetch_metadata(article.mdata)
+    # views_count = await MetricsManager.get_article_view(article.id)
 
     metadata_dict.update(
         {
@@ -107,7 +107,6 @@ async def json(query: Article) -> Optional[dict[str, Any]]:
             "slug": query.slug,
             "type": query.type,
             "title": query.title,
-            "views": views_count,
             "status": query.status,
             "content": query.content,
             "parameter": query.parameter,
@@ -186,10 +185,7 @@ class ArticleService:
         categories = [int(c) for c in data_querys.get("category", [])]
 
         # Bulk delete existing TermsRelationship for this article
-        db.execute(
-            delete(TermsRelationship).where(TermsRelationship.article_id == article_id)
-        )
-
+        db.execute(delete(TermsRelationship).where(TermsRelationship.article_id == article_id))
         db.flush()
         # Add new TermsRelationships
         terms_relationships = [
@@ -199,8 +195,8 @@ class ArticleService:
             for terms_id in categories
         ]
         db.add_all(terms_relationships)
-
-        # 3. Update Terms usage counter & cache
+        db.flush()
+        # Update Terms usage counter & cache
         for terms_id in categories:
             stmt = select(Terms).where(Terms.id == terms_id)
             record = db.execute(stmt).scalar_one_or_none()
@@ -208,7 +204,7 @@ class ArticleService:
                 record.used = (record.used or 0) + 1
                 TermsCache._cache(_Terms(**serialize(record)))
 
-        # 4. Parse & sync tags/suggestions
+        # Parse & sync tags/suggestions
         raw_tags = data_querys.get("tags", "")
         if isinstance(raw_tags, str):
             tag_list = list({k.strip() for k in raw_tags.split(",") if k.strip()})
@@ -216,6 +212,9 @@ class ArticleService:
             tag_list = list(set(raw_tags or []))
 
         remaining_tags = copy.deepcopy(tag_list)
+        
+        # db.execute(text("DROP TABLE IF EXISTS suggestion"))
+        # db.commit()
 
         if remaining_tags:
             stmt = select(Suggestion).where(Suggestion.tags.in_(tag_list))
@@ -284,7 +283,6 @@ class ArticleService:
             title=title,
             slug=slug,
             content=data_querys.get("content"),
-            views=data_querys.get("views", 0),
             parameter=data_querys.get("parameter"),
             timestamp=data_querys.get("timestamp"),
             thumbnail=data_querys.get("thumbnail"),
@@ -433,9 +431,7 @@ class ArticleService:
         return db.execute(stmt).scalar_one_or_none()
 
     @staticmethod
-    async def getCollection(
-        query: Union[int, str, Article] = None,
-    ) -> Optional[dict[str, Any]]:
+    async def getCollection(query: Union[int, str, Article] = None,) -> Optional[dict[str, Any]]:
         article_query = await ArticleService.get_article(query)
         if not article_query:
             return None
@@ -446,20 +442,20 @@ class ArticleService:
             if parameters and parameters.id != 0
             else article_query.slug
         )
-
-        mdata = article_query.mdata
+        
+        db = await active_secondary_db()
+        metadata_stmt = select(ArticleMetadata).where(ArticleMetadata.id == article_query.id)
+        mdata = db.execute(metadata_stmt).scalars().first()
         if mdata is None:
             mdata = ArticleMetadata(
                 id=article_query.id,
                 tags_group=[],
                 subject_id=0,
                 excerpt="",
-                secret_key="",
+                secret_key=""
             )
 
-        db = await active_secondary_db()
         suggestion_ints = list(map(int, filter(None, mdata.tags_group or [])))
-
         stmt = select(Suggestion).where(Suggestion.id.in_(suggestion_ints))
         suggestions = db.execute(stmt).scalars().all()
 

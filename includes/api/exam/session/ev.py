@@ -1,7 +1,7 @@
 import asyncio
 from collections import deque
 
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 
 STUDENT_LIVE_IN_EXAME = {}
 

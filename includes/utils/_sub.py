@@ -1,7 +1,7 @@
 from includes.core.cache import AppCache
 from includes.core.config import main_database
 from includes.core.metadata import MetaData
-from includes.db.models.owner import Subject
+from includes.database.models.owner import Subject
 from includes.metrics import MetricsManager
 from includes.schemas.trending import ArticleTrendingService
 

@@ -367,36 +367,19 @@ $.define("dm/action", function Action(ED) {
                 form.submitButton("Add Subject");
                 form.setRequestRoot("/api/admin/subject/insert", true)
 
-                form.finish = function (r, b) {
-                    let query = r.is("data");
-                    let $id = "subject-" + $.id;
+                form.error = r => $.confirm({ t: r.data.error, c: "Ok" })
+
+                form.finish = r => {
+                    if (!r.success)
+                        return
+
+                    let s = $("[name='subject_id']", false);
+                    s && s.create.option({
+                        "sub-id": r.data.data.id,
+                        value: r.data.data.id,
+                        inner: r.data.data.name
+                    });
                     popupWindow.close();
-
-                    if ($($id, true)) {
-                        return;
-                    }
-                    let subject = $.create({
-                        for: $id,
-                        tagName: "label",
-                        "sub-id": $.id,
-                        jsname: "ACSTC"
-                    })
-                    subject.create({
-                        tagName: "input",
-                        onclick: `title_set(${$.name})`,
-                        id: $id,
-                        type: "radio",
-                        name: "subject_id",
-                        value: $.id,
-                        title: $.name,
-
-                    })
-                    subject.create.span("tis", $.name);
-                    const g = a.parentFilter(e => e.isclass("inside"));
-                    console.log(a, g);
-
-
-                    a.parentFilter(e => e.isclass("insides")).in(subject, 0)
                 }
 
             })

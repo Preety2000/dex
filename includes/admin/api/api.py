@@ -43,7 +43,9 @@ class ADMIN_API:
 
         if "subject" == app_context.route.resource_type:
             if app_context.route.resource_slug:
-                return await AdminApiSubject.execute(app_context.route.resource_slug)
+                return json_response(
+                    await AdminApiSubject.execute(app_context.route.resource_slug)
+                )
 
         if "content" == app_context.route.resource_type:
             if app_context.route.resource_slug:

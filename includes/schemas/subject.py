@@ -5,8 +5,8 @@ from sqlalchemy import asc
 
 from includes.core.globals.entry import app_context, GlobleCatch
 from includes.admin.api.schemas import subject
-from includes.db.models.owner import Subject
-from includes.db.dataclass import to_dict
+from includes.database.models.owner import Subject
+from includes.database.dataclass.dataclass import to_dict
 from includes.schemas.cache.mcq_question import QuizQuestionCache
 from includes.schemas.cache.terms import TermsCache
 from includes.schemas.cache.subject import SubjectCache

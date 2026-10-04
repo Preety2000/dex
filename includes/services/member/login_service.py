@@ -1,15 +1,15 @@
 from sqlalchemy import inspect
 
 from includes.core.metadata import MetaData
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
-from includes.db.models.owner import Members, MemberSession
+from includes.database.models.owner import Members, MemberSession
 from includes.schemas.cache.member import MemberCache
 from includes.utils.utils import get_query_value
 
 
-def complete_login(member: Members, db) -> str | None:
+async def complete_login(member: Members, db) -> str | None:
     device_id = app_context.client_info.get("device_id")
 
     user_sessions = MemberSession(
@@ -55,7 +55,7 @@ def complete_login(member: Members, db) -> str | None:
     db.refresh(member)
 
     # Cache
-    MemberCache._cache(member)
+    await MemberCache._cache(member)
     app_context.setting.update_cookie()
 
     try:

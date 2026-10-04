@@ -14,11 +14,11 @@ from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPM
 
 # Project specific imports (modify according to your project structure)
-from includes.database.sql import LocalDB
+from includes.database.chait.sql import LocalDB
 from includes.core.repo.thumbnail import Thumbnail
-from includes.database.media_asset_model import MediaAsset, MediaAssetBase
+from includes.database.chait.media_asset_model import MediaAsset, MediaAssetBase
 from includes.utils.file import serialize_media_asset
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 
 # MIME TYPES MAPPING & HELPER
 

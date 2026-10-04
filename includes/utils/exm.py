@@ -8,7 +8,7 @@ from collections import Counter, defaultdict
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import encode_id
 from includes.core.security import _Security
-from includes.db.dataclass import ExamRqStatus
+from includes.database.dataclass.dataclass import ExamRqStatus
 
 ES = {}
 
@@ -355,7 +355,7 @@ def update_countdown(target_time):
     return formatted
 
 
-from includes.db.models.utils import TimeStamp
+from includes.database.models.utils import TimeStamp
 
 
 def time_until(target_time: int):

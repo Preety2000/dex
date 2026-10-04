@@ -9,10 +9,10 @@ from includes.core.globals.coreutils import is_empty, slugify
 from includes.core.globals.entry import GlobleCatch, app_context
 from includes.core.metadata import MetaData
 from includes.core.paginator import NewQueryPaginator
-from includes.db.connection import active_secondary_db
-from includes.db.dataclass import serialize
-from includes.db.models.owner import Subject
-from includes.db.models.secondary import Terms
+from includes.database.connection import active_primary_db, active_secondary_db
+from includes.database.dataclass.dataclass import serialize
+from includes.database.models.owner import Subject
+from includes.database.models.secondary import Terms
 from includes.schemas.cache.subject import SubjectCache
 from includes.schemas.router_schema import DynamicURLRoute
 from includes.utils.utils import get_next_id, get_post_value
@@ -33,7 +33,8 @@ class AdminClassTerms:
     async def get_all_terms_by_subject() -> List[dict[str, Any]]:
         """Fetch all subjects with their associated terms."""
 
-        db, sdb = await app_context.db.configure()
+        db = await active_primary_db()
+        sdb = await active_secondary_db()
 
         # Subjects
         subjects_result = db.execute(select(Subject).order_by(Subject.name))
@@ -125,9 +126,10 @@ class AdminClassTerms:
         slug = slugify(data.get("slug"))
 
         # Check existing slug
+        db = await active_secondary_db()
         stmt = select(Terms).where(Terms.slug == slug)
 
-        result = app_context.db.execute(stmt)
+        result = db.execute(stmt)
 
         existing_term = result.scalars().first()
 
@@ -141,8 +143,6 @@ class AdminClassTerms:
             )
 
             return data
-
-        _, db = await app_context.db.configure()
 
         term = Terms(
             slug=slug,
@@ -178,11 +178,12 @@ class AdminClassTerms:
         item_id = app_context.function.getRequestInt("item")
 
         terms_query = None
-
+        
+        db = await active_secondary_db()
         if item_id:
             stmt = select(Terms).where(Terms.id == int(item_id))
 
-            result = app_context.db.execute(stmt)
+            result = db.execute(stmt)
 
             terms_query = result.scalars().first()
 
@@ -226,7 +227,7 @@ class AdminClassTerms:
             terms_query.description,
         )
 
-        app_context.db.commit()
+        db.commit()
 
         app_context.response["message"] = (
             "Updated " "<a href='/admin/category'>Back</a>"
@@ -241,10 +242,11 @@ class AdminClassTerms:
 
         terms_query = None
 
+        db = await active_secondary_db()
         if id:
             stmt = select(Terms).where(Terms.id == id)
 
-            result = app_context.db.execute(stmt)
+            result = db.execute(stmt)
 
             terms_query = result.scalars().first()
 
@@ -256,14 +258,14 @@ class AdminClassTerms:
             ):
 
                 # Delete main Terms record
-                app_context.db.execute(delete(Terms).where(Terms.id == terms_query.id))
+                db.execute(delete(Terms).where(Terms.id == terms_query.id))
 
                 # Delete related records
-                app_context.db.execute(
+                db.execute(
                     delete(Terms).where(Terms.terms_id == terms_query.id)
                 )
 
-                app_context.db.commit()
+                db.commit()
 
                 GlobleCatch.get_with_terms = None
 
@@ -327,7 +329,7 @@ class AdminClassTerms:
 
             return term
 
-        _, db = await app_context.db.configure()
+        db = await active_secondary_db()
 
         query_terms_keys = [
             "id",
@@ -386,9 +388,10 @@ class AdminClassTerms:
         terms_query_data = None
 
         if item_id:
+            db = await active_secondary_db()
             stmt = select(Terms).where(Terms.id == int(item_id))
 
-            result = app_context.db.execute(stmt)
+            result = db.execute(stmt)
 
             record = result.scalars().first()
 

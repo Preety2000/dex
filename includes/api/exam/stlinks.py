@@ -1,8 +1,8 @@
 from dataclasses import asdict
-from includes.db.connection import active_exam_db
+from includes.database.connection import active_exam_db
 from includes.core.pagination import Pagination
 from includes.core.request_filter import RequestFilter
-from includes.db.models.db_exam import (
+from includes.database.models.db_exam import (
     _StudentTeacherAssociation,
     _TeacherProfile,
     ExamRequestSession,

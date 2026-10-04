@@ -1,11 +1,12 @@
 from typing import Optional
 
 from bs4 import BeautifulSoup
-from sqlalchemy import func
+from sqlalchemy import func, select
 
 from includes.core.config import app_context
-from includes.db.dataclass import _Article, _Terms
-from includes.db.models.secondary import Article, Trending
+from includes.database.connection import active_secondary_db
+from includes.database.dataclass.dataclass import _Article, _Terms
+from includes.database.models.secondary import Article, ArticleMetadata, Trending
 from includes.metrics import MetricsManager
 from includes.schemas.cache.subject import SubjectCache
 from includes.schemas.cache.suggestion import SuggestionCache
@@ -44,29 +45,35 @@ async def get_artical_url(article: _Article) -> str:
     return article.url
 
 
-async def enrich_article(
-    article: _Article, *, suggestion=False, excerpt=False
-) -> _Article:
-    if article.mdata is None:
-        article.mdata = {
+async def enrich_article(article: _Article, *, suggestion=False, excerpt=False) -> _Article:
+    db = await active_secondary_db()
+    metadata_stmt = select(ArticleMetadata).where(ArticleMetadata.id == article.id)
+    mdata = db.execute(metadata_stmt).scalars().first()
+    
+    if mdata is None:
+        mdata = {
             "secret_key": None,
             "tags_group": [],
             "subject_id": None,
             "excerpt": None,
         }
+    else:
+        mdata = {field: getattr(mdata, field) for field in mdata.__table__.columns.keys()}
+        
+        
 
-    article.secret_key = article.mdata["secret_key"]
-    article.subject = await SubjectCache.get_by_id(article.mdata["subject_id"])
+    article.secret_key = mdata["secret_key"]
+    article.subject = await SubjectCache.get_by_id(mdata["subject_id"])
 
     if suggestion:
-        tags = [int(tag_id) for tag_id in article.mdata["tags_group"] if tag_id]
+        tags = [int(tag_id) for tag_id in mdata["tags_group"] if tag_id]
         article.suggestion = [
             {"tag": s.tags, "used": s.most_used}
             for s in await SuggestionCache.get_many(tags)
         ]
 
     if excerpt:
-        article.excerpt = article.mdata["excerpt"] or get_excerpt(article)
+        article.excerpt = mdata["excerpt"] or get_excerpt(article)
 
     return article
 
@@ -89,6 +96,9 @@ async def get_mini_article_json(
             category=category,
             like=like,
         )
+        
+    if article is None:
+        return {}
 
     await get_artical_url(article)
     await enrich_article(article, excerpt=excerpt, suggestion=suggestion)

@@ -2,7 +2,7 @@ import inspect
 from typing import Literal
 
 from sqlalchemy import String, Text, and_, or_
-from includes.db.models.db_exam import JsonList
+from includes.database.models.db_exam import JsonList
 from includes.utils.utils import _resolve_request_getter
 
 RequestType = Literal["query", "api", "referer"]

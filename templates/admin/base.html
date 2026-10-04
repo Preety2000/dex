@@ -52,7 +52,7 @@
 
 
 
-<body class="{{collapsed_nav}}" theme="{{_andow.theme}}">
+<body class="{{collapsed_nav}}" theme="{{_andow.theme if _andow else "" }}">
     {{app_context.checked}}
     <button class="button hideView"
         style="position: absolute;left: 45px;top: 4.5px;z-index: 999999;background: #fff;width: fit-content;height: fit-content;padding: 1px 12px;display: block;overflow: hidden;">View
