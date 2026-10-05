@@ -98,7 +98,6 @@ async def json(query: Article) -> Optional[dict[str, Any]]:
         {
             "id": query.id,
             "rank": rank(article.id),
-            "likes": article.likes,
             "types": types,
             "parameters": parameters,
             "category": article.category,

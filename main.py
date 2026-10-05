@@ -19,6 +19,7 @@ from fastapi.responses import (
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 from includes.core.deviceinfo import DeviceInfo
 from includes.core.repo.upload import extract_uploaded_files
@@ -29,17 +30,16 @@ from includes.executers import (
     build_http_response,
     process_account,
 )
+from includes.api.v1.api import API
+from includes.qs.qs_index import QS
+from includes.admin.entry import admin_init
+from includes.admin.api.api import ADMIN_API
 from includes.core.repo.media import Media
 from includes.core.repo.dir_manager import folder
 from includes.core.globals.entry import app_context
 from includes.core.globals.initialize import initialize_database
 from includes.core.metadata import MetaData
-from includes.middleware import request_context
-from includes.admin.api.api import ADMIN_API
-from includes.admin.entry import admin_init
 from includes.api.websocket import APIWS
-from includes.api.v1.api import API
-from includes.qs.qs_index import QS
 from includes.schemas.search import Search
 from includes.schemas.captcha import Captcha
 from includes.schemas.router_schema import DynamicURLRoute
@@ -47,6 +47,8 @@ from includes.services.exam.exam import process_exam
 from includes.src.string import TextExplorer
 from includes.routes.payment import payment_router
 from includes.routes.payment import process_payment
+from includes.middleware.compression import CompressionMiddleware
+from includes.middleware.request_context import DataBaseConnectionMiddleware
 
 app = FastAPI(
     title="Vidya Vistar",
@@ -91,7 +93,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.add_middleware(request_context.DataBaseConnectionMiddleware)
+
+app.add_middleware(CompressionMiddleware)
+app.add_middleware(DataBaseConnectionMiddleware)
 app.include_router(payment_router)
 
 # from fastapi_cache.backends.redis import RedisBackend
@@ -242,7 +246,7 @@ async def script(filename: str, request: Request):
 @app.api_route("/media/{root:path}", methods=["GET", "POST"])
 async def folder_root(root: str | None = None, request: Request = None):
     query = Media(request)
-    response = await query.execute()
+    response = await query.execute(root)
     if isinstance(response, StreamingResponse) or isinstance(response, Response):
         response.headers["Cache-Control"] = "public, max-age=3000"
         return response

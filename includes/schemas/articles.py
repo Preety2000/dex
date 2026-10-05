@@ -40,7 +40,6 @@ def get_excerpt(article, max_length=180):
     return f"{first}।"
 
 
-
 class ArticleService:
 
     @staticmethod
@@ -49,13 +48,6 @@ class ArticleService:
 
         article.type = await TermsCache.get_by_id(article.type)
         article.parameter = await TermsCache.get_by_id(article.parameter)
-
-        member_id = await app_context.setting.member("id")
-        Likes.exists(article.id, member_id)
-
-        article.feedback = (
-            "article-like" if Likes.exists(article.id, member_id) else "feedback"
-        )
 
         await get_artical_url(article)
         await enrich_article(article, excerpt=True, suggestion=True)
@@ -74,7 +66,7 @@ class ArticleService:
                 "update_session_returns": {
                     "id": article.id,
                     "update_type": "article_metrics",
-                    "update_option": ["rank", "views"],
+                    "update_option": ["rank", "views", "likes"],
                 }
             }
         )

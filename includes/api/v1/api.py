@@ -20,7 +20,7 @@ from includes.schemas.search import Search
 from includes.database.models.secondary import Article
 from PIL import Image, ImageDraw, ImageFont
 
-from includes.utils.utils import get_post_value, json_response
+from includes.utils.utils import get_post_value, json_null_response, json_response
 
 
 @dataclass
@@ -137,7 +137,9 @@ class API:
         if resource_type == "feedback":
             member = await app_context.setting.member()
             if not member:
-                return json_response([{"message": "You must be loogged in to like this Artical."}])
+                return json_null_response(
+                    code="Xe022524", details="You must be loogged in to like this Artical."
+                )
 
             # Get the referer URL
             referer = self.request.headers.get("referer")
@@ -152,7 +154,7 @@ class API:
             category = await TermsCache.get_by_slug(det_)
             article = app_context.db.query(Article).filter(Article.slug == res_).first()
             if category and article and article.parameter == category.id:
-                return Likes.handle_like(
+                return await Likes.handle_like(
                     article_id=article.id,
                     users_id=member.get("id"),
                     option=("removelike" if len(opg_) == 20 else "like"),
@@ -166,7 +168,10 @@ class API:
             if query:
                 return json_response(
                     [
-                        {"excerpt": query.get("excerpt"), "title": query.get("question")},
+                        {
+                            "excerpt": query.get("excerpt"),
+                            "title": query.get("question"),
+                        },
                         200,
                     ]
                 )

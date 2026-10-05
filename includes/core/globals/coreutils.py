@@ -93,7 +93,17 @@ def format_view_count(num: Union[int, float, str]) -> str:
     return f"{formatted}{suffixes[magnitude]}"
 
 
-def process_image(
+import base64
+import os
+from io import BytesIO
+from pathlib import Path
+from typing import Any, Optional, Union
+
+from fastapi.responses import StreamingResponse
+from PIL import Image
+
+
+async def process_image(
     image_relative_path: str,
     output_type: str = "base64",
     *,
@@ -101,34 +111,103 @@ def process_image(
     height: Optional[int] = None,
 ) -> Union[dict[str, Any], StreamingResponse, str]:
     """
-    Processes an image (resizing, converting to WebP) and returns Base64 or StreamingResponse.
-    """
-    image_path = folder._get_file_path("static", image_relative_path)
+    Safely process an image from the static directory.
 
-    print(f"Processing image at: {image_path} with width={width}, height={height}, output_type={output_type}")
-    if not os.path.exists(image_path):
-        return "Image unavailable."
+    Prevents path traversal / arbitrary file access by ensuring that
+    the resolved image path remains inside the static directory.
+    """
+
     try:
-        with Image.open(image_path) as base_image:
-            if width and height:
-                base_image = base_image.resize((width, height))
+        # Basic input validation
+        if not image_relative_path or not isinstance(image_relative_path, str):
+            return "Invalid image path."
+
+        # Optional: only allow these output types
+        if output_type not in {"base64", "img", "ico"}:
+            return "Invalid output type."
+
+        # Validate dimensions
+        if width is not None and (not isinstance(width, int) or width <= 0):
+            return "Invalid width."
+
+        if height is not None and (not isinstance(height, int) or height <= 0):
+            return "Invalid height."
+
+        # Resolve the static root
+        static_root = Path(folder.static_folder).resolve()
+
+        # Resolve the requested path
+        requested_path = (static_root / image_relative_path).resolve()
+
+        # IMPORTANT:
+        # Ensure requested_path is actually inside static_root.
+        try:
+            requested_path.relative_to(static_root)
+        except ValueError:
+            return "Invalid image path."
+
+        # File must exist and must be a regular file
+        if not requested_path.is_file():
+            return "Image unavailable."
+
+        # Optional but recommended: prevent symlink escape
+        # resolve() normally catches this, but this makes the intention explicit.
+        if requested_path.is_symlink():
+            return "Invalid image path."
+        
+        print("requested_path====", requested_path)
+        # Process image
+        with Image.open(requested_path) as base_image:
+            # Force loading while inside the controlled context
+            base_image.load()
+
+            if width is not None and height is not None:
+                base_image = base_image.resize(
+                    (width, height),
+                    Image.Resampling.LANCZOS,
+                )
+
             orig_width, orig_height = base_image.size
+
             image_io = BytesIO()
+
+            # Convert modes that WebP may not handle correctly
+            if base_image.mode not in ("RGB", "RGBA"):
+                if "A" in base_image.getbands():
+                    base_image = base_image.convert("RGBA")
+                else:
+                    base_image = base_image.convert("RGB")
+
             base_image.save(image_io, format="WEBP")
             image_bytes = image_io.getvalue()
-            if output_type in ("img", "ico"):
-                media_type = "image/x-icon" if output_type == "ico" else "image/webp"
-                return StreamingResponse(BytesIO(image_bytes), media_type=media_type)
-            base64_str = base64.b64encode(image_bytes).decode("utf-8")
-            base64_header = f"data:image/webp;base64,{base64_str}"
-            return {
-                "width": orig_width,
-                "height": orig_height,
-                "type": "image/webp",
-                "image": base64_header,
-            }
+
+        # Streaming response
+        if output_type in {"img", "ico"}:
+            media_type = (
+                "image/x-icon"
+                if output_type == "ico"
+                else "image/webp"
+            )
+
+            return StreamingResponse(
+                BytesIO(image_bytes),
+                media_type=media_type,
+            )
+
+        # Base64 response
+        base64_str = base64.b64encode(image_bytes).decode("utf-8")
+
+        return {
+            "width": orig_width,
+            "height": orig_height,
+            "type": "image/webp",
+            "image": f"data:image/webp;base64,{base64_str}",
+        }
+
     except Exception as e:
-        return f"Error processing image: {str(e)}"
+        # Production mein actual exception expose na karein
+        return "Error processing image."
+
 
 
 def get_active_class(current_state: str, target_state: str) -> str:

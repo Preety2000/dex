@@ -1,17 +1,18 @@
 import time
 from sqlalchemy import select
-from typing import Any,  Iterable
+from typing import Any, Iterable
 
+from includes.schemas.cache.likes import Likes
+from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import format_view_count
 from includes.database.connection import active_secondary_db, get_contry
 from includes.database.models.secondary import ArticleView, QuizView
-
-
 
 VIEW_CACHE: dict[str, dict[int, dict[str, Any]]] = {
     "article": {},
     "practice": {},
 }
+
 
 class MetricsManager:
     """Manages in-memory buffering and periodic database flushing
@@ -22,7 +23,6 @@ class MetricsManager:
         self.models = None
         self.flush_ms = flush_interval_minutes * 60 * 1000
 
-
     @staticmethod
     def _now_ms() -> int:
         return int(time.time() * 1000)
@@ -31,7 +31,7 @@ class MetricsManager:
         return (self._now_ms() - updated_ms) >= self.flush_ms
 
     @staticmethod
-    async def track_views(item_type: str, id: int, update:bool=True) -> int:
+    async def track_views(item_type: str, id: int, update: bool = True) -> int:
         """Increment views in memory and periodically flush to DB."""
         country = await get_contry()
         type_cache = VIEW_CACHE.get(item_type)
@@ -42,13 +42,13 @@ class MetricsManager:
 
         if item_type == "article":
             manager.models = ArticleView
-        
+
         elif item_type == "practice":
             manager.models = QuizView
-            
+
         if id not in type_cache:
             type_cache[id] = {
-                "country": country, 
+                "country": country,
                 "views": await manager._fetch_views(id),
                 "timestamp": manager._now_ms(),
             }
@@ -63,7 +63,7 @@ class MetricsManager:
         if manager._is_expired(type_cache[id]["timestamp"]):
             cached_views = type_cache[id]["views"]
             target_country = type_cache[id]["country"]
-            synced_views = await manager._sync_views( id, cached_views, target_country)
+            synced_views = await manager._sync_views(id, cached_views, target_country)
 
             type_cache[id] = {
                 "views": synced_views,
@@ -82,7 +82,7 @@ class MetricsManager:
 
         return val if val is not None else 0
 
-    async def _sync_views(self, id: int, views: int=1, country: str=None) -> int:
+    async def _sync_views(self, id: int, views: int = 1, country: str = None) -> int:
         db_session = await active_secondary_db()
 
         stmt = select(self.models).where(self.models.id == id)
@@ -103,7 +103,9 @@ class MetricsManager:
         return rank_value
 
     @classmethod
-    async def article_metrics(cls, id: int, options: Iterable[str], servic=None) -> dict[str, Any]:
+    async def article_metrics(
+        cls, id: int, options: Iterable[str], servic=None
+    ) -> dict[str, Any]:
         result: dict[str, Any] = {}
         options_set = set(options)
 
@@ -114,10 +116,18 @@ class MetricsManager:
             total_views = await cls.track_views("article", id)
             result["views"] = format_view_count(total_views)
 
+        if "likes" in options_set:
+            result["likes"], result["feedback"] = await Likes.get_metrics(
+                article_id=id,
+                users_id=await app_context.setting.member("id"),
+            )
+
         return result
 
     @classmethod
-    async def practice_metrics(cls, mcq_id: int, options: Iterable[str], servic=None) -> dict[str, Any]:
+    async def practice_metrics(
+        cls, mcq_id: int, options: Iterable[str], servic=None
+    ) -> dict[str, Any]:
         result: dict[str, Any] = {}
         options_set = set(options)
 
@@ -128,6 +138,5 @@ class MetricsManager:
         return result
 
     @classmethod
-    async def get_article_view(cls, id:int):
+    async def get_article_view(cls, id: int):
         return await cls.track_views("article", id, False)
-

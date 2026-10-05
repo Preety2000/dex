@@ -32,22 +32,22 @@ $.define("worker", function Worker() {
         let err = a => {
             up();
             let p = $.popup(), box = p.create("IN092");
-            p.closeButton.remove();
-            box.addIcon("help");
-            box.create.h2("IN093", "Sorry!");
-            box.create.p("alert-massags", a.is("message") || "Internal Server Error");
-            box.create("IN094").create.button("button", "Login").event.on(() => (p.close(), $("login").click()));
-            box.create("IN094").create.button("button", "Cancel").event.on(() => (p.close(), this.loader(false)));
+            p.closeButton.remove(); box.addIcon("help"); box.create.h2("IN093", "Sorry!"); box.create.p("alert-massags", a.details || "Internal Server Error");
+            let IN094 = box.create("IN094")
+            for (const [n, f] of Object.entries({ Login: () => (p.close(), $("login").click()), Cancel: () => (p.close(), this.loader(false)) }))
+                IN094.create.button("button", n).event.on(f);
         };
 
         up();
         let o = opt(), v = new FormData(), ars = $.apirequest("feedback");
         ars.progress = () => this.loader(true);
         ars.finish = a => {
+            console.log(a);
+
             this.loader(false);
             a.export(o) && (up(), $.message("Like is not update :("));
         };
-        ars.error = a => a.is("error_code") == "Xe022524" && err(a);
+        ars.error = a => a.meta.error && err(a.meta.error);
 
         v.append("log_", $.makeid(57));
         v.append("opg_", $.makeid(o == "like" ? 20 : 25));

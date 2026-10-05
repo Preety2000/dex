@@ -11,7 +11,7 @@ class StaticRouteHandler:
     @staticmethod
     async def handle_static_route(scope_type: str):
         if scope_type == "favicon.ico":
-            return process_image("favicon.png", "ico")
+            return await process_image("favicon.png", "ico")
 
         if scope_type == "sitemap.xml":
             xml_data = Sitemap.sitemap()

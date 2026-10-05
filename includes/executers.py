@@ -237,10 +237,10 @@ async def handle_request_with_cache(*, allow_catch: bool = True, **binds):
         handler = binds.get("callback", execute_request)
         session = await handler(app_context.route)
 
-        # if allow_catch is True:
-        #     AppCache.add(
-        #         encrypted_url, (MetaData.to_dict(), session, app_context.response)
-        #     )
+        if allow_catch is True:
+            AppCache.add(
+                encrypted_url, (MetaData.to_dict(), session, app_context.response)
+            )
 
     # Response Enrichment & Processing
     app_context.response = await enrich_request_response(app_context.response)

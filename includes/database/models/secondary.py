@@ -1,6 +1,7 @@
 import json
+import os
 import time
-from sqlalchemy.ext.declarative import declarative_base
+from includes.core.repo.dir_manager import folder
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import format_view_count
 from includes.database.base import BaseSecondary
@@ -358,11 +359,10 @@ class Terms(BaseSecondary):
 
     @property
     def img(self):
-        return (
-            self.image_src
-            if "/" in self.image_src
-            else f"/media/img/category/{self.image_src}"
-        )
+        path = folder._get_file_path("static", "img", "category", f"{self.slug}.png")
+        src = f"{self.slug}.png" if os.path.isfile(path) else self.image_src
+        return src if "/" in src else f"/media/img/category/{src}"
+    
 
     @property
     def url(self):

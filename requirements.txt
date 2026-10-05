@@ -177,3 +177,4 @@ websockets
 Werkzeug
 wheel
 yarl
+brotli

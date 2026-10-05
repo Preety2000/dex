@@ -162,7 +162,6 @@ button,
     .IN022 .logo {
         height: auto;
         width: -webkit-fill-available;
-        ;
     }
 
     .IN022 .meta {
@@ -177,6 +176,7 @@ button,
         margin-bottom: 0;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-size: 85%;
     }
 
     .IN022 .IN0104 .learning-link {}
@@ -247,4 +247,10 @@ button,
     color: var(--text-primary);
     background: var(--bg-secondary);
     /* border: solid 2px var(--border-light); */
+}
+
+
+
+.IN003 .IN079{
+    padding: 0;
 }

@@ -20,6 +20,7 @@ from fastapi.responses import (
 from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPM
 
+from includes.api.router import DynamicSokitURLRoute
 from includes.core.security import _Security
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import process_image
@@ -230,66 +231,62 @@ class Media:
             return Response(content=svg_content, media_type="image/svg+xml")
 
     # GET
-    async def execute(self, roots=None):
-        # scope_type/scope_slug/resource_type/resource_slug/sub_action/child_entity/modifier
+    async def execute(self, root:str=None):
+        _root = DynamicSokitURLRoute.parse(root)
 
-        if app_context.route.scope_slug == "upload":
+        # print("/////////////", _root)
+        if _root.scope_type == "upload":
             return await FileUpload.execute()
 
         # SVG
-        if app_context.route.scope_slug == "svg":
-            if app_context.route.resource_slug:
-                app_context.route.resource_type = posixpath.join(
-                    app_context.route.resource_type, app_context.route.resource_slug
-                )
+        if _root.scope_type == "svg" and _root.scope_slug:
+            path = _root.scope_slug
+            if _root.resource_type:
+                path = posixpath.join(_root.scope_slug, _root.resource_type)
 
-            return self.get_svg(app_context.route.resource_type)
+            return self.get_svg(_root.scope_slug)
 
         # ==============================
         # IMAGE
         # ==============================
-        if app_context.route.scope_slug == "img":
-            if app_context.route.resource_type == "category":
-                app_context.route.resource_slug = (
-                    app_context.route.resource_slug or "empty.png"
+        if _root.scope_type == "img":
+            if _root.scope_slug == "category":
+                _root.resource_type = (
+                    _root.resource_type or "empty.png"
                 )
-            if app_context.route.resource_slug:
-                app_context.route.resource_type = posixpath.join(
-                    app_context.route.resource_type, app_context.route.resource_slug
+            if _root.resource_type:
+                _root.scope_slug = posixpath.join(
+                    _root.scope_slug, _root.resource_type
                 )
 
-            return process_image(f"img/{app_context.route.resource_type}", "img")
+            return await process_image(f"img/{_root.scope_slug}", "img")
 
         # ==============================
         # ICon
         # ==============================
-        if app_context.route.scope_slug == "icon":
-            if app_context.route.resource_slug:
-                app_context.route.resource_type = posixpath.join(
-                    app_context.route.resource_type, app_context.route.resource_slug
+        if _root.scope_type == "icon":
+            if _root.resource_type:
+                _root.scope_slug = posixpath.join(
+                    _root.scope_slug, _root.resource_type
                 )
 
-            print(app_context.route.resource_type)
-            return process_image(f"icon/{app_context.route.resource_type}", "img")
+            return await process_image(f"icon/{_root.scope_slug}", "img")
 
         # ==============================
         # THUMBNAIL
         # ==============================
 
-        if app_context.route.scope_slug == "th":
+        if _root.scope_type == "th":
 
             path = get_query_value("pt")
 
             file_path = _Security.short_decode(path)
 
             file_path = folder.root + file_path
-
             thumb_name = Path(file_path).name + ".webp"
-
             thumb_path = posixpath.join(folder.root, "thumbs", thumb_name)
 
             if not os.path.exists(thumb_path):
-
                 self.create_thumbnail_file(file_path, thumb_path)
 
             return FileResponse(thumb_path, media_type="image/webp")
@@ -298,10 +295,10 @@ class Media:
         # USER IMAGE
         # ==============================
 
-        if app_context.route.scope_slug == "u" and app_context.route.resource_type:
+        if _root.scope_type == "u" and _root.scope_slug:
 
             roll_no, folder_path = get_email_folder_info(
-                app_context.route.resource_type, False
+                _root.scope_slug, False
             )
             file_path = posixpath.join(folder_path, "profile.webp")
 
@@ -333,33 +330,33 @@ class Media:
         # FILES
         # ==============================
 
-        if not app_context.route.scope_slug:
+        if not _root.scope_type:
             return ""
 
         if (
-            app_context.route.scope_slug == "exnr"
-            and app_context.route.resource_type
-            and app_context.route.resource_slug
+            _root.scope_type == "exnr"
+            and _root.scope_slug
+            and _root.resource_type
         ):
             path = posixpath.join(
                 folder.exnr,
-                app_context.route.resource_type,
-                app_context.route.resource_slug,
+                _root.scope_slug,
+                _root.resource_type,
             )
             if os.path.exists(path):
                 return self.file_sender(path)
             return self.file_sender("/")
 
-        upload_path = posixpath.join(folder.upload_folder, app_context.route.scope_slug)
-        static_path = posixpath.join(folder.static_folder, app_context.route.scope_slug)
+        upload_path = posixpath.join(folder.upload_folder, _root.scope_type)
+        static_path = posixpath.join(folder.static_folder, _root.scope_type)
 
-        if app_context.route.resource_type:
-            upload_path = posixpath.join(upload_path, app_context.route.resource_type)
-            static_path = posixpath.join(static_path, app_context.route.resource_type)
+        if _root.scope_slug:
+            upload_path = posixpath.join(upload_path, _root.scope_slug)
+            static_path = posixpath.join(static_path, _root.scope_slug)
 
-        if app_context.route.resource_slug:
-            upload_path = posixpath.join(upload_path, app_context.route.resource_slug)
-            static_path = posixpath.join(static_path, app_context.route.resource_slug)
+        if _root.resource_type:
+            upload_path = posixpath.join(upload_path, _root.resource_type)
+            static_path = posixpath.join(static_path, _root.resource_type)
 
         if os.path.exists(upload_path):
             return self.file_sender(upload_path)

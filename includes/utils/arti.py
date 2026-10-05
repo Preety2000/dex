@@ -109,7 +109,6 @@ async def get_mini_article_json(
         "title": article.title,
         "subject": article.subject,
         "excerpt": article.excerpt,
-        "likes": article.likes,
         "category": article.category,
         "views": await MetricsManager.get_article_view(article.id),
         "date": article.date,

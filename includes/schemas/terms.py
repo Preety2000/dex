@@ -17,8 +17,7 @@ def get_terms_json(item):
     if not item:
         return item
 
-    image_src = item.image_src or "empty.png"
-
+    image_src = item.image_src
     return dict(
         {
             **{c.name: getattr(item, c.name) for c in item.__table__.columns},
