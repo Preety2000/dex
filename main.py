@@ -352,6 +352,4 @@ async def resource(request: Request, root: str):
 # python -m uvicorn main:app --reload
 # python -m uvicorn main:app --reload --ssl-keyfile key.pem --ssl-certfile cert.pem
 # python -m uvicorn main:app --workers 4 --ssl-keyfile key.pem --ssl-certfile cert.pem
-
-
 # pip freeze > requirements.txt
