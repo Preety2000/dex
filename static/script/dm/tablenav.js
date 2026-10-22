@@ -70,7 +70,7 @@ isdefine("tableNav", function tablenav(was, extend, modules) {
         };
     });
 
-    $.weres("a", false).filter(e => e.href == "javascript:void(0)").for(function (button) {
+    $.picks("a", false).filter(e => e.href == "javascript:void(0)").for(function (button) {
         button.event.on(function () {
             var modules = isModules(this.get("jsname"))
             if (F(modules)) {

@@ -1,14 +1,15 @@
+from includes.src.request import Request
 from sqlalchemy import and_, desc, select, func
 
 from includes.api.exam.socket.student_req import StudentRequestSession
 from includes.api.exam.student import Student
-from includes.database.connection import active_exam_db
+from includes.database.connection import config_exam_db
 from includes.database.models.utils import TimeStamp
 from includes.core.globals.entry import app_context
 from includes.core.pagination import Pagination
 from includes.core.request_filter import RequestFilter
 from includes.database.dataclass.dataclass import serialize
-from includes.database.models.db_exam import (
+from includes.database.models.exam import (
     _ExamDetails,
     ExamDetails,
     ExamRecord,
@@ -33,7 +34,7 @@ ExamTamp = {}
 
 
 async def get_exam_dick(query, option=False):
-    language = await app_context.setting.get("language", "English")
+    language = "English"
 
     def get_value(options, index, default):
         return (
@@ -142,7 +143,7 @@ class Exam:
 
         stmt = select(ExamDetails).where(ExamDetails.id == exam_id)
 
-        db = await active_exam_db()
+        db = await config_exam_db()
         result = db.execute(stmt)
         query = result.scalar_one_or_none()
 
@@ -150,7 +151,7 @@ class Exam:
 
     @staticmethod
     async def _update(data: _ExamDetails) -> _ExamDetails:
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         _data = serialize(data)
 
@@ -187,7 +188,7 @@ class Exam:
         exam_id: int,
         data: dict,
     ) -> _ExamDetails:
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         stmt = select(ExamDetails).where(ExamDetails.id == exam_id)
 
@@ -218,7 +219,7 @@ class Exam:
                 "message": "Exam details not found.",
             }
 
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         stmt = select(ExamDetails).where(
             and_(
@@ -273,7 +274,7 @@ class Exam:
     async def get_lists(
         id: int,
         limit: int = 10,
-        page: int = 0,
+        request: Request = None,
     ):
         # Base SELECT statement
         stmt = select(ExamDetails).where(ExamDetails.teacher_id == id)
@@ -281,6 +282,7 @@ class Exam:
         # Apply request filters
         stmt = await RequestFilter.apply_request_filters(
             model=ExamDetails,
+            request=request,
             request_type="referer",
             query=stmt,
             columns={
@@ -296,13 +298,13 @@ class Exam:
             ],
         )
 
-        db = await active_exam_db()
+        db = await config_exam_db()
         # Total count
         count_stmt = select(func.count()).select_from(stmt.subquery())
 
         total = db.execute(count_stmt).scalar_one()
 
-        pagination = Pagination("referer")
+        pagination = Pagination(request=request, request_type= "referer")
         await pagination.load(limit=limit)
 
         offset = pagination.get_offset()
@@ -366,7 +368,7 @@ class Exam:
 
         # Fetch all student exam records
         student_exam_stmt = select(ExamRecord).where(ExamRecord.exam_id == exam_id)
-        db = await active_exam_db()
+        db = await config_exam_db()
         student_exam_result = db.execute(student_exam_stmt)
 
         student_exam_query = student_exam_result.scalars()

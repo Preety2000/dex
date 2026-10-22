@@ -2,17 +2,19 @@ import base64
 import random
 from dataclasses import dataclass, fields
 
+from includes.src.request import Request
+
 from includes.api.exam.session.ch import ExamCacheMemory, ExamContext
 from includes.api.exam.manager.practice import build_subject_category
-from includes.core.globals.entry import app_context
 from includes.api.exam.metadata import exam_category
 from includes.core.security import _Security
-from includes.database.models.db_exam import ExamDetails, TeacherProfile
+from includes.database.models.exam import ExamDetails, TeacherProfile
 from includes.schemas.cache.subject import SubjectCache
 from includes.schemas.cache.terms import TermsCache
 from includes.schemas.objective import ClassObjective
 from includes.schemas.subject import ClassSubject
 from includes.utils.utils import get_post_value, get_referer_value, json_response
+from includes.database.connection import config_exam_db
 
 
 @dataclass(slots=True)
@@ -30,7 +32,7 @@ class CreateExam:
     async def load(self):
 
         for item in CREATE_FIELDS:
-            setattr(self, item, await get_post_value(item))
+            setattr(self, item, await get_post_value(request, item))
 
 
 CREATE_FIELDS = tuple(x.name for x in fields(CreateExam))
@@ -110,7 +112,9 @@ class ExamCreatePage:
         return missing, selected, summary
 
     @staticmethod
-    async def insurt_exam_preferences_on_database(exam_name, details, questions):
+    async def insurt_exam_preferences_on_database(
+        exam_name, details, questions, request: Request = None
+    ):
 
         def generate_id(db):
 
@@ -122,8 +126,8 @@ class ExamCreatePage:
 
                     return uid
 
-        db = await app_context.db.configure_exam()
-        member = await app_context.setting.member()
+        db = await config_exam_db()
+        member = await request.state.setting.member()
         exam_id = generate_id(db)
 
         teacher = (
@@ -151,13 +155,13 @@ class ExamCreatePage:
 
         encoded = _Security.short_encode(str(exam_id))
 
-        return app_context.request.referer.base_url.replace(
+        return request.state.referer.base_url.replace(
             "create",
             f"index?id={encoded}&_request_type=c7b4e436-ab36-4a93-834-565159552bdc&Jump=True",
         )
 
     @staticmethod
-    async def insurt_exam_question(exam_context, entry):
+    async def insurt_exam_question(exam_context, entry, request: Request = None):
 
         if exam_context is None:
             return {
@@ -182,9 +186,15 @@ class ExamCreatePage:
             data = exam_context.exam_meta[key]
             limit, subject, category, *_ = data
 
-            search_subject = get_referer_value("Cg")
+            search_subject = get_referer_value(request, "Cg")
             query, paginator, result = await ClassObjective.at_tests(
-                subject, category, 20, selected, results=True, co_search=search_subject
+                subject,
+                category=category,
+                limit=20,
+                ids=selected,
+                request=request,
+                results=True,
+                co_search=search_subject,
             )
 
             co_list = []
@@ -254,7 +264,7 @@ class ExamCreatePage:
         return True
 
     @staticmethod
-    async def create(request_search):
+    async def create(request_search, request):
 
         entry = request_search.get("entry")
         encoded = request_search.get("tn")
@@ -274,10 +284,14 @@ class ExamCreatePage:
             await ExamCreatePage.update_question_submit(
                 entry, exam_context, create_exam.questions, create_exam.oictionary
             )
-            return await ExamCreatePage.insurt_exam_question(exam_context, entry)
+            return await ExamCreatePage.insurt_exam_question(
+                exam_context, entry, request=request
+            )
 
         if entry:
-            return await ExamCreatePage.insurt_exam_question(exam_context, entry)
+            return await ExamCreatePage.insurt_exam_question(
+                exam_context, entry, request=request
+            )
 
         if create_exam.examPreferences and exam_name and exam_context is None:
 

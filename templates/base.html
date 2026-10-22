@@ -39,7 +39,7 @@
         "publisher": {
             "@type": "{{site_name  | safe}}",
             "name": "{{site_domain}}",
-            "url": "{{request.base_url}}",
+            "url": "{{request.host_url}}",
             "logo": {
                 "@type": "ImageObject",
                 "url": "/static/logo.png",
@@ -56,7 +56,7 @@
         "url": "{{request.url}}",
         "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": "{{request.base_url}}{{parameter.slug}}"
+            "@id": "{{request.host_url}}{{parameter.slug}}"
         },
         "datePublished": "{{timestamp}}",
         "tags": "{{ tags |join(',') }}",
@@ -118,6 +118,7 @@
         <div class="IN001">
             <div class="progress"><span class="IN002"></span></div>
         </div>
+        
         <!-- Header Session  -->
         <div class='IN038'>
             <header class='header DIS01 clear'>
@@ -136,16 +137,16 @@
                         <li class='list nort'><a class='list-item' href='/'
                                 title='{{function.utc("Home")}}'>{{function.utc("Home")}}</a>
                         </li>
-                        <li class='list nort'><a class='list-item' href='{{request.base_url}}trending'
+                        <li class='list nort'><a class='list-item' href='{{request.host_url}}trending'
                                 title='{{function.utc("Trending")}}'>{{function.utc("Trending")}}</a>
                         </li>
-                        <li class='list nort'><a class='list-item' href='{{request.base_url}}topic'
+                        <li class='list nort'><a class='list-item' href='{{request.host_url}}topic'
                                 title='{{function.utc("Topic")}}'>{{function.utc("Topic")}}</a>
                         </li>
-                        <li class='list nort'><a class='list-item' href='{{request.base_url}}questions'
+                        <li class='list nort'><a class='list-item' href='{{request.host_url}}questions'
                                 title='{{function.utc("Questions")}}'>{{function.utc("Questions")}}</a>
                         </li>
-                        <li class='list nort'><a class='list-item' href='{{request.base_url}}books'
+                        <li class='list nort'><a class='list-item' href='{{request.host_url}}books'
                                 title='{{function.utc("Books")}}'>{{function.utc("Books")}}</a>
                         </li>
                     </ul>{%endif%}
@@ -304,7 +305,7 @@
     {% block script %}{% endblock %}
     <div class="print-ariya"></div>
 
-    {%if not app_context.cookie.get("_cf_bQ") %}
+    {%if not request.state.cookie.get("_cf_bQ") %}
     <script type="text/javascript">//{% include 'components/cookie-consent.js' %}</script>
     {%endif%}
     <script>const N = { "search": ["action_form", $] }</script>

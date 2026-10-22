@@ -1,11 +1,12 @@
+from includes.src.request import Request
 from sqlalchemy import update
 
 from includes.core.config import MASTER_KEY
 from includes.core.globals.entry import app_context
 from includes.core.globals.fun import random_string
 from includes.core.security import _Security
-from includes.database.connection import active_primary_db
-from includes.database.models.owner import Members, MemberSession
+from includes.database.connection import config_primary_db
+from includes.database.models.primary import Members, MemberSession
 from includes.database.models.utils import TimeStamp
 from includes.schemas.cache.member import MemberCache
 from includes.utils.utils import get_post_value
@@ -28,11 +29,11 @@ class LogoutHandler:
         db.commit()
 
     @classmethod
-    async def process_logout(cls):
+    async def process_logout(cls, request: Request = None):
         """Current session ya all sessions ko safely terminate karta hai."""
-        db_session = await active_primary_db()
-        session_type = await get_post_value("session")
-        system_user = await app_context.setting.member()
+        db_session = await config_primary_db()
+        session_type = await get_post_value(request, "session")
+        system_user = await request.state.setting.member()
 
         if not system_user:
             return {
@@ -49,7 +50,7 @@ class LogoutHandler:
 
         # 1. Current Session ID extracting & deactivating
         try:
-            master_key = app_context.setting.setting_session.get("MASTER_KEY", "")
+            master_key = request.state.setting.setting_session.get("MASTER_KEY", "")
             if "///" in master_key:
                 device_key = master_key.split("///")[1]
                 session_db_id = int(_Security.short_decode(device_key))
@@ -79,8 +80,8 @@ class LogoutHandler:
             member.device = devices
 
         # Cookie & Master key update
-        app_context.setting.setting_session["MASTER_KEY"] = MASTER_KEY
-        app_context.setting.update_cookie()
+        request.state.setting.setting_session["MASTER_KEY"] = MASTER_KEY
+        request.state.setting.update_cookie()
 
         # Cache
         await MemberCache._cache(member)

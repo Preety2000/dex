@@ -2,9 +2,9 @@ from sqlalchemy import or_, select
 
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
-from includes.database.connection import active_primary_db
+from includes.database.connection import config_primary_db
 from includes.database.dataclass.dataclass import serialize
-from includes.database.models.owner import Members
+from includes.database.models.primary import Members
 from includes.utils.meb import (
     extract_id_from_roll,
     get_email_folder_info,
@@ -67,7 +67,7 @@ class MemberCache:
             return await MemberCache.get_with_id(cached_id)
 
         stmt = select(Members).where(Members.secret == secret).limit(1)
-        db = await active_primary_db()
+        db = await config_primary_db()
         result = db.execute(stmt)
         record = result.scalar_one_or_none()
 
@@ -87,7 +87,7 @@ class MemberCache:
             return MemberCache.filters(record, keys)
 
         stmt = select(Members).where(Members.id == id).limit(1)
-        db = await active_primary_db()
+        db = await config_primary_db()
         result = db.execute(stmt)
         record = result.scalar_one_or_none()
 
@@ -122,7 +122,7 @@ class MemberCache:
             )
             .limit(1)
         )
-        db = await active_primary_db()
+        db = await config_primary_db()
         result = db.execute(stmt)
         record = result.scalar_one_or_none()
 
@@ -152,7 +152,7 @@ class MemberCache:
         if missing:
             stmt = select(Members).where(Members.id.in_(missing))
 
-            db = await active_primary_db()
+            db = await config_primary_db()
             result = db.execute(stmt)
             db_records = result.scalars().all()
 

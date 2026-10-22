@@ -1,11 +1,13 @@
 from typing import Optional, Union
+from includes.src.request import Request
 from sqlalchemy import or_, select
+from includes.core.globals.route_context import Route
 from includes.schemas.captcha import captcha_verification
 from includes.utils._sub import configure_page
-from includes.core.config import MASTER_KEY, app_context
-from includes.database.connection import active_primary_db
+from includes.core.globals.entry import app_context
+from includes.database.connection import config_primary_db
 from includes.database.dataclass.dataclass import serialize
-from includes.database.models.owner import Members, MemberSession, VerifyIdentity
+from includes.database.models.primary import Members, MemberSession, VerifyIdentity
 from includes.schemas.articles import ArticleService
 from includes.schemas.cache.member import MemberCache
 from includes.services.member.identity import Identity
@@ -26,6 +28,8 @@ from includes.database.models.utils import TimeStamp
 from typing import Union
 
 from sqlalchemy import or_, select
+from includes.database.connection import db
+
 
 def get_member(query: Union[str, int]):
     print("\033[91mget method call member get_member\033[0m")
@@ -43,14 +47,11 @@ def get_member(query: Union[str, int]):
         .limit(1)
     )
 
-    session_member = app_context.db.execute(stmt).scalar_one_or_none()
+    session_member = db.execute(stmt).scalar_one_or_none()
 
     return (
-        serialize_member(MemberCache._cache(session_member))
-        if session_member
-        else None
+        serialize_member(MemberCache._cache(session_member)) if session_member else None
     )
-
 
 
 def filter_member_by_device(member: dict, device_key: str) -> dict:
@@ -59,7 +60,7 @@ def filter_member_by_device(member: dict, device_key: str) -> dict:
 
 
 async def update_member_profile_image(user_id: int, file_name: str):
-    db_session = await active_primary_db()
+    db_session = await config_primary_db()
 
     member = db_session.query(Members).filter(Members.id == user_id).first()
 
@@ -79,8 +80,11 @@ async def getrollnumber(rollnumber: int):
 
 class ClassUser:
 
+    def __init__(self, request):
+        self.request = request
+
     async def identifier(self, member):
-        db_session = await active_primary_db()
+        db_session = await config_primary_db()
         session_member = (
             db_session.query(Members)
             .filter(
@@ -96,9 +100,8 @@ class ClassUser:
         return session_member
 
     async def teacher(self, member):
-        db_session = await active_primary_db()
+        db_session = await config_primary_db()
         return
-
 
     async def getrollnumber(self, rollnumber: int):
         userid = extract_id_from_roll(rollnumber)
@@ -106,7 +109,7 @@ class ClassUser:
         return serialize(record)
 
     async def update(self, id_or_email, option):
-        db_session = await active_primary_db()
+        db_session = await config_primary_db()
 
         try:
             member_id = int(id_or_email)
@@ -133,23 +136,23 @@ class ClassUser:
         return member
 
     async def check_user_name(self, username):
-        db_session = await active_primary_db()
+        db_session = await config_primary_db()
         query = db_session.query(Members).filter_by(username=username).first()
         return query
 
     async def password_verify(self, email, password):
-        db_session = await active_primary_db()
+        db_session = await config_primary_db()
         member = db_session.query(Members).filter_by(email=email).first()
 
         return True if member and member.check_password(password) else None
 
     async def apimapp(self, query):
 
-        member = await app_context.setting.member()
+        member = await self.request.state.setting.member()
         if member and query == "edit":
 
             query = {
-                field: await get_post_value(field)
+                field: await get_post_value(self.request, field)
                 for field in (
                     "email",
                     "username",
@@ -160,7 +163,7 @@ class ClassUser:
                 )
             }
 
-            if not await captcha_verification():
+            if not await captcha_verification(request=self.request):
                 return json_null_response(
                     code="Ex000042",
                     details=[
@@ -207,10 +210,10 @@ class ClassUser:
 
         if member and query == "password_verify":
 
-            email = await get_post_value("email")
-            password = await get_post_value("password")
+            email = await get_post_value(self.request, "email")
+            password = await get_post_value(self.request, "password")
 
-            if not await captcha_verification():
+            if not await captcha_verification(request=self.request):
                 return json_null_response(
                     details=[
                         "captcha_virification_error",
@@ -236,9 +239,9 @@ class ClassUser:
         return [{"ff": query}]
 
     async def logout(self):
-        return await LogoutHandler.process_logout()
+        return await LogoutHandler.process_logout(request=self.request)
 
-    def forgot_password(self, chacks=False):
+    def forgot_password(self, chacks=False, request: Request = None):
         template = "member/forgot_password.html"
         inputOption = [
             "name",
@@ -247,39 +250,38 @@ class ClassUser:
             "password",
             "cpassword",
         ]
-        app_context.response["forgot_password"] = {}
+        request.state.response["forgot_password"] = {}
         for inputs in inputOption:
-            inputsValue = app_context.request.post(inputs)
-            app_context.response["forgot_password"][inputs] = inputsValue
+            inputsValue = request.post(inputs)
+            request.state.response["forgot_password"][inputs] = inputsValue
 
             if not inputsValue:
-                app_context.response["forgot_password"][inputs + "_error"] = "error"
+                request.state.response["forgot_password"][inputs + "_error"] = "error"
                 chacks = True
 
         if chacks == True:
             return template
 
-    @classmethod
-    async def get_template(cls, template=None):
-        self = cls()
-        reso = app_context.route.resource_type.replace(".php", "")
+    async def get_template(self, roots: Route = None, template: str = None):
+        reso = self.request.state.roote.entity.replace(".php", "")
 
         if reso == "login":
-            return await Login.authenticate()
+            return await Login(request=self.request).authenticate()
 
         if reso == "signup":
-            return await SineUp.authenticate()
+            return await SineUp.authenticate(request=self.request)
 
-        member = await app_context.setting.member()
+        member = await self.request.state.setting.member()
 
-        if reso == "teacher" and app_context.route.resource_slug == "verify-indentity":
+        if reso == "teacher" and self.request.state.roote.action == "verify-indentity":
             return await Identity.teacher_verify_identity()
 
-        if app_context.function.is_post():
+        if self.request.is_post:
             return await getattr(self, reso)(member) or "error"
 
-        elif reso == "password" and app_context.route.resource_slug == "reset":
+        elif reso == "password" and self.request.state.roote.action == "reset":
             configure_page(
+                self.request.state.metadata,
                 template=template if template else "member/forgot_password",
                 title="Reset Password",
                 suffix=True,
@@ -295,28 +297,34 @@ class ClassUser:
 
         return template
 
-    @staticmethod
-    async def liked_questions():
-        system_user = await app_context.setting.member()
+    async def liked_questions(self):
+        system_user = await self.request.state.setting.member()
         if not system_user:
             configure_page(
-                template="query/login_required", title="Login Required", suffix=True
+                self.request.state.metadata,
+                template="query/login_required",
+                title="Login Required",
+                suffix=True,
             )
             return {}
 
-        article = await ArticleService.find_liked_article(system_user.get("id"))
+        article = await ArticleService.find_liked_article(
+            system_user.get("id"), self.request
+        )
         configure_page(
-            template="member/liked-question", title="Liked Question", suffix=True
+            self.request.state.metadata,
+            template="member/liked-question",
+            title="Liked Question",
+            suffix=True,
         )
         return {"data_querys": article}
 
-    @staticmethod
-    async def fetch_active_sessions(fetch_all: bool = False):
+    async def fetch_active_sessions(self, fetch_all: bool = False):
         """User ke devices/sessions fetch karta hai.
         :param fetch_all: True hone par user ke saare sessions lata hai,
         False hone par sirf current/active device sessions.
         """
-        system_user = await app_context.setting.member()
+        system_user = await self.request.state.setting.member()
 
         # Validation checks
         if not system_user or not system_user.get("device"):
@@ -337,7 +345,7 @@ class ClassUser:
         if not session_ids and not fetch_all:
             return []
 
-        db = await active_primary_db()
+        db = await config_primary_db()
 
         # SQLAlchemy Query Execution
         # If fetch_all is True: fetch all sessions for the user

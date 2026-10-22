@@ -9,7 +9,7 @@ from includes.core.device_encoder import decode_device
 from includes.core.repo.dir_manager import folder
 from includes.database.models.utils import TimeStamp
 from includes.core.security import _Security
-from includes.database.models.owner import MemberSession
+from includes.database.models.primary import MemberSession
 
 GENDER = ["Prefer not to say", "Female", "Male"]
 

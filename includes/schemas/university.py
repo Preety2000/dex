@@ -1,16 +1,16 @@
 from sqlalchemy import asc
 from includes.core.globals.entry import app_context
 from includes.database.models.secondary import Courses, Syllabus, University
-
+from includes.database.connection import db
 
 class ClassUniversity:
 
     @staticmethod
     def property(query):
-        query.syllabus = app_context.db.query(Syllabus).filter(
+        query.syllabus = db.query(Syllabus).filter(
             Syllabus.university == query.id
         )
-        query.courses = app_context.db.query(Courses).filter(
+        query.courses = db.query(Courses).filter(
             Courses.university == query.id
         )
         return query
@@ -27,7 +27,7 @@ class ClassUniversity:
 
     @classmethod
     def get(cls, query=None, quet=None):
-        university = app_context.db.query(University)
+        university = db.query(University)
 
         if query is True and isinstance(query, bool):
             all_university = university.order_by(asc(University.name)).all()

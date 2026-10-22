@@ -1,60 +1,61 @@
-from dataclasses import asdict, dataclass, fields
-from typing import Any
-
-from fastapi import Request
+from includes.src.request import Request
 from user_agents import parse
-
-from includes.core.metadata import Metadata
+from dataclasses import dataclass
+from typing import Optional, Union
+from dataclasses import asdict, dataclass
 
 
 @dataclass
-class _DeviceInfo:
-    device_type: str | None = None
-    platform: str | None = None
-    browser: str | None = None
-    device: str | None = None
-    platform_version: str | None = None
-    browser_version: str | None = None
+class DeviceInfo:
+    device_type: Optional[str] = None
+    platform: Optional[str] = None
+    browser: Optional[str] = None
+    device: Optional[str] = None
+    platform_version: Optional[str] = None
+    browser_version: Optional[str] = None
 
     is_mobile: bool = False
     is_pc: bool = False
     is_tablet: bool = False
     is_bot: bool = False
 
-    accept_language: str | None = None
-    client_timezone: str | None = None
+    accept_language: Optional[str] = None
+    client_timezone: Optional[str] = None
 
-    def load_config(self, request: Request) -> "_DeviceInfo":
-        """Load client information from the current HTTP request."""
+    def __init__(self, request: Union[Request, str, None] = None):
+        """Directly instantiate using: device_info = DeviceInfo(request)"""
+        if request is not None:
+            self.load_config(request)
 
-        self.accept_language = request.headers.get("Accept-Language", "")
-        self.client_timezone = request.headers.get("X-Timezone", "")
+    def load_config(self, request: Union[Request, str]) -> "DeviceInfo":
+        """Load client information from the current HTTP request or User-Agent string."""
 
-        user_agent_string = request.headers.get("User-Agent", "")
+        # FastAPI Request Object handling
+        if isinstance(request, Request):
+            self.accept_language = request.headers.get("Accept-Language", "")
+            self.client_timezone = request.headers.get("X-Timezone", "")
+            user_agent_string = request.headers.get("User-Agent", "")
+        else:
+            # Direct User-Agent String handling (Testing or manual pass)
+            user_agent_string = str(request)
+            self.accept_language = ""
+            self.client_timezone = ""
 
         ua = parse(user_agent_string)
 
-        # -------------------------
         # Device information
-        # -------------------------
         self.device = ua.device.family
         self.device_type = self._get_device_type(ua)
 
-        # -------------------------
         # Platform information
-        # -------------------------
         self.platform = ua.os.family
         self.platform_version = ua.os.version_string
 
-        # -------------------------
         # Browser information
-        # -------------------------
         self.browser = ua.browser.family
         self.browser_version = ua.browser.version_string
 
-        # -------------------------
         # Device flags
-        # -------------------------
         self.is_mobile = ua.is_mobile
         self.is_pc = ua.is_pc
         self.is_tablet = ua.is_tablet
@@ -63,53 +64,22 @@ class _DeviceInfo:
         return self
 
     @staticmethod
-    def _get_device_type(ua: Any) -> str:
-        """Return a normalized device type."""
-
+    def _get_device_type(ua) -> str:
+        """Helper method to derive device type string."""
         if ua.is_mobile:
             return "mobile"
 
-        if ua.is_tablet:
+        elif ua.is_tablet:
             return "tablet"
 
-        if ua.is_pc:
+        elif ua.is_pc:
             return "desktop"
+
+        elif ua.is_bot:
+            return "bot"
 
         return "unknown"
 
-    def reset(self, request: Request) -> "_DeviceInfo":
-        """Reset all values and reload them from the request."""
-
-        default_instance = type(self)()
-
-        for field_info in fields(self):
-            setattr(
-                self,
-                field_info.name,
-                getattr(default_instance, field_info.name),
-            )
-
-        return self.load_config(request)
-
-    def update_from_dict(self, data: dict[str, Any]) -> "_DeviceInfo":
-        """Update only fields that exist in this dataclass."""
-
-        if not isinstance(data, dict):
-            return self
-
-        valid_fields = {field_info.name for field_info in fields(self)}
-
-        for key, value in data.items():
-            if key in valid_fields:
-                setattr(self, key, value)
-
-        return self
-
-    def to_dict(self) -> dict[str, Any]:
-        """Return client information as a dictionary."""
-
+    def to_dict(self) -> dict:
+        """Convert the _DeviceInfo dataclass instance into a clean Python dictionary."""
         return asdict(self)
-
-
-# Global instance
-DeviceInfo = _DeviceInfo()

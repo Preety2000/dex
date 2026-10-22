@@ -1,7 +1,7 @@
 from includes.core.globals.entry import app_context
-from includes.database.connection import active_primary_db
+from includes.database.connection import config_primary_db
 from includes.database.dataclass.dataclass import serialize
-from includes.database.models.owner import Subject
+from includes.database.models.primary import Subject
 from includes.schemas.cache.subject import SubjectCache
 from includes.utils.utils import (
     create_slug,
@@ -16,7 +16,8 @@ class AdminApiSubject:
     async def insert():
 
         data = {
-            field: await get_post_value(field) for field in ("name", "content", "slug")
+            field: await get_post_value(request, field)
+            for field in ("name", "content", "slug")
         }
 
         name = (data.get("name") or "").strip()
@@ -24,7 +25,7 @@ class AdminApiSubject:
         if not name:
             return {"error": "Subject Name is required."}
 
-        db = await active_primary_db()
+        db = await config_primary_db()
 
         slug = create_slug((data.get("slug") or name).strip())
         existing = db.query(Subject).filter(Subject.slug == slug).first()

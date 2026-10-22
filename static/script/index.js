@@ -100,9 +100,10 @@
 
     function script(p, c) {
         const i = btoa(p); p.includes("http") || (p = Sl + p);
-        const b = $.getHtmlBody(); let s = $.weres(`[type="text/javascript"]`).find(e => e.id == i);
+        const b = $.getHtmlBody() || $.bindFunction(document.body);
+        let s = $.picks(`[type="text/javascript"]`).find(e => e.id == i);
         if (!s) {
-            s = b.create({ tagName: "script", type: "text/javascript", src: p, id: i });
+            s = (b || $.create()).create({ tagName: "script", type: "text/javascript", src: p, id: i });
             s._callbacks = []; s.onload = () => { s._loaded = 1; s._callbacks.forEach(f => f(s)); s._callbacks = [] };
         }
         F(c) && (s._loaded ? c(s) : s._callbacks.push(c)); return s;
@@ -113,7 +114,7 @@
         if (!p.endsWith(".css")) p += ".css";
 
 
-        let g = $.weres("link", false);
+        let g = $.picks("link", false);
         if (g.filter(m => m.get("href") == p) <= 0) {
             const l = $.bindFunction(document.head).create({
                 tagName: "link",
@@ -635,7 +636,7 @@
         }(a instanceof NodeList || a instanceof HTMLCollection || b == true ? a.__proto__ : {});
     }
 
-    const globals = function (s, c) { return globals.choose(s, c); };
+    const globals = function (s, c) { return globals.pick(s, c); };
     globals.fn = globals.prototype = {
         length: 0,
         vidya: "0.4.1e",
@@ -855,10 +856,10 @@
         });
         bind(function parentFilter(a, b) { return parent(this, a, b) });
         bind(function find(a) { return exports("bindFunction", e.querySelector(a)) });
-        bind(function weres(a, b, c) {
-            return exports("weres", a, b, e).filter(x => x.parentFilter(p => p == e))
+        bind(function picks(a, b, c) {
+            return exports("picks", a, b, e).filter(x => x.parentFilter(p => p == e))
         });
-        bind(function choose(a, b) { return exports("choose", a, b, e) });
+        bind(function pick(a, b) { return exports("pick", a, b, e) });
         bind(function get(a, b) { return dimensions(this, a, b) });
         bind(function c(a, b, c) { return e.in(exports("c", a, b, c)) });
         bind(function clear() { return e.innerHTML = null, e });
@@ -896,14 +897,14 @@
         b === true ? c = c.toUTCString() : c;
         return c;
     })
-    isdefine("choose", function choose(a, b, c, d) {
+    isdefine("pick", function pick(a, b, c, d) {
         // a => condition
         // b => firstSelector
         // c => secondSelector
         // d => context
 
         function dc(b, c) {
-            return (b.length > 1) && (b = c.choose(b[0])) && (b.get("class") == a)
+            return (b.length > 1) && (b = c.pick(b[0])) && (b.get("class") == a)
                 ? b
                 : null;
         }
@@ -935,8 +936,8 @@
             return nt;
         }
 
-        const g = function (element, choose) {
-            return element.querySelector(choose);
+        const g = function (element, pick) {
+            return element.querySelector(pick);
         };
 
         const h = function (obj, func) {
@@ -953,7 +954,7 @@
         if (typeof b === "boolean") {
             m = b ? specialCharsMap.hash : "";
         } else if (typeof b === s) {
-            d = exports("choose", b, c, e);
+            d = exports("pick", b, c, e);
         } else if (b?.tagName) {
             d = b;
         }
@@ -976,8 +977,8 @@
 
         return data
     })
-    isdefine("weres", function weres(a, b, c) {
-        return exports("choose", a, b, function (d, e) {
+    isdefine("picks", function picks(a, b, c) {
+        return exports("pick", a, b, function (d, e) {
             return d.querySelectorAll(e)
         }, c)
     })
@@ -1019,7 +1020,7 @@
     isdefine("create", function create(a, b, c, d) {
         let ab;
         function sel(a) {
-            const b = new globals.choose(function () {
+            const b = new globals.pick(function () {
                 this.index = -1;
                 this.classList = [];
                 this.tagName = Y[0];
@@ -1073,7 +1074,7 @@
 
     })
     isdefine("onlink", function onlink(a, b, c) {
-        b = a.choose(b);
+        b = a.pick(b);
         b = b.get("href");
         t.location = b;
     })
@@ -1151,7 +1152,7 @@
                 an.body.in(exports("create", "style", e.s, `.${e.c[3]}{flexs: 0;}.${e.c[2]}{position: relative;overflow: hidden;}.${e.c[6]} {member-select: none;z-index: 1;position: relative;}[array-click="false"] .${e.c[5]} {opacity: 1; transform: translate(-50%, -50%) scale(0);transition: 0s;}.${e.c[5]}{background: ${p};opacity: 0; position: absolute; transform: translate(-50%, -50%) scale(1); border-radius: 50%; content: ''; transition: transform 0.5s, opacity 1s, padding 1s;`), 0);
             }, q = function (a, b) {
 
-                p = a || p, st = an.body?.weres("style", false).filter(function (a) {
+                p = a || p, st = an.body?.picks("style", false).filter(function (a) {
                     return a.isclass(e.s)
                 });
                 if (b === !0) {
@@ -1178,7 +1179,7 @@
         return an;
     })
     isdefine("event", function event(a, b, c) {
-        a = exports("choose", a, c);
+        a = exports("pick", a, c);
         return a !== null ? b(a, globals) : a;
     })
     isdefine("windows", function (target, { container, functions, noremove } = {}, type) {
@@ -1394,7 +1395,7 @@
     })
     isdefine("message", function message(a, b) {
         if (a === undefined) return;
-        const c = S(a) ? a : a.message || "", d = a.class || "f4nM", e = (N(b) ? b : a.time) || 4000, f = (!N(b) && b) || $.getHtmlBody(), g = this.choose("IN027", f) || f.create("IN027");
+        const c = S(a) ? a : a.message || "", d = a.class || "f4nM", e = (N(b) ? b : a.time) || 4000, f = (!N(b) && b) || $.getHtmlBody(), g = this.pick("IN027", f) || f.create("IN027");
         return g.in(this.create(d, c), true), setTimeout(() => g.remove(), e), true
     }
     );
@@ -1660,7 +1661,7 @@
         isdefine(name, value);
     }
     isdefine("isfor", function (a, b) {
-        let elementList = $.weres(a);
+        let elementList = $.picks(a);
         F(b)
             ? elementList.for(e => e.event.on(b))
             : null;
@@ -1697,24 +1698,17 @@
         return icons;
     })
     isdefine("DOMContentLoaded", function DOMContentLoaded(a, b, c) {
+        if (document.readyState !== 'loading')
+            return a(b, c);
         $.onReadyCallbacks ??= [];
-        !$.onReadyCallbacks.some(item =>
-            item.evt === a && item.log === b && item.net === c
-        ) && $.onReadyCallbacks.push({ call: a, b, c });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            $.onReadyCallbacks.forEach(item =>
-                !item.executed && (item.executed = true, item.call($, $.bindFunction(item.b), item.c))
-            );
-        });
-
-        // document.addEventListener('DOMContentLoaded', e => a($, globals.bindFunction(b), c))
+        !$.onReadyCallbacks.some(i => i.evt === a && i.log === b && i.net === c) && $.onReadyCallbacks.push({ call: a, b, c });
+        document.addEventListener('DOMContentLoaded', () => $.onReadyCallbacks.forEach(i => !i.executed && (i.executed = true, i.call($, $.bindFunction(i.b), i.c))));
     })
     isdefine("popup", function PopupMessage(t, o) {
         const b = $.getHtmlBody();
         !o && this.windowPopup?.close();
         const r = o
-            ? (b.choose(o) || b.create(o).add("IN031"))
+            ? (b.pick(o) || b.create(o).add("IN031"))
             : b.create("IN031"),
             p = r.create("IN034"),
             h = p.create.header("DIS01");
@@ -1758,7 +1752,7 @@
             });
         }
 
-        const b = ($.choose("tcont") || $.getHtmlBody().create("tcont"));
+        const b = ($.pick("tcont") || $.getHtmlBody().create("tcont"));
         const c = $.create("tooltip-container"), d = c.create("tooltip-body");
 
         if (!a.get("id")) a.set("id", $.getid());
@@ -1848,7 +1842,7 @@
                 if (m.icon) { const p = $.create("nOvE6"); p.append($.create.span().addIcon(m.icon), o); o = p; }
                 const q = d.create.button(null, o);
                 m.active && q.add("active");
-                if (F(m.event)) q.event.on(r => m.event.call(q, r, c.close, v) && c.close());
+                if (F(m.event)) q.event.on(r => m.event.call(q, r, { c: c.close, d: l, v: m, g: v }) && c.close());
                 if (F(m.hover)) q.event.mouseover(r => m.hover.call(q, r, c.close));
                 if (m.event === false) q.event.on(c.close);
                 if (n < l.length - 1) d.create("border");
@@ -1921,7 +1915,7 @@
         return $("mobile") ? true : false;
     })
     isdefine("conversations", function Conversations(a, b) {
-        let c = globals.choose(function Conversations() { this.element = globals.choose(a); this.conversationsName = b; this.chenge = function () { } });
+        let c = globals.pick(function Conversations() { this.element = globals.pick(a); this.conversationsName = b; this.chenge = function () { } });
 
         async function d(a) {
             let e = "", f = $.create("IN079 boc");
@@ -1933,7 +1927,7 @@
             }
 
             $.fch("/api/v1/conversations", a, function (a, b) {
-                let d = globals.choose(function Event() { return this }), e = Object.getPrototypeOf(a);
+                let d = globals.pick(function Event() { return this }), e = Object.getPrototypeOf(a);
                 for (let c in e) d.add(c, a[c]);
                 d.responseType = a.responseType; d.withCredentials = a.withCredentials;
                 d.response = b; d.responseText = b;
@@ -1960,8 +1954,8 @@
     }
 
     $.DOMContentLoaded(function () {
-        const x = (b = globals.weres) => b("button").combined(b("button", false)),
-            b = (c = globals.weres) => { c("[data-sjs]", false).for(e => globals.loadjs(JSON.parse(e.textContent))); let d = Object.entries($.domStylelist || {}).map(([a, b]) => { let c = document.createElement("div"); return Object.assign(c.style, b || {}), $(a) && c.style.cssText ? `.${a} { ${c.style.cssText} }` : null }).filter(Boolean).join("\n"); $.styleContainer ??= $.bindFunction(document.head).create("style"), $.styleContainer.setAttribute("rel", "stylesheet"), $.styleContainer.textContent != d && ($.styleContainer.textContent = d) };
+        const x = (b = globals.picks) => b("button").combined(b("button", false)),
+            b = (c = globals.picks) => { c("[data-sjs]", false).for(e => globals.loadjs(JSON.parse(e.textContent))); let d = Object.entries($.domStylelist || {}).map(([a, b]) => { let c = document.createElement("div"); return Object.assign(c.style, b || {}), $(a) && c.style.cssText ? `.${a} { ${c.style.cssText} }` : null }).filter(Boolean).join("\n"); $.styleContainer ??= $.bindFunction(document.head).create("style"), $.styleContainer.setAttribute("rel", "stylesheet"), $.styleContainer.textContent != d && ($.styleContainer.textContent = d) };
         Array.prototype.getbase = function () { return globals.require.find(a => a[0] == "base") };
         let c = new MutationObserver(a => { b(), globals.buttonAnimation(x()); for (let b of a) for (let a of b.addedNodes) { try { F(a.bindLess) && a.bindLess() } catch (b) { } F(a.appended) && (a.appended(a), a.appended = undefined) } });
         b(), globals.buttonAnimation(x()), c.observe(document.body, { childList: true, subtree: true });

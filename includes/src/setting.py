@@ -1,16 +1,15 @@
 import json
 import base64
+from includes.src.request import Request
 from dataclasses import dataclass
 
-from fastapi import Request
-from includes.utils._sub import configure_page
+
 from includes.core.client_session import KS
-from includes.core.config import MASTER_KEY, app_context
-from includes.schemas.cache.member import MemberCache
+from includes.core.config import MASTER_KEY
 from includes.core.security import _Security
-
-
+from includes.utils._sub import configure_page
 from includes.utils.meb import serialize_member
+from includes.schemas.cache.member import MemberCache
 
 
 @dataclass
@@ -56,14 +55,9 @@ class Setting:
         self._member = None
         self.setting_session = None
 
-    # -------------------------------
     # Session Logic
-    # -------------------------------
-
     async def initialize_settings(self) -> dict:
-        auth_token = app_context.cookie.get(self.COOKIE_NAME)
-        # self.setting_session = KS.get(app_context.request.ip)
-
+        auth_token = self.request.state.cookie.get(self.COOKIE_NAME)
         if not self.setting_session:
             auth_token_dict = AUTH_TOKEN.decode(auth_token)
             self.setting_session = {
@@ -116,12 +110,9 @@ class Setting:
         self.request.state.languageCode = session.get("languageCode")
         self.request.state.auth_session = session.get("auth_session")
 
-    # -------------------------------
     # Public API
-    # -------------------------------
     async def preferences(self):
-        q = await self.initialize_settings()
-        return q
+        return await self.initialize_settings()
 
     async def get(self, key: str | None = None, default=None):
         session = await self.initialize_settings()
@@ -150,7 +141,7 @@ class Setting:
             }
         )
 
-        app_context.cookie.domain(self.COOKIE_NAME, auth_token, self.COOKIE_TTL)
+        self.request.state.cookie.domain(self.COOKIE_NAME, auth_token, self.COOKIE_TTL)
         return True
 
     # -------------------------------
@@ -158,10 +149,15 @@ class Setting:
     # -------------------------------
 
     def handle_request(self, parameter: str):
-        app_context.response["active"] = {parameter: "active"}
+        self.request.state.response["active"] = {parameter: "active"}
         if parameter == "profiles" and self.request.method == "POST":
             # self.profiles(parameter)
-            return app_context.settingparams.json
-        
-        configure_page(template="query/setting", title="Setting", suffix=True)
+            return self.request.state.settingparams.json
+
+        configure_page(
+            self.request.state.metadata,
+            template="query/setting",
+            title="Setting",
+            suffix=True,
+        )
         return {}

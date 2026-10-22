@@ -2,14 +2,15 @@ import inspect
 from dataclasses import is_dataclass
 from typing import Any, Callable, Optional, Tuple
 from urllib.parse import parse_qs, urlencode
+from includes.src.request import Request
 from sqlalchemy import func, select
 
 from includes.core.globals.entry import app_context
-from includes.database.connection import active_secondary_db
+from includes.database.connection import config_secondary_db
 from includes.database.dataclass.dataclass import serialize
 from includes.utils.utils import (
+    _resolve_request_getter,
     get_post_value,
-    get_query_value,
     get_referer,
     get_referer_value,
 )
@@ -38,7 +39,7 @@ def build_pagination_url(
     name: Any,
     css_class: str,
     page: int,
-    request: Any,
+    request: Request,
 ) -> dict:
     if not request:
         return {
@@ -75,26 +76,16 @@ def build_pagination_url(
 
 
 class Pagination:
-    def __init__(self, request_type: str | None = None):
+    def __init__(self, request: Request, request_type: str | None = None):
         request_type = request_type or "query"
-
-        if request_type == "query":
-            self.url = app_context.request
-            self.callback = get_query_value
-        elif request_type == "api":
-            self.url = app_context.request
-            self.callback = get_post_value
-        elif request_type == "referer":
-            self.url = get_referer()
-            self.callback = get_referer_value
-        else:
-            raise ValueError(
-                f"Invalid request_type: {request_type!r}. "
-                "Expected: 'query', 'api', or 'referer'."
-            )
-
+        self.request: Request = request
         self.page: int | None = None
         self.limit: int | None = None
+        self.callback = lambda name: _resolve_request_getter(
+            request,
+            request_type or "query",
+            name,
+        )
 
     def set_page_limit(
         self,
@@ -185,7 +176,7 @@ class Pagination:
         # Navigation Links
         if self.page > 1:
             pagination.append(
-                build_pagination_url("Prev", "deactive", self.page - 1, self.url)
+                build_pagination_url("Prev", "deactive", self.page - 1, self.request)
             )
 
         start_page = max(1, self.page - 2)
@@ -197,18 +188,18 @@ class Pagination:
                     page_number,
                     "active" if page_number == self.page else "deactive",
                     page_number,
-                    self.url,
+                    self.request,
                 )
             )
 
         if self.page < total_pages:
             pagination.append(
-                build_pagination_url("Next", "deactive", self.page + 1, self.url)
+                build_pagination_url("Next", "deactive", self.page + 1, self.request)
             )
 
         if total_pages > 1 and self.page < total_pages:
             pagination.append(
-                build_pagination_url("Last", "deactive", total_pages, self.url)
+                build_pagination_url("Last", "deactive", total_pages, self.request)
             )
 
         if data is not None:
@@ -222,6 +213,7 @@ class Pagination:
         *,
         limit: int = 10,
         query: Any = None,
+        request: Request = None,
         transform: Optional[Callable] = None,
         order_by: Any | None = None,
         request_type: str | None = None,
@@ -230,7 +222,7 @@ class Pagination:
         """SQLAlchemy select() compatible async paginator execution."""
 
         # 1. Resolve DB Session safely
-        db = db or active_secondary_db()
+        db = db or config_secondary_db()
         if inspect.isawaitable(db):
             db = await db
 
@@ -253,7 +245,10 @@ class Pagination:
                 total_count = await total_count
 
         # 3. Paginator Setup
-        paginator = cls(request_type)
+        paginator = cls(
+            request=request,
+            request_type=request_type,
+        )
         await paginator.load(limit=limit)
         offset = paginator.get_offset()
 

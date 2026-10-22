@@ -1,20 +1,21 @@
 from collections import defaultdict
 from typing import Any, List, Optional
 
+from includes.src.request import Request
 from sqlalchemy import asc, delete, select
 
 from includes.admin.modals import checked
 from includes.admin.schemas.backup import ClassBeckup
+from includes.core.globals.entry import GlobleCatch
 from includes.core.globals.coreutils import is_empty, slugify
-from includes.core.globals.entry import GlobleCatch, app_context
-from includes.core.metadata import MetaData
+
+from includes.core.globals.route_context import Route
 from includes.core.paginator import NewQueryPaginator
-from includes.database.connection import active_primary_db, active_secondary_db
+from includes.database.connection import config_primary_db, config_secondary_db
 from includes.database.dataclass.dataclass import serialize
-from includes.database.models.owner import Subject
+from includes.database.models.primary import Subject
 from includes.database.models.secondary import Terms
 from includes.schemas.cache.subject import SubjectCache
-from includes.schemas.router_schema import DynamicURLRoute
 from includes.utils.utils import get_next_id, get_post_value
 
 
@@ -29,12 +30,15 @@ def empty_message(
 
 class AdminClassTerms:
 
+    def __init__(self, request: Request = None):
+        self.request = request
+
     @staticmethod
     async def get_all_terms_by_subject() -> List[dict[str, Any]]:
         """Fetch all subjects with their associated terms."""
 
-        db = await active_primary_db()
-        sdb = await active_secondary_db()
+        db = await config_primary_db()
+        sdb = await config_secondary_db()
 
         # Subjects
         subjects_result = db.execute(select(Subject).order_by(Subject.name))
@@ -83,8 +87,8 @@ class AdminClassTerms:
 
         return data
 
-    @staticmethod
     async def getList(
+        self,
         limit: int = 20,
         **more,
     ) -> List[dict[str, Any]]:
@@ -101,13 +105,14 @@ class AdminClassTerms:
 
         all_query = select(Terms)
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         data = await NewQueryPaginator.paginate(
             db=db,
             limit=limit,
             types="query",
             model=Terms,
+            request=self.request,
             query=all_query,
             transform=lambda item: add_subject(serialize(item)),
             **more,
@@ -115,18 +120,15 @@ class AdminClassTerms:
 
         return data.records
 
-    @staticmethod
-    async def insert(
-        data: dict[str, Any],
-    ) -> dict[str, Any]:
+    async def insert(self, data: dict[str, Any]) -> dict[str, Any]:
 
-        if app_context.response.get("error"):
+        if self.request.state.response.get("error"):
             return data
 
         slug = slugify(data.get("slug"))
 
         # Check existing slug
-        db = await active_secondary_db()
+        db = await config_secondary_db()
         stmt = select(Terms).where(Terms.slug == slug)
 
         result = db.execute(stmt)
@@ -134,7 +136,7 @@ class AdminClassTerms:
         existing_term = result.scalars().first()
 
         if existing_term:
-            app_context.response["error"] = (
+            self.request.state.response["error"] = (
                 "This Category already exists with "
                 f"the slug: [{existing_term.slug}]. "
                 "Please change the slug. You can view it "
@@ -167,19 +169,16 @@ class AdminClassTerms:
 
         return {"redirect": True}
 
-    @staticmethod
-    async def update(
-        data: dict[str, Any],
-    ) -> Optional[dict[str, Any]]:
+    async def update(self, data: dict[str, Any]) -> Optional[dict[str, Any]]:
 
-        if app_context.response.get("error"):
+        if self.request.state.response.get("error"):
             return data
 
-        item_id = app_context.function.getRequestInt("item")
+        item_id = self.request.query_params.get("item")
 
         terms_query = None
-        
-        db = await active_secondary_db()
+
+        db = await config_secondary_db()
         if item_id:
             stmt = select(Terms).where(Terms.id == int(item_id))
 
@@ -188,7 +187,7 @@ class AdminClassTerms:
             terms_query = result.scalars().first()
 
         if not terms_query:
-            app_context.response["error"] = "No query record found."
+            self.request.state.response["error"] = "No query record found."
 
             return None
 
@@ -229,20 +228,17 @@ class AdminClassTerms:
 
         db.commit()
 
-        app_context.response["message"] = (
+        self.request.state.response["message"] = (
             "Updated " "<a href='/admin/category'>Back</a>"
         )
 
         return data
 
-    @staticmethod
-    async def delete(
-        id: int,
-    ) -> Optional[bool]:
+    async def delete(self, id: int) -> Optional[bool]:
 
         terms_query = None
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
         if id:
             stmt = select(Terms).where(Terms.id == id)
 
@@ -261,9 +257,7 @@ class AdminClassTerms:
                 db.execute(delete(Terms).where(Terms.id == terms_query.id))
 
                 # Delete related records
-                db.execute(
-                    delete(Terms).where(Terms.terms_id == terms_query.id)
-                )
+                db.execute(delete(Terms).where(Terms.terms_id == terms_query.id))
 
                 db.commit()
 
@@ -271,7 +265,7 @@ class AdminClassTerms:
 
                 return True
 
-            app_context.response["pop_message"] = {
+            self.request.state.response["pop_message"] = {
                 "title": (
                     "This 'terms' id could not be " "deleted. Error code Xe742524"
                 ),
@@ -280,24 +274,17 @@ class AdminClassTerms:
 
             return None
 
-        app_context.response["pop_message"] = {
+        self.request.state.response["pop_message"] = {
             "title": ("This 'terms' id was not found. " "Error code Xe742525"),
             "url": "/admin/category",
         }
 
         return None
 
-    @staticmethod
-    async def terms_query(
-        roots: DynamicURLRoute,
-    ) -> dict[str, Any]:
+    async def terms_query(self, roots: Route) -> dict[str, Any]:
+        async def add_more(term: dict[str, Any]) -> dict[str, Any]:
 
-        async def add_more(
-            term: dict[str, Any],
-        ) -> dict[str, Any]:
-
-            app_context.response["subjects"] = []
-
+            self.request.state.response["subjects"] = []
             subject_id = int(term.get("subject_id") or 0)
 
             for subject in await SubjectCache.get_all():
@@ -310,7 +297,7 @@ class AdminClassTerms:
                 ):
                     term["subject_name"] = subject.name
 
-                app_context.response["subjects"].append(item)
+                self.request.state.response["subjects"].append(item)
 
             topic_enabled = int(term.get("topic") or 0) == 1
 
@@ -329,7 +316,7 @@ class AdminClassTerms:
 
             return term
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         query_terms_keys = [
             "id",
@@ -354,9 +341,10 @@ class AdminClassTerms:
         ]
 
         # POST
-        if app_context.function.is_post():
+        if self.request.is_post:
 
             terms_query_data = await get_post_value(
+                self.request,
                 query_terms_keys,
                 query_terms_defaults,
             )
@@ -373,22 +361,22 @@ class AdminClassTerms:
                     "description",
                     "image_src",
                 ]:
-                    app_context.response["error"] = app_context.response.get(
+                    self.request.state.response[
                         "error"
-                    ) or empty_message(
+                    ] = self.request.state.response.get("error") or empty_message(
                         key,
-                        roots.scope_slug,
+                        roots.scope,
                     )
 
             return await add_more(terms_query_data)
 
         # GET / Update
-        item_id = app_context.function.getRequestInt("item")
+        item_id = self.request.query_params.get("item")
 
         terms_query_data = None
 
         if item_id:
-            db = await active_secondary_db()
+            db = await config_secondary_db()
             stmt = select(Terms).where(Terms.id == int(item_id))
 
             result = db.execute(stmt)
@@ -405,46 +393,30 @@ class AdminClassTerms:
 
         return await add_more(terms_query_data)
 
-    @staticmethod
-    async def index(
-        roots: DynamicURLRoute,
-    ) -> str:
+    async def index(self, roots: Route) -> str:
 
-        if roots.scope_slug == "delete" and await AdminClassTerms.delete(
-            app_context.function.getRequestInt("item")
+        if roots.scope == "delete" and await self.delete(
+            self.request.query_params.get("item")
         ):
-            MetaData.redirect_url = "/admin/category"
+            self.request.state.metadata.redirect_url = "/admin/category"
 
             return "redirect"
 
-        if roots.scope_slug in (
-            "insert",
-            "update",
-        ):
-            data_querys = await AdminClassTerms.terms_query(roots)
-
-            bind_function = getattr(
-                AdminClassTerms,
-                roots.scope_slug,
-                None,
-            )
-
-            if app_context.function.is_post() and callable(bind_function):
+        if roots.scope in ("insert", "update"):
+            data_querys = await self.terms_query(roots)
+            bind_function = getattr(self, roots.scope, None)
+            if self.request.is_post and callable(bind_function):
                 bind_value = await bind_function(data_querys)
 
                 if bind_value and bind_value.get("redirect"):
-                    MetaData.redirect_url = "/admin/category"
+                    self.request.state.metadata.redirect_url = "/admin/category"
 
                     return "redirect"
 
-            app_context.response["data_querys"] = data_querys
+            self.request.state.response["data_querys"] = data_querys
 
             return "admin/add_terms"
 
-        app_context.response["data_querys"] = await AdminClassTerms.getList(10)
+        self.request.state.response["data_querys"] = await self.getList(10)
 
         return "admin/terms"
-
-
-# Alias for backward compatibility
-AsminClassTerms = AdminClassTerms

@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from includes.core.globals.route_context import Route
 from includes.core.repo.dir_manager import folder
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import format_view_count
@@ -149,7 +150,7 @@ class QuizQuestion(BaseSecondary):
     views = Column(Integer, nullable=False)
     timestamp = Column(TimeStamp, default=TimeStamp.now_iso)
 
-    async def next_prev_question(self):
+    async def next_prev_question(self, request):
         terms = None
         db = await app_context.db.configure_secondary()
 
@@ -157,7 +158,7 @@ class QuizQuestion(BaseSecondary):
         base = select(QuizQuestion)
 
         # Category filtering
-        if app_context.route.scope_slug != "tagged" and app_context.route.resource_type:
+        if request.state.roote.scope != "tagged" and request.state.roote.entity:
             base = (
                 base.join(
                     QuizRelationships, QuizRelationships.quiz_id == QuizQuestion.id
@@ -166,11 +167,11 @@ class QuizQuestion(BaseSecondary):
                     Terms,
                     Terms.id == QuizRelationships.terms_id,
                 )
-                .where(Terms.slug == app_context.route.scope_slug)
+                .where(Terms.slug == request.state.roote.scope)
             )
 
             terms_stmt = (
-                select(Terms).where(Terms.slug == app_context.route.scope_slug).limit(1)
+                select(Terms).where(Terms.slug == request.state.roote.scope).limit(1)
             )
 
             terms = db.execute(terms_stmt).scalar_one_or_none()
@@ -213,7 +214,7 @@ class QuizQuestion(BaseSecondary):
         terms = db.execute(term_stmt).scalars().all()
 
         data["url"] = (
-            f"{app_context.request.host_url}"
+            f"{app_context.host_url}"
             f"practice"
             f"{f'/{self.terms.slug}' if getattr(self, 'terms', None) else ''}"
             f"/{self.id}"
@@ -305,7 +306,7 @@ class Article(BaseSecondary):
 
         db = await app_context.db.configure_secondary()
 
-        # Article Metadata
+        # Article MetaData
         metadata_stmt = select(ArticleMetadata).where(ArticleMetadata.id == self.id)
         article.mdata = db.execute(metadata_stmt).scalars().first()
 
@@ -362,11 +363,10 @@ class Terms(BaseSecondary):
         path = folder._get_file_path("static", "img", "category", f"{self.slug}.png")
         src = f"{self.slug}.png" if os.path.isfile(path) else self.image_src
         return src if "/" in src else f"/media/img/category/{src}"
-    
 
     @property
     def url(self):
-        return f"{app_context.request.host_url}questions/tagged/{self.slug}"
+        return f"{app_context.host_url}questions/tagged/{self.slug}"
 
     mcq_count = column_property(
         select(func.count(QuizRelationships.quiz_id))

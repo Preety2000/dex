@@ -71,24 +71,15 @@ $.define(function MCQ(container, opretar, ES) {
     })
 
     extend(function startCountdown(a, b, c) {
-        let d = 0, e = a(), f = setInterval(() => {
-
-            console.log(ES.ws?.readyState);
-            
+        let e, f = setInterval(() => {
             ES.ws?.readyState > WebSocket.CLOSING && (!$("IN031") && hx() && $.confirm({
                 h: "Connection Blocked",
                 t: "The server connection was blocked by your browser or network settings. Check your internet connection, disable VPN/proxy if needed, and ensure cookies are enabled.",
                 c: "Exit", b: "Retry"
             }, () => location.reload()), clearInterval(f));
 
-            d++ > 5 && (d = 0, e = a());
-
-            b.innerHTML = [
-                Math.floor(e / 3600),
-                Math.floor(e / 60) % 60,
-                e % 60
-            ].map(x => String(x).padStart(2, "0")).join(":");
-
+            e = a();
+            b.in(ES.formatTm(e), true);
             MCQ.SESSION.active && storage.update("timeup", --e);
             e < 0 && (clearInterval(f), c(), b.innerHTML = "Time's up!");
         }, 1000);
@@ -138,7 +129,7 @@ $.define(function MCQ(container, opretar, ES) {
     })
     extend(function getValue() {
         let o = [], i = null, s = false;
-        const inputs = mcqe.T052.weres("input", false);
+        const inputs = mcqe.T052.picks("input", false);
         inputs.forEach(input => {
             const count = input.get("count");
             if (input.type === "radio") {
@@ -190,7 +181,7 @@ $.define(function MCQ(container, opretar, ES) {
             input.event.change(e => F0009.closest(".options").children.for(e => e.set("data-select", e == F0009)))
             count++
         }
-        const buttons = mcqe.noqu.weres("button", false);
+        const buttons = mcqe.noqu.picks("button", false);
         for (const [, data] of MCQ.submitValue) {
             for (const [a, , c] of data || []) {
                 const button = buttons.find(e => e.questionId === Number(a));
@@ -211,7 +202,7 @@ $.define(function MCQ(container, opretar, ES) {
         }
 
 
-        let backButton = mcqe.T055.choose("back");
+        let backButton = mcqe.T055.pick("back");
         MCQ.SESSION.index <= 0 ? backButton.add("hidden") : backButton.removed("hidden");
 
         try { MathJax.typeset() }
@@ -223,7 +214,7 @@ $.define(function MCQ(container, opretar, ES) {
                 ? mcqe.backbutton.click()
                 : e.keyCode == 13
                     ? MCQ.saveQuery(e)
-                    : mcqe.T052.weres("input", false).for(input => String(e.key - 1) == input.get("count") ? input.click() : null)
+                    : mcqe.T052.picks("input", false).for(input => String(e.key - 1) == input.get("count") ? input.click() : null)
             return false;
         }
 
@@ -270,7 +261,7 @@ $.define(function MCQ(container, opretar, ES) {
 
         var time = mcqe.right_header.create("T058", "Time Left : ").create.span("time", "00:00:00");
 
-        MCQ.startCountdown(e => Math.floor(((storage.export("expiry") || 0) - I()) / 1000), time, function (e) {
+        MCQ.startCountdown(e => Math.floor((storage.export("expiry") || 0) - Date.now()), time, function (e) {
             MCQ.SESSION.active = false;
             storage.remove();
             MCQ.submit(e);

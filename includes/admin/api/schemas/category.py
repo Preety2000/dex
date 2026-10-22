@@ -1,5 +1,6 @@
 from includes.core.globals.entry import app_context
-from includes.database.models.owner import Subject
+from includes.database.connection import config_primary_db, config_secondary_db
+from includes.database.models.primary import Subject
 from includes.database.models.secondary import Terms
 from includes.schemas.cache.terms import TermsCache, TermsCacheData
 from includes.utils.utils import create_slug, get_next_id, get_post_value
@@ -9,15 +10,15 @@ class AdminApiCategory:
 
     @classmethod
     async def insert(cls):
-        replace = await get_post_value("replace")
+        replace = await get_post_value(request, "replace")
         fields = ["description", "name", "resource", "slug", "subject", "topic"]
-        data = {i: await get_post_value(i) for i in fields}
+        data = {i: await get_post_value(request, i) for i in fields}
 
         if not data["name"] or not data["subject"] or not data["description"]:
             return {"error": "Category name, description and subject are required."}
 
-        msb, db = await app_context.db.configure()
-
+        msb = await config_primary_db()
+        db = await config_secondary_db()
         slug = create_slug(data.get("slug") or data["name"])
 
         subject = msb.query(Subject).filter(Subject.name == data["subject"]).first()
@@ -25,7 +26,7 @@ class AdminApiCategory:
             return {"error": "6a8473f9-73d4-83ea-ba81-6a76a0d9fd8"}
 
         existing = (
-            app_context.db.query(Terms)
+            db.query(Terms)
             .filter(
                 Terms.slug == slug,
                 Terms.name == data["name"],

@@ -27,9 +27,9 @@
                 <div id="content-wrap" class="core-ui editor-wrap tmce-active has-dfw">
                     <link rel="stylesheet" id="editor-buttons-css" href="/static/css/admin/editor.min.css" media="all">
                     <div id="content-editor-tools" class="editor-tools hide-if-no-js">
-                        <div id="content-media-buttons" class="media-buttons"><button type="button"
-                                id="insert-media-button" class="button insert-media add_media"
-                                data-editor="content"><span class="media-buttons-icon"></span> Add Media</button>
+                        <div id="content-media-buttons" class="media-buttons"><button type="button" id="insert-media"
+                                class="button insert-media add_media" data-editor="content"><span
+                                    class="media-buttons-icon"></span> Add Media</button>
                         </div>
                         <div class="editor-tabs">
                             <button type="button" id="content-tmce" class="switch-editor switch-tmce">Visual</button>
@@ -88,7 +88,7 @@
                                         <span class="screen-F0019">Add a new Subject List</span>
                                     </a>
                                 </div>
-                                <script>function title_set(e) { $.choose("subject-display", true).in(e) }</script>
+                                <script>function title_set(e) { $.pick("subject-display", true).in(e) }</script>
                             </div>
                         </div>
 

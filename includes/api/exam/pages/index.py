@@ -1,8 +1,8 @@
 from includes.api.exam.controller import ExamController
 from includes.api.exam.session.ev import ExamEventManager
 from includes.api.exam.teacher import Teachers
-from includes.core.globals.entry import app_context
 
+from includes.src.request import Request
 from includes.api.exam.index import Exam
 from includes.utils.exm import get_exam_id
 from includes.api.exam.metadata import exam_setting_setter, build_settings_page
@@ -18,13 +18,14 @@ class ExamIndexPage:
         return response
 
     @staticmethod
-    async def index(path, request_search):
-        id = request_search.get("id")
-        page = int(request_search.get("page", 0))
-        jump = request_search.get("Jump")
-        route = request_search.get("_request_type")
+    async def index(path, request: Request = None):
+
+        id = request.state.referer.params.get("id")
+        jump = request.state.referer.params.get("Jump")
+        route = request.state.referer.params.get("_request_type")
+
         exam_id = get_exam_id(id)
-        language = await app_context.setting.get("language", "English")
+        language = await request.state.setting.get("language", "English")
 
         if exam_id:
             if route == "c7b4e436-ab36-4a93-834-565159552bdc":
@@ -32,7 +33,7 @@ class ExamIndexPage:
 
                 update, exam_query = await exam_setting_setter(exam_query)
                 for i in ["start_timestamp", "publish_timestamp"]:
-                    value = await get_post_value(i)
+                    value = await get_post_value(request, i)
                     if value and int(value):
                         update = True
                         setattr(exam_query, i, int(value))
@@ -41,12 +42,16 @@ class ExamIndexPage:
                     setattr(
                         exam_query,
                         "exam_category",
-                        await get_post_value("exam_category", "any"),
+                        await get_post_value(request, "exam_category", "any"),
                     )
                     setattr(
                         exam_query,
                         "notification",
-                        True if await get_post_value("notification") == "ON" else False,
+                        (
+                            True
+                            if await get_post_value(request, "notification") == "ON"
+                            else False
+                        ),
                     )
                     exam_query = await Exam._update(exam_query)
                     if jump:
@@ -68,7 +73,9 @@ class ExamIndexPage:
 
         else:
             dbList, paginators, results = await Exam.get_lists(
-                await app_context.setting.member("id"), 10, page
+                await request.state.setting.member("id"),
+                request=request,
+                limit=10,
             )
             return {
                 "__ac": 113,

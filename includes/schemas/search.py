@@ -3,21 +3,23 @@ from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 from deep_translator import GoogleTranslator
+from includes.src.request import Request
 from langdetect import DetectorFactory
 
 from sqlalchemy import select, or_, desc
 
+from includes.core.globals.route_context import Route
 from includes.core.paginator import NewQueryPaginator
-from includes.database.models.owner import Subject
+from includes.database.models.primary import Subject
 from includes.database.models.utils import TimeStamp
 from includes.utils._sub import configure_page
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import (
     format_view_count,
 )
-from includes.core.metadata import MetaData
+
 from includes.core.pagination import Pagination
-from includes.database.connection import db
+from includes.database.connection import config_secondary_db, config_primary_db
 from includes.database.models.secondary import (
     Article,
     ArticleMetadata,
@@ -41,49 +43,6 @@ DetectorFactory.seed = 0
 OPENAI_URL = "https://api.openai.com/v1/completions"
 
 
-
-def postsmetatags_json(query):
-    if not query:
-        return None
-
-    # Subject
-    subject_stmt = select(Subject).where(Subject.id == query.subject)
-
-    subject_obj = db.execute(subject_stmt).scalar_one_or_none()
-
-    subjects = app_context.subject.json(subject_obj) if subject_obj else None
-
-    # Safe tag filtering and mapping
-    tags_group = query.tags_group or []
-
-    suggestion_ints = [int(x) for x in tags_group if str(x).isdigit()]
-
-    if suggestion_ints:
-
-        suggestion_stmt = select(Suggestion).where(Suggestion.id.in_(suggestion_ints))
-
-        suggestions = db.execute(suggestion_stmt).scalars().all()
-
-        suggestion_data = [
-            {
-                "tag": item.tags,
-                "used": item.most_used,
-            }
-            for item in suggestions
-        ]
-
-    else:
-        suggestion_data = []
-
-    return {
-        "id": query.id,
-        "subject": subjects,
-        "excerpt": query.excerpt,
-        "secret_key": query.secret_key,
-        "tags": suggestion_data,
-    }
-
-
 class Search:
 
     def __init__(self, request):
@@ -97,43 +56,29 @@ class Search:
         self.category_data = None
 
         parsed_url = urlparse(str(request.url))
-
         self.host_url = f"{parsed_url.scheme}://" f"{parsed_url.netloc}/"
 
     def search_term_array(self, search_term):
-        search_term_clean = re.sub(
-            r"[।.,?]",
-            "",
-            search_term,
-        )
-
+        search_term_clean = re.sub(r"[।.,?]", "", search_term)
         words = search_term_clean.split()
-
         filtered_words = [
             word
             for word in words
             if (word not in HINDI_STOP_WORDS and word not in ENGLISH_STOP_WORDS)
         ]
-
         search_term_array_1 = [x for x in words if x]
-
         search_term_array_2 = [x for x in filtered_words if len(x) > 2]
 
-        return (
-            search_term_array_1,
-            search_term_array_2,
-        )
+        return (search_term_array_1, search_term_array_2)
 
-    def article_property(self, query):
-
+    async def article_property(self, query):
+        db = await config_secondary_db()
         # Terms
         terms_stmt = select(Terms).where(Terms.id == query.parameter)
-
         terms = db.execute(terms_stmt).scalar_one_or_none()
 
         # Type
         type_stmt = select(Terms).where(Terms.id == query.type)
-
         query.types = db.execute(type_stmt).scalar_one_or_none()
 
         if terms:
@@ -175,11 +120,9 @@ class Search:
             subject_stmt = select(Subject).where(
                 Subject.id == terms_relationship.subject_id
             )
-
-            subject_query = db.execute(subject_stmt).scalar_one_or_none()
-
+            mdb = await config_primary_db()
+            subject_query = mdb.execute(subject_stmt).scalar_one_or_none()
             query.subjects = subject_query
-
             query.subject = subject_query.slug if subject_query else None
 
         else:
@@ -224,14 +167,6 @@ class Search:
 
         return query
 
-    def suggestion_property(self, query):
-
-        article_stmt = select(Article).where(Article.id == query.query_id)
-
-        query.article = db.execute(article_stmt).scalars()
-
-        return query
-
     def subject_json(self, query):
         if not query:
             return None
@@ -243,11 +178,7 @@ class Search:
             "used": query.used,
         }
 
-    def find_best_match(
-        self,
-        matching_words,
-        content,
-    ):
+    def find_best_match(self, matching_words, content):
         if not matching_words or not content:
             return ""
 
@@ -274,11 +205,7 @@ class Search:
 
         return best_match
 
-    def find_best_match_and_highlight(
-        self,
-        matching_words,
-        content,
-    ):
+    def find_best_match_and_highlight(self, matching_words, content):
         if not matching_words or not content:
             return ""
 
@@ -286,10 +213,7 @@ class Search:
             r"\b(?:" + "|".join(re.escape(word) for word in matching_words) + r")\b"
         )
 
-        pattern = re.compile(
-            matching_pattern,
-            re.IGNORECASE,
-        )
+        pattern = re.compile(matching_pattern, re.IGNORECASE)
 
         best_match = ""
         max_match_count = 0
@@ -383,7 +307,8 @@ class Search:
 
         return query1
 
-    def mcqs_property(self, query):
+    async def mcqs_property(self, query):
+        db = await config_secondary_db()
         if not query:
             return None
 
@@ -401,8 +326,8 @@ class Search:
 
         # Subject
         subject_stmt = select(Subject).where(Subject.id == query.subject_id)
-
-        query.subjects = db.execute(subject_stmt).scalar_one_or_none()
+        mdb = await config_primary_db()
+        query.subjects = mdb.execute(subject_stmt).scalar_one_or_none()
 
         # First relationship
         relationship_stmt = (
@@ -417,9 +342,9 @@ class Search:
 
         return query
 
-    def mcqs_json(self, query, quet=None):
-
-        query = self.mcqs_property(query)
+    async def mcqs_json(self, query, quet=None):
+        db = await config_secondary_db()
+        query = await self.mcqs_property(query)
 
         if not query:
             return None
@@ -574,11 +499,9 @@ class Search:
 
         return dictionary
 
-    def mcqs_search(
-        self,
-        search_term,
-        question_limit,
-    ):
+    async def mcqs_search(self, search_term, question_limit):
+
+        db = await config_secondary_db()
         self.search_term = search_term
         self.question_limit = question_limit
 
@@ -606,7 +529,7 @@ class Search:
             if item.excerpt:
 
                 mcqs_result.append(
-                    self.mcqs_json(
+                    await self.mcqs_json(
                         item,
                         True,
                     )
@@ -619,35 +542,35 @@ class Search:
 
         return mcqs_result
 
-    async def index(self, root=None):
+    async def index(self, request: Request = None, roots: Route = None):
 
         configure_page(
+            request.state.metadata,
             template="query/search",
             title="Search",
             suffix=True,
         )
+        db = await config_secondary_db()
+
+        search_term = request.query_params.get("q")
+        search_tag = request.query_params.get("tag")
 
         response2 = {"resource": "widget"}
-
-        search_term = self.function.get_request_value("q")
-
-        search_tag = self.function.get_request_value("tag")
-
         search_page_uri = f"{self.host_url}search"
 
         if search_term:
 
             configure_page(
+                request.state.metadata,
                 title=search_term,
                 suffix=True,
             )
 
             response2["search_term"] = search_term
 
-            (
-                self.search_term_array_vars,
-                search_term_array,
-            ) = self.search_term_array(search_term)
+            self.search_term_array_vars, search_term_array = self.search_term_array(
+                search_term
+            )
 
             # -------------------------------------------------
             # Article search conditions
@@ -670,19 +593,11 @@ class Search:
             )
 
             suggestions = db.execute(suggestion_stmt).scalars().all()
-
             suggestion_article_ids = [
-                s.query_id
-                for s in suggestions
-                if getattr(
-                    s,
-                    "query_id",
-                    None,
-                )
+                s.query_id for s in suggestions if getattr(s, "query_id", None)
             ]
 
             if suggestion_article_ids:
-
                 search_conditions.append(Article.id.in_(suggestion_article_ids))
 
             # -------------------------------------------------
@@ -690,13 +605,11 @@ class Search:
             # -------------------------------------------------
 
             terms_stmt = select(Terms).where(Terms.name.ilike(f"%{search_term}%"))
-
             matched_terms = db.execute(terms_stmt).scalars().all()
 
             if matched_terms:
 
                 term_ids = [t.id for t in matched_terms]
-
                 terms_relationship_stmt = select(TermsRelationship).where(
                     TermsRelationship.terms_id.in_(term_ids)
                 )
@@ -707,7 +620,6 @@ class Search:
                 ]
 
                 if article_ids_from_terms:
-
                     search_conditions.append(Article.id.in_(article_ids_from_terms))
 
             # -------------------------------------------------
@@ -718,24 +630,20 @@ class Search:
 
             # Exact term
             exact_term_stmt = select(Terms).where(Terms.name == search_term).limit(1)
-
             terms = db.execute(exact_term_stmt).scalar_one_or_none()
 
-            (
-                response2["data_querys"],
-                response2["paginator"],
-                response2["results"],
-            ) = await Pagination.get_paginate(
-                query=query,
-                limit=10,
-                transform=lambda item: (self.article_json(item)),
+            response2["data_querys"], response2["paginator"], response2["results"] = (
+                await Pagination.get_paginate(
+                    limit=10,
+                    query=query,
+                    request=self.request,
+                    transform=lambda item: (self.article_json(item)),
+                )
             )
 
             response2["terms"] = get_terms_json(terms) if terms else None
-
-            response2["suggestion"] = self.suggestion(search_term)
-
-            response2["mcq_results"] = self.mcqs_search(
+            response2["suggestion"] = await self.suggestion(search_term)
+            response2["mcq_results"] = await self.mcqs_search(
                 search_term,
                 4,
             )
@@ -750,7 +658,7 @@ class Search:
 
             response2["keywords"] = list(set(keywords))
 
-            MetaData.template = "query/search_query"
+            request.state.metadata.template = "query/search_query"
 
             return response2
 
@@ -776,6 +684,7 @@ class Search:
                     types="query",
                     query=articles,
                     model=Article,
+                    request=request,
                     transform=lambda item: (self.article_json(item)),
                     limit=20,
                 )
@@ -789,6 +698,7 @@ class Search:
             response2["terms_query"] = get_terms_json(category) if category else None
 
             configure_page(
+                request.state.metadata,
                 template="query/tagged",
                 title=search_tag,
                 suffix=True,
@@ -799,15 +709,12 @@ class Search:
         if self.request.url == search_page_uri:
             return response2
 
-        MetaData.redirect_url = self.host_url + "search"
+        request.state.metadata.redirect_url = self.host_url + "search"
 
         return {}
 
-    def suggestion(
-        self,
-        search_term,
-        limit=10,
-    ):
+    async def suggestion(self, search_term, limit=10):
+        db = await config_secondary_db()
         suggestions = []
 
         suggestion_stmt = (
@@ -817,13 +724,9 @@ class Search:
         )
 
         suggestion_query = db.execute(suggestion_stmt).scalars().all()
-
         for item in suggestion_query:
 
-            new_uri = item.tags.replace(
-                " ",
-                "+",
-            )
+            new_uri = item.tags.replace(" ", "+")
 
             uri = f"{self.host_url}" f"search?q={new_uri}"
 
@@ -839,28 +742,20 @@ class Search:
         return suggestions
 
     async def list(self):
-
-        search_term_arrays = await get_post_value("q") or []
+        db = await config_secondary_db()
+        search_term_arrays = await get_post_value(self.request, "q") or []
 
         l2 = []
 
         for search_term in search_term_arrays:
-
-            (
-                search_term_array1,
-                search_term_array,
-            ) = self.search_term_array(search_term)
+            search_term_array1, search_term_array = self.search_term_array(search_term)
 
             article_conditions = [Article.title.ilike(f"%{search_term}%")]
-
             suggestion_conditions = [Suggestion.tags.ilike(f"%{search_term}%")]
 
             for insex in search_term_array:
-
                 insex_clean = insex.replace(",", "")
-
                 article_conditions.append(Article.title.ilike(f"%{insex_clean}%"))
-
                 suggestion_conditions.append(Suggestion.tags == insex_clean)
 
             # -------------------------------------------------
@@ -868,21 +763,12 @@ class Search:
             # -------------------------------------------------
 
             suggestion_stmt = select(Suggestion).where(or_(*suggestion_conditions))
-
             matched_suggestions = db.execute(suggestion_stmt).scalars().all()
-
             matched_query_ids = [
-                s.query_id
-                for s in matched_suggestions
-                if getattr(
-                    s,
-                    "query_id",
-                    None,
-                )
+                s.query_id for s in matched_suggestions if getattr(s, "query_id", None)
             ]
 
             if matched_query_ids:
-
                 article_conditions.append(Article.id.in_(matched_query_ids))
 
             # -------------------------------------------------
@@ -896,15 +782,8 @@ class Search:
             lists = []
 
             for match in combined_articles:
-
-                match = self.article_property(match)
-
-                lists.append(
-                    {
-                        "uri": "/" + match.uri,
-                        "title": match.title,
-                    }
-                )
+                match = await self.article_property(match)
+                lists.append({"uri": "/" + match.uri, "title": match.title})
 
             l2.append(
                 [

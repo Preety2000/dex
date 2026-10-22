@@ -1,13 +1,10 @@
-from sqlalchemy import Column, Integer, String, BigInteger, Boolean, create_engine
-from sqlalchemy.orm import declarative_base
-
+from sqlalchemy import Column, Integer, String, BigInteger, Boolean
+from includes.database.base import MediaAssetBase
 from includes.database.models.utils import TimeStamp
-
-MediaAssetBase = declarative_base()
 
 
 class MediaAsset(MediaAssetBase):
-    __tablename__ = "media_assets"
+    __tablename__ = "media_asset"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
@@ -29,7 +26,7 @@ class MediaAsset(MediaAssetBase):
     # System Timestamp
     timestamp = Column(TimeStamp, default=TimeStamp.now_iso)
 
-    # File Metadata & Extensions
+    # File MetaData & Extensions
     extension = Column(String(10), nullable=True)
     duration = Column(Integer, default=0)  # Video/Audio duration (seconds)
 

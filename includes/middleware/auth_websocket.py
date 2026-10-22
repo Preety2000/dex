@@ -12,6 +12,6 @@ class AuthWebsocket:
 
     @staticmethod
     async def adding(websocket):
-        member_id = await app_context.setting.member("id")
+        member_id = await websocket.state.setting.member("id")
         conn_id = id(websocket)
-        f"{conn_id}/{await app_context.setting.member("id")}"
+        f"{conn_id}/{await websocket.state.setting.member("id")}"

@@ -71,7 +71,7 @@ $(function $Chat(r, a, b, c, d, e, f, g, h, i, j) {
     var chat_window = $("window");
 
     const fs = function (b, c) {
-        b.scrollTop = c && c.choose('message--send') ?
+        b.scrollTop = c && c.pick('message--send') ?
             c.scrollHeight :
             b.scrollHeight;
     }
@@ -137,7 +137,7 @@ $(function $Chat(r, a, b, c, d, e, f, g, h, i, j) {
     }
 
     const gs = function (a, b, c, d, e) {
-        if (b = $.weres('[data-timestamp]').find(e => e.get("data-timestamp") == a.timestamp)) {
+        if (b = $.picks('[data-timestamp]').find(e => e.get("data-timestamp") == a.timestamp)) {
             c = b.create("dartr DIS00");
             e = c.create('message-time', timeAgo(Number(a.timestamp)));
             d = c.create("wamere");
@@ -173,7 +173,7 @@ $(function $Chat(r, a, b, c, d, e, f, g, h, i, j) {
 
 
         var DIS02, elm = f === true ? e.firstElementChild : e.lastElementChild;
-        if (elm && elm.isclass('send') && (DIS02 = elm.choose('DIS02'))) { }
+        if (elm && elm.isclass('send') && (DIS02 = elm.pick('DIS02'))) { }
         else {
             DIS02 = d.create("DIS02");
             if (f === true) { e.in(cf, 0); }
@@ -337,7 +337,7 @@ $(function $Chat(r, a, b, c, d, e, f, g, h, i, j) {
                 return g ? $.create('online', g) : timeAgo(+a.__t)
             }
             , g = function (a) {
-                const el = this.choose(f);
+                const el = this.pick(f);
                 if (el) el.in(t(a), true);
             };
 
@@ -392,7 +392,7 @@ $(function $Chat(r, a, b, c, d, e, f, g, h, i, j) {
         })
 
         var DIS02, elm = c === true ? a.firstElementChild : a.lastElementChild;
-        if (elm && elm.isclass('resave') && (DIS02 = elm.choose('DIS02'))) {
+        if (elm && elm.isclass('resave') && (DIS02 = elm.pick('DIS02'))) {
             console.log(elm, DIS02);
         }
         else {
@@ -467,7 +467,7 @@ $(function $Chat(r, a, b, c, d, e, f, g, h, i, j) {
         }
 
 
-        if (d = e?.choose('sub--dark')) {
+        if (d = e?.pick('sub--dark')) {
             d.in(a.__ms, true);
         }
     })
@@ -483,7 +483,7 @@ $(function $Chat(r, a, b, c, d, e, f, g, h, i, j) {
     })
     mx.add(405, function (a, b, c, d) {
         const [e, i] = userConversionsLists.get(a.__n) || [];
-        if (d = e?.choose('sub--dark')) {
+        if (d = e?.pick('sub--dark')) {
             d.in(i.userName, true);
         }
 
@@ -555,13 +555,13 @@ $(function $Chat(r, a, b, c, d, e, f, g, h, i, j) {
             if ($('mobile')) {
                 listBox.add('hidden');
                 chat_view.add('chatactive');
-                if (!chat_view.header.choose('back-button')) {
+                if (!chat_view.header.pick('back-button')) {
                     let back_button = $.create.button('back-button');
                     chat_view.header.in(back_button, 0);
                     back_button.addIcon('ice_arrow_left');
                     back_button.event.on(e => {
                         for (const [k, v] of Object.entries(chat.chatBoxList)) {
-                            if (chat_view.choose(v.id, true)) {
+                            if (chat_view.pick(v.id, true)) {
                                 v.session = false;
                             }
                         }

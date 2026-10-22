@@ -1,3 +1,4 @@
+from includes.src.request import Request
 from sqlalchemy import case, delete, func, or_, select
 
 from includes.admin.api.schemas.practice import AdminApiMCQ
@@ -5,26 +6,29 @@ from includes.admin.modals import checked, emptyMessage
 from includes.admin.schemas.backup import ClassBeckup
 from includes.core.globals.coreutils import is_empty
 from includes.core.globals.entry import app_context
-from includes.core.metadata import MetaData
+
+from includes.core.globals.route_context import Route
+
 from includes.core.paginator import NewQueryPaginator
-from includes.database.connection import active_secondary_db
+from includes.database.connection import config_secondary_db
 from includes.database.dataclass.dataclass import serialize
 from includes.database.models.secondary import QuizQuestion, QuizRelationships
 from includes.schemas.cache.subject import SubjectCache
 from includes.schemas.cache.terms import TermsCache
-from includes.schemas.router_schema import DynamicURLRoute
-from includes.utils.utils import get_post_value, get_query_value, set_response
+from includes.utils.utils import get_post_value, set_response
 
 
-class ClassObjective:
+class AdminClassObjective:
+
+    def __init__(self, request):
+        self.request = request
 
     # ==========================================
     # SELECT / FETCH METHODS
     # ==========================================
 
-    @staticmethod
-    async def get_list(limit=None):
-        db = await active_secondary_db()
+    async def get_list(self, limit: int = None):
+        db = await config_secondary_db()
 
         stmt = select(
             func.count(QuizQuestion.id).label("total"),
@@ -34,14 +38,15 @@ class ClassObjective:
 
         result = db.execute(stmt).one()
 
-        set_response("total", result.total)
-        set_response("draft", result.draft)
-        set_response("publish", result.publish)
+        set_response(self.request, "total", result.total)
+        set_response(self.request, "draft", result.draft)
+        set_response(self.request, "publish", result.publish)
 
         data = await NewQueryPaginator.paginate(
             db=db,
             limit=limit,
             types="query",
+            request=self.request,
             model=QuizQuestion,
             query=select(QuizQuestion),
             transform=lambda item: item.to_dict(),
@@ -56,7 +61,7 @@ class ClassObjective:
         if not item_id:
             return None
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         stmt = select(QuizQuestion).where(QuizQuestion.id == int(item_id))
 
@@ -69,7 +74,7 @@ class ClassObjective:
         if not question_text:
             return None
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         stmt = select(QuizQuestion).where(QuizQuestion.question == question_text)
 
@@ -110,11 +115,10 @@ class ClassObjective:
     # INSERT / CREATE METHODS
     # ==========================================
 
-    @staticmethod
-    async def insert(data_querys):
+    async def insert(self, data_querys):
 
         def returnsError(query, errorType):
-            app_context.response["error"] = (
+            self.request.state.response["error"] = (
                 f"This post already exists with the "
                 f"{errorType}: "
                 f"{query.get(errorType.lower())}. "
@@ -133,16 +137,16 @@ class ClassObjective:
         error = data.get("error") if isinstance(data, dict) else None
 
         if error is not None:
-            app_context.response["error"] = error
+            self.request.state.response["error"] = error
             return data_querys
 
-        if app_context.response.get("error"):
+        if self.request.state.response.get("error"):
             return data_querys
 
         question = data_querys.get("question")
 
         # Duplicate Question check
-        existing_question = await ClassObjective.get_by_question(question)
+        existing_question = await AdminClassObjective.get_by_question(question)
 
         if existing_question:
             return returnsError(
@@ -160,13 +164,13 @@ class ClassObjective:
             status=data_querys.get("status"),
         )
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         db.add(question_query)
         db.flush()
 
         # Attach categories
-        await ClassObjective.add_category(
+        await AdminClassObjective.add_category(
             db,
             question_query.id,
             data_querys,
@@ -174,7 +178,7 @@ class ClassObjective:
 
         db.commit()
 
-        if app_context.function.is_api():
+        if self.request.method == "POST" and self.request.query_params.get("key"):
             return [
                 {
                     "insert": True,
@@ -193,7 +197,7 @@ class ClassObjective:
         for item_key, value in data.items():
             question_text = value.get("question")
 
-            query = await ClassObjective.get_by_question(question_text)
+            query = await AdminClassObjective.get_by_question(question_text)
 
             if query:
                 existing.append(
@@ -220,7 +224,7 @@ class ClassObjective:
                     "incorrect_answers": value.get("incorrect_answers"),
                 }
 
-                ins = await ClassObjective.insert(payload)
+                ins = await self.insert(payload)
 
                 news.append(
                     [
@@ -238,17 +242,16 @@ class ClassObjective:
     # UPDATE METHOD
     # ==========================================
 
-    @staticmethod
-    async def update(data_querys):
-        if app_context.response.get("error"):
+    async def update(self, data_querys):
+        if self.request.state.response.get("error"):
             return data_querys
 
-        item_id = app_context.function.getRequestInt("item")
+        item_id = self.request.query_params.get("item")
 
-        question_query = await ClassObjective.get_by_id(item_id)
+        question_query = await AdminClassObjective.get_by_id(item_id)
 
         if not question_query:
-            app_context.response["error"] = "No question found to update."
+            self.request.state.response["error"] = "No question found to update."
 
             return data_querys
 
@@ -257,7 +260,7 @@ class ClassObjective:
             question_query.question,
         )
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         # Check duplicate excluding current ID
         stmt = select(QuizQuestion).where(
@@ -268,7 +271,7 @@ class ClassObjective:
         extQuery = db.execute(stmt).scalar_one_or_none()
 
         if extQuery:
-            app_context.response["error"] = (
+            self.request.state.response["error"] = (
                 f"This post already exists with the "
                 f"question: <b>{question}</b>. "
                 f"Please change the Question and save. "
@@ -307,7 +310,7 @@ class ClassObjective:
             question_query.status,
         )
 
-        await ClassObjective.add_category(
+        await AdminClassObjective.add_category(
             db,
             question_query.id,
             data_querys,
@@ -315,7 +318,7 @@ class ClassObjective:
 
         db.commit()
 
-        app_context.response["message"] = (
+        self.request.state.response["message"] = (
             "Updated Question successfully. " "<a href='/admin/practice'>Back</a>"
         )
 
@@ -325,18 +328,17 @@ class ClassObjective:
     # DELETE & STATUS ACTIONS
     # ==========================================
 
-    @staticmethod
-    async def action(item_id, action_type):
-        question_record = await ClassObjective.get_by_id(item_id)
+    async def action(self, item_id, action_type):
+        question_record = await AdminClassObjective.get_by_id(item_id)
 
         if not question_record:
-            app_context.response["pop_message"] = (
+            self.request.state.response["pop_message"] = (
                 "Question not found. Error code: Ae8340"
             )
 
             return False
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         # Status Toggle
         if action_type in [
@@ -374,14 +376,14 @@ class ClassObjective:
 
                 return True
 
-            app_context.response["pop_message"] = (
+            self.request.state.response["pop_message"] = (
                 "This 'Question' could not be deleted "
                 "during backup. Error code: Ae8349"
             )
 
             return False
 
-        app_context.response["pop_message"] = (
+        self.request.state.response["pop_message"] = (
             "Invalid action requested. " "Error code: Ae8340"
         )
 
@@ -391,29 +393,25 @@ class ClassObjective:
     # DATA COLLECTION / CONTROLLER ROUTER
     # ==========================================
 
-    @staticmethod
-    async def addCollection(querys):
+    async def addCollection(self, querys):
         subject_id = querys.get("subject_id")
         queryCategories = querys.get(
             "category",
             [],
         )
 
-        app_context.response["subjects"] = []
+        self.request.state.response["subjects"] = []
 
         for subject in await SubjectCache.get_all():
             item = serialize(subject)
 
-            if checked(
-                subject.id == int(subject_id or 0),
-                item,
-            ):
+            if checked(subject.id == int(subject_id or 0), item):
                 querys["subject_name"] = subject.name
 
-            app_context.response["subjects"].append(item)
+            self.request.state.response["subjects"].append(item)
 
-        app_context.response["resources"] = []
-        app_context.response["category"] = []
+        self.request.state.response["resources"] = []
+        self.request.state.response["category"] = []
 
         category_ids = [
             int(i) if isinstance(i, (int, str)) else i.get("id")
@@ -431,49 +429,30 @@ class ClassObjective:
 
             if category.topic == 1:
                 category_dictionary = dictionary.copy()
-
-                checked(
-                    category.id in category_ids,
-                    category_dictionary,
-                )
-
-                app_context.response["category"].append(category_dictionary)
+                checked(category.id in category_ids, category_dictionary)
+                self.request.state.response["category"].append(category_dictionary)
 
         return querys
 
-    @staticmethod
-    async def index(roots: DynamicURLRoute):
-        isPostMethod = app_context.function.is_post()
-
-        item_id = app_context.function.getRequestInt("item")
-
-        action_type = get_query_value("action")
+    async def index(self, roots: Route):
+        isPostMethod = self.request.is_post
+        item_id = self.request.query_params.get("item")
+        action_type = self.request.query_params.get("action")
 
         # Handle Action
-        if (
-            item_id
-            and action_type
-            and await ClassObjective.action(
-                item_id,
-                action_type,
-            )
-        ):
-            MetaData.redirect_url = "/admin/practice"
+        if item_id and action_type and await self.action(item_id, action_type):
+            self.request.state.metadata.redirect_url = "/admin/practice"
 
             return "redirect"
 
         # Handle Form Submissions
-        if roots.scope_slug in (
-            "insert",
-            "update",
-        ):
+        if roots.scope in ("insert", "update"):
             data_querys = None
 
             if item_id:
-                record = await ClassObjective.get_by_id(item_id)
-
+                record = await AdminClassObjective.get_by_id(item_id)
                 if record:
-                    data_querys = record.to_dict()
+                    data_querys = await record.to_dict()
 
             request_keynme = [
                 "question",
@@ -497,18 +476,17 @@ class ClassObjective:
 
             if isPostMethod:
                 data_querys = await get_post_value(
-                    request_keynme,
-                    default_values,
+                    self.request, request_keynme, default_values
                 )
 
                 for key_name, value in data_querys.items():
 
                     if is_empty(value) and key_name not in ["excerpt"]:
-                        app_context.response["error"] = app_context.response.get(
+                        self.request.state.response[
                             "error"
-                        ) or emptyMessage(
+                        ] = self.request.state.response.get("error") or emptyMessage(
                             key_name,
-                            roots.scope_slug,
+                            roots.scope,
                         )
 
             if not data_querys and not isPostMethod:
@@ -517,37 +495,23 @@ class ClassObjective:
                     for i, key in enumerate(request_keynme)
                 }
 
-                data_querys.update(
-                    {
-                        "incorrect_answers": [
-                            "",
-                            "",
-                            "",
-                        ]
-                    }
-                )
+                data_querys.update({"incorrect_answers": ["", "", ""]})
 
-            bind_function = getattr(
-                ClassObjective,
-                roots.scope_slug,
-                None,
-            )
-
+            bind_function = getattr(self, roots.scope, None)
             if isPostMethod and callable(bind_function):
                 bind_value = await bind_function(data_querys)
 
                 if bind_value and bind_value.get("redirect"):
-                    MetaData.redirect_url = "/admin/practice"
+                    self.request.state.metadata.redirect_url = "/admin/practice"
 
                     return "redirect"
 
-            app_context.response["data_querys"] = await ClassObjective.addCollection(
+            self.request.state.response["data_querys"] = await self.addCollection(
                 data_querys
             )
-
             return "admin/add_mcq"
 
         # Default GET list
-        app_context.response["data_querys"] = await ClassObjective.get_list(10)
+        self.request.state.response["data_querys"] = await self.get_list(10)
 
         return "admin/practice"

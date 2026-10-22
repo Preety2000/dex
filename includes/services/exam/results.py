@@ -2,10 +2,11 @@ import json
 import ast
 from datetime import date, datetime
 
+from includes.src.request import Request
 from includes.api.exam.student import RecordType, Student
-from includes.core.globals.entry import app_context
 from includes.api.exam.results.results_conducted import IS_RESULTS
 from includes.api.exam.results.results_practice import SELF_RESULTS
+from includes.core.globals.route_context import Route
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -18,14 +19,13 @@ class CustomJSONEncoder(json.JSONEncoder):
 class Results:
 
     @staticmethod
-    async def index():
+    async def index(request:Request):
         source, code = (
-            (app_context.route.resource_slug, RecordType.STUDENT)
-            if (app_context.route.resource_type and app_context.route.resource_slug)
-            else (app_context.route.resource_type, RecordType.INVIGILATOR)
+            (request.state.roote.action, RecordType.STUDENT)
+            if (request.state.roote.entity and request.state.roote.action)
+            else (request.state.roote.entity, RecordType.INVIGILATOR)
         )
 
         record = await Student.get_by_exam_key(source, code)
-        print(app_context.route)
-        app_context.response["record"] = record
+        request.state.response["record"] = record
         return "widget/results_index"

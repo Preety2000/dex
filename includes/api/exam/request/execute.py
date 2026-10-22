@@ -1,5 +1,5 @@
 from includes.api.exam.stlinks import StLinksHendlar
-from includes.core.globals.entry import app_context
+from includes.src.request import Request
 from includes.api.exam.index import Exam
 from includes.api.exam.controller import ExamController
 from includes.api.exam.student import RecordType, Student
@@ -37,7 +37,9 @@ def parse_request(data):
     )
 
 
-async def updateHandle(exam_id: int, data: RequestObject, teacher_profile):
+async def updateHandle(
+    exam_id: int, data: RequestObject, teacher_profile, request: Request
+):
 
     if data.actionKey == 5608:
         await Exam.update(exam_id, data.payload)
@@ -47,7 +49,9 @@ async def updateHandle(exam_id: int, data: RequestObject, teacher_profile):
     return {}
 
 
-async def requestHandle(exam_id: int, data: RequestObject, teacher_profile):
+async def requestHandle(
+    exam_id: int, data: RequestObject, teacher_profile, request: Request
+):
 
     if data.actionKey == 203 and isinstance(data.moreData, int):
         user_id, rollno = data.payload
@@ -121,7 +125,8 @@ async def requestHandle(exam_id: int, data: RequestObject, teacher_profile):
 
         elif data.action == "result":
             record = await Student.get_by_exam(rollno, exam_id, RecordType.INVIGILATOR)
-            result_data = await IS_RESULTS.get_result(record, True)
+            is_result = IS_RESULTS(request)
+            result_data = await is_result.get_result(record, True)
             return json_response(result_data)
 
         else:
@@ -133,14 +138,14 @@ async def requestHandle(exam_id: int, data: RequestObject, teacher_profile):
     # return await searchStudent(data.action)
 
 
-async def handle_exam_requests(exam_id=None, teacher_profile=None):
-
-    request_handlers = {300: requestHandle, 302: updateHandle}
+async def handle_exam_requests(
+    exam_id=None, teacher_profile=None, request: Request = None
+):
 
     responses = []
-
-    for request in await get_post_value(True, []):
-        request_data = parse_request(request)
+    request_handlers = {300: requestHandle, 302: updateHandle}
+    for req in await get_post_value(request, True, []):
+        request_data = parse_request(req)
         handler = request_handlers.get(request_data.requestKey)
 
         if not callable(handler):
@@ -152,6 +157,8 @@ async def handle_exam_requests(exam_id=None, teacher_profile=None):
             )
             continue
 
-        responses.append(await handler(exam_id, request_data, teacher_profile))
+        responses.append(
+            await handler(exam_id, request_data, teacher_profile, request=request)
+        )
 
     return None if not responses else responses[0] if len(responses) == 1 else responses

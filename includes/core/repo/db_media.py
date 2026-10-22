@@ -1,22 +1,20 @@
 import os
 import math
+from pathlib import Path
 import posixpath
 import fitz
 import hashlib
 import mimetypes
-from io import BytesIO
-from datetime import datetime
 from typing import Any, List
-from contextlib import contextmanager
 
 from PIL import Image
+from sqlalchemy import select
 from svglib.svglib import svg2rlg
-from reportlab.graphics import renderPM
 
 # Project specific imports (modify according to your project structure)
 from includes.database.chait.sql import LocalDB
 from includes.core.repo.thumbnail import Thumbnail
-from includes.database.chait.media_asset_model import MediaAsset, MediaAssetBase
+from includes.database.models.media_asset import MediaAsset, MediaAssetBase
 from includes.utils.file import serialize_media_asset
 from includes.database.models.utils import TimeStamp
 
@@ -103,6 +101,35 @@ class TableRegistry:
 # 3. HELPER FUNCTIONS
 
 
+def get_media_url(path, dif=None):
+    path = Path(path)
+
+    parts = [part.lower() for part in path.parts]
+    media_types = {
+        "img": "img",
+        "image": "img",
+        "images": "img",
+        "video": "video",
+        "video": "video",
+        "pdf": "pdf",
+    }
+
+    for index, part in enumerate(parts):
+        if part in media_types:
+            media_type = media_types[part]
+
+            # Original path ke parts use karenge,
+            # lekin media folder se start karenge.
+            original_parts = path.parts[index + 1 :]
+
+            if original_parts:
+                return f"{media_type}/{'/'.join(original_parts)}"
+
+            return media_type
+
+    return dif
+
+
 def calculate_file_hash(file_path: str) -> str:
     """MD5 file hash calculate karta hai duplicate files detect karne ke liye."""
     hasher = hashlib.md5()
@@ -133,7 +160,7 @@ class MediaManager:
 
     @staticmethod
     def _get_db():
-        return LocalDB("DB_FILES", MediaAssetBase, "db_media")
+        return LocalDB("DB_FILESL", MediaAssetBase, "db_media")
 
     @staticmethod
     def calculate_file_size(file_path: str):
@@ -180,7 +207,7 @@ class MediaManager:
 
         return {
             "name": file,
-            "src": f"/media/{media_type}/{file}",
+            "src": f"/media/{ get_media_url(file_path, f'{media_type}/{file}')}",
             "thumbnail": thumbnail.get("data_url", ""),
             "file_type": mime_type or "application/octet-stream",
             "size_bytes": size_bytes,
@@ -209,10 +236,8 @@ class MediaManager:
             return
 
         with db.session_scope() as session:
-            existing = session.query(MediaAsset).filter_by(src=meta["src"]).first()
-
-            print(meta["directory_path"])
-
+            stmt = select(MediaAsset).where(MediaAsset.src == meta["src"])
+            existing = session.execute(stmt).scalar_one_or_none()
             if not existing:
                 db_entry = MediaAsset(
                     name=meta["name"],
@@ -284,15 +309,15 @@ class MediaManager:
             return []
 
         created_assets: List[MediaAsset] = []
-
         with db.session_scope() as session:
             session.bulk_insert_mappings(MediaAsset, parsed_metadata_list)
             session.flush()
-
             inserted_names = [m["name"] for m in parsed_metadata_list]
             created_assets = (
-                session.query(MediaAsset)
-                .filter(MediaAsset.name.in_(inserted_names))
+                session.execute(
+                    select(MediaAsset).where(MediaAsset.name.in_(inserted_names))
+                )
+                .scalars()
                 .all()
             )
 
@@ -315,11 +340,9 @@ class MediaManager:
         resolved_assets: List[dict[str, Any]] = []
 
         with db.session_scope() as session:
-            db_records = (
-                session.query(MediaAsset)
-                .filter(MediaAsset.name.in_(target_filenames))
-                .all()
-            )
+            stmt = select(MediaAsset).where(MediaAsset.name.in_(target_filenames))
+
+            db_records = session.execute(stmt).scalars().all()
 
             found_names = set()
             for record in db_records:

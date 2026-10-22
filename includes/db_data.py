@@ -6,13 +6,13 @@ from sympy import root
 from includes.core.repo.dir_manager import folder
 
 from includes.database.connection import (
-    active_exam_db,
-    active_primary_db,
-    active_secondary_db,
+    config_exam_db,
+    config_primary_db,
+    config_secondary_db,
 )
-from includes.database.models.owner import Members
+from includes.database.models.primary import Members
 from includes.core.globals.entry import app_context
-from includes.utils.utils import get_query_value, get_referer_value
+from includes.utils.utils import get_referer_value
 
 
 async def export_database(db):
@@ -32,13 +32,13 @@ async def export_database(db):
 
 async def import_database(root, result):
 
-    db_count = get_query_value("db", get_referer_value("db", None))
+    db_count = request.query_params.get("db", get_referer_value("db", None))
 
     db = await {
-        "1": active_primary_db,
-        "2": active_secondary_db,
-        "3": active_exam_db,
-    }.get(str(db_count), active_primary_db)()
+        "1": config_primary_db,
+        "2": config_secondary_db,
+        "3": config_exam_db,
+    }.get(str(db_count), config_primary_db)()
 
     inserted = 0
     inserteds = []
@@ -133,23 +133,23 @@ async def import_database(root, result):
 
 
 async def download_db_data(root, templates, request: Request):
-    if "upload" == app_context.route.scope_slug:
+    if "upload" == request.state.roote.scope:
         return templates.TemplateResponse(
             request=request,
             name="upload_db.html",
         )
 
-    db_count = get_query_value("db")
+    db_count = request.query_params.get("db")
 
     db = await {
-        "1": active_primary_db,
-        "2": active_secondary_db,
-        "3": active_exam_db,
-    }.get(str(db_count), active_primary_db)()
+        "1": config_primary_db,
+        "2": config_secondary_db,
+        "3": config_exam_db,
+    }.get(str(db_count), config_primary_db)()
 
     result = await export_database(db)
 
-    if "download" == app_context.route.scope_slug:
+    if "download" == request.state.roote.scope:
         file_path = f"database_backup_{db_count}.json"
 
         with open(file_path, "w", encoding="utf-8") as f:
@@ -161,7 +161,7 @@ async def download_db_data(root, templates, request: Request):
             media_type="application/json",
         )
 
-    if "view" == app_context.route.scope_slug:
+    if "view" == request.state.roote.scope:
         return result
 
     else:
@@ -190,9 +190,9 @@ async def SHUTDOWN():
     path_primary = folder._get_path("database", "primary.json")
     path_secondary = folder._get_path("database", "secondary.json")
 
-    exam = await export_database(await active_exam_db())
-    primary = await export_database(await active_primary_db())
-    secondary = await export_database(await active_secondary_db())
+    exam = await export_database(await config_exam_db())
+    primary = await export_database(await config_primary_db())
+    secondary = await export_database(await config_secondary_db())
 
     with open(path_exam, "w", encoding="utf-8") as f:
         json.dump(exam, f, ensure_ascii=False, indent=2, default=str)

@@ -1456,7 +1456,7 @@ textarea {
     border-radius: 6px;
     border: 1px solid var(--border);
     background: var(--bg-muted);
-    color: var(--text-color-main);
+    color: var(--text-primary);
     width: -webkit-fill-available;
 }
 
@@ -2083,7 +2083,7 @@ ul.categorychecklist li:hover {
     margin: 4px;
     padding: 0;
     border: none;
-    color: var(--text-color-main);
+    color: var(--text-primary);
     background: transparent;
 }
 

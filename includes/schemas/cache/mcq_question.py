@@ -2,12 +2,11 @@ from sqlalchemy import select
 
 from includes.database.dataclass.dataclass import _QuizQuestion
 from includes.schemas.cache.dataclass import QuizQuesCache
-from includes.database.connection import active_secondary_db
+from includes.database.connection import config_secondary_db
 from includes.database.models.secondary import (
     QuizQuestion,
     QuizRelationships,
 )
-
 
 QuizQuestionCacheData = QuizQuesCache()
 
@@ -29,13 +28,9 @@ class QuizQuestionCache:
         if record:
             return record
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
-        stmt = (
-            select(QuizQuestion)
-            .where(QuizQuestion.id == id)
-            .limit(1)
-        )
+        stmt = select(QuizQuestion).where(QuizQuestion.id == id).limit(1)
 
         result = db.execute(stmt)
         record = result.scalar_one_or_none()
@@ -61,12 +56,9 @@ class QuizQuestionCache:
         if not missing:
             return records
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
-        stmt = (
-            select(QuizQuestion)
-            .where(QuizQuestion.id.in_(missing))
-        )
+        stmt = select(QuizQuestion).where(QuizQuestion.id.in_(missing))
 
         result = db.execute(stmt)
         db_records = result.scalars().all()
@@ -75,15 +67,9 @@ class QuizQuestionCache:
         cached_records = {}
 
         for record in db_records:
-            cached_records[record.id] = (
-                await QuizQuestionCache._cache(record)
-            )
+            cached_records[record.id] = await QuizQuestionCache._cache(record)
 
-        records.extend(
-            cached_records[qid]
-            for qid in missing
-            if qid in cached_records
-        )
+        records.extend(cached_records[qid] for qid in missing if qid in cached_records)
 
         return records
 
@@ -96,7 +82,7 @@ class QuizQuestionCache:
         if cached_id:
             return await QuizQuestionCache.get(cached_id)
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         stmt = (
             select(QuizQuestion)
@@ -104,9 +90,7 @@ class QuizQuestionCache:
                 QuizRelationships,
                 QuizRelationships.quiz_id == QuizQuestion.id,
             )
-            .where(
-                QuizRelationships.terms_id == terms_id
-            )
+            .where(QuizRelationships.terms_id == terms_id)
             .limit(1)
         )
 

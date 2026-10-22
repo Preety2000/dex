@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Any
 
+from includes.src.request import Request
+
 from includes.core.globals.entry import app_context
 from includes.src.chat.relationships import ChatRelationships
 from includes.utils.utils import get_post_value
@@ -33,8 +35,8 @@ class CHAIT:
     @staticmethod
     async def index():
 
-        async def friendships_action(rq_action: RequestObject):
-            friendships = ChatRelationships(await app_context.setting.member("id"))
+        async def friendships_action(rq_action: RequestObject, request: Request = None):
+            friendships = ChatRelationships(await request.state.setting.member("id"))
             if rq_action.action == "chats":
                 data = await friendships.getChatList()
                 return {"__ac": {5001: data}}
@@ -53,7 +55,7 @@ class CHAIT:
             400: friendships_action,
         }
 
-        for request in await get_post_value(True, []):
+        for request in await get_post_value(request, True, []):
             request_data = parse_request(request)
             handler = request_handlers.get(request_data.request_code)
 

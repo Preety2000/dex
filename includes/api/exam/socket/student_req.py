@@ -6,9 +6,9 @@ from sqlalchemy import delete, func, select
 
 from includes.utils.exm import get_exam_status_message
 from includes.core.globals.entry import app_context
-from includes.database.connection import active_exam_db
+from includes.database.connection import config_exam_db
 from includes.database.dataclass.dataclass import ExamRqStatus
-from includes.database.models.db_exam import (
+from includes.database.models.exam import (
     _ExamRequestSession,
     ExamRequestSession,
 )
@@ -43,7 +43,7 @@ class StudentRequestSession:
         if record:
             return record
 
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         stmt = select(ExamRequestSession).where(
             ExamRequestSession.roll_no == int(rollno),
@@ -96,7 +96,7 @@ class StudentRequestSession:
             ExamRequestSession.exam_id == int(exam_id),
         )
 
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         row = db.execute(stmt).scalars().first()
 
@@ -177,7 +177,7 @@ class StudentRequestSession:
         check_status=None,
     ) -> Optional[ExamRequestSession]:
 
-        await active_exam_db()
+        await config_exam_db()
 
         record = SRSCache.get(roll_no)
 
@@ -190,7 +190,7 @@ class StudentRequestSession:
             ExamRequestSession.roll_no == int(roll_no),
             ExamRequestSession.connect_key == connect_key,
         )
-        db = await active_exam_db()
+        db = await config_exam_db()
         record = db.execute(stmt).scalars().first()
 
         if not record:
@@ -228,7 +228,7 @@ class StudentRequestSession:
         **filter,
     ) -> Optional[ExamRequestSession]:
 
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         conditions = [
             getattr(ExamRequestSession, key) == value
@@ -253,7 +253,7 @@ class StudentRequestSession:
         ]
 
         stmt = select(ExamRequestSession).where(*conditions)
-        db = await active_exam_db()
+        db = await config_exam_db()
         record = db.execute(stmt).scalars().first()
 
         return StudentRequestSession._cache(record.to_dataclass()) if record else None
@@ -276,7 +276,7 @@ class StudentRequestSession:
             if value is not None
         ]
 
-        db = await active_exam_db()
+        db = await config_exam_db()
         if callable(callback):
 
             stmt = select(ExamRequestSession).where(*conditions)
@@ -353,7 +353,7 @@ class StudentRequestSession:
         ]
 
         select_stmt = select(ExamRequestSession).where(*conditions)
-        db = await active_exam_db()
+        db = await config_exam_db()
         record = db.execute(select_stmt).scalars().first()
 
         if record:
@@ -410,7 +410,7 @@ class StudentRequestSession:
         )
 
         # Counts
-        db = await active_exam_db()
+        db = await config_exam_db()
         joined_count = db.execute(
             select(func.count())
             .select_from(ExamRequestSession)

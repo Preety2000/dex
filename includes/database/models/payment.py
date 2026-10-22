@@ -1,6 +1,6 @@
 from sqlalchemy import BigInteger, Column, Float, Integer, String, Text
 
-from includes.database.models.owner import BaseOwner
+from includes.database.models.primary import BaseOwner
 from includes.database.models.utils import TimeStamp
 
 

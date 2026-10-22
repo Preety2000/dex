@@ -1,10 +1,12 @@
 from includes.admin.modals import checked, emptyMessage
 from includes.core.globals.coreutils import is_empty, slugify
 from includes.core.globals.entry import app_context
-from includes.core.metadata import MetaData
-from includes.database.models.owner import Subject
+
+from includes.core.globals.route_context import Route
+
+from includes.database.connection import db
+from includes.database.models.primary import Subject
 from includes.database.models.secondary import Syllabus, University
-from includes.schemas.router_schema import DynamicURLRoute
 from includes.utils.utils import get_post_value
 
 
@@ -31,7 +33,7 @@ class AClassSyllabus:
 
     @classmethod
     def get(cls, query=None, raw=False):
-        db_query = app_context.db.query(Syllabus)
+        db_query = db.query(Syllabus)
 
         # Return all
         if query is True:
@@ -54,7 +56,7 @@ class AClassSyllabus:
 
     @classmethod
     def insert(cls, data):
-        if app_context.response["error"]:
+        if request.state.response["error"]:
             return data
 
         slug = data.get("slug") or data.get("title")
@@ -66,7 +68,7 @@ class AClassSyllabus:
 
         # Duplicate slug
         if cls.get(slug, raw=True):
-            app_context.response["pop_message"] = "This syllabus already exists."
+            request.state.response["pop_message"] = "This syllabus already exists."
             return data
 
         subject = data.get("subject")
@@ -80,8 +82,8 @@ class AClassSyllabus:
             content=data.get("content"),
         )
 
-        app_context.db.add(syllabus)
-        app_context.db.commit()
+        db.add(syllabus)
+        db.commit()
 
         data["slug"] = slug
         data["redirect"] = True
@@ -92,15 +94,15 @@ class AClassSyllabus:
 
     @classmethod
     def update(cls, data):
-        if app_context.response["error"]:
+        if request.state.response["error"]:
             return data
 
-        item_id = app_context.function.getRequestInt("item")
+        item_id = get_post_value(request, "item")
 
         syllabus = cls.get(item_id, raw=True)
 
         if syllabus is None:
-            app_context.response["pop_message"] = "Syllabus not found."
+            request.state.response["pop_message"] = "Syllabus not found."
             return data
 
         slug = data.get("slug") or syllabus.slug
@@ -119,9 +121,9 @@ class AClassSyllabus:
         if data.get("content") is not None:
             syllabus.content = data["content"]
 
-        app_context.db.commit()
+        db.commit()
 
-        app_context.response["message"] = "Updated <a href='/admin/syllabus'>Back</a>"
+        request.state.response["message"] = "Updated <a href='/admin/syllabus'>Back</a>"
 
         data["redirect"] = True
 
@@ -134,22 +136,22 @@ class AClassSyllabus:
         item_id = data.get("id")
 
         if not item_id:
-            item_id = app_context.function.getRequestInt("item")
+            item_id = get_post_value(request, "item")
 
         syllabus = cls.get(item_id, raw=True)
 
         if syllabus is None:
-            app_context.response["pop_message"] = "Syllabus not found."
+            request.state.response["pop_message"] = "Syllabus not found."
             return data
 
         try:
-            app_context.db.delete(syllabus)
-            app_context.db.commit()
+            db.delete(syllabus)
+            db.commit()
 
         except Exception:
-            app_context.db.rollback()
+            db.rollback()
 
-            app_context.response["pop_message"] = (
+            request.state.response["pop_message"] = (
                 "Syllabus could not be deleted. " "Error code Xe742524"
             )
 
@@ -179,7 +181,7 @@ class AClassSyllabus:
         # Subjects
         subjects = []
 
-        for subject in app_context.db.query(Subject).all():
+        for subject in db.query(Subject).all():
             item = {
                 "id": subject.id,
                 "name": subject.name,
@@ -191,12 +193,12 @@ class AClassSyllabus:
 
             subjects.append(item)
 
-        app_context.response["subjects"] = subjects
+        request.state.response["subjects"] = subjects
 
         # Universities
         universities = []
 
-        for university in app_context.db.query(University).all():
+        for university in db.query(University).all():
             item = {
                 "id": university.id,
                 "name": university.name,
@@ -208,7 +210,7 @@ class AClassSyllabus:
 
             universities.append(item)
 
-        app_context.response["universitys"] = universities
+        request.state.response["universitys"] = universities
 
         return data
 
@@ -225,6 +227,7 @@ class AClassSyllabus:
         ]
 
         data = await get_post_value(
+            request,
             fields,
             "",
         )
@@ -241,7 +244,7 @@ class AClassSyllabus:
         # Required fields
         for field, value in data.items():
             if is_empty(value) and field != "content":
-                app_context.response["error"] = app_context.response[
+                request.state.response["error"] = request.state.response[
                     "error"
                 ] or emptyMessage(field, "")
 
@@ -250,9 +253,9 @@ class AClassSyllabus:
     # INDEX
 
     @classmethod
-    async def index(cls, roots: DynamicURLRoute):
-        item_id = app_context.function.getRequestInt("item")
-        is_post = app_context.function.is_post()
+    async def index(cls, roots: Route):
+        item_id = get_post_value(request, "item")
+        is_post = request.is_post
 
         actions = {
             "insert": cls.insert,
@@ -264,13 +267,13 @@ class AClassSyllabus:
         # INSERT / UPDATE / DELETE
         # -----------------------------------------------------
 
-        if roots.scope_slug in actions:
-            action = actions[roots.scope_slug]
+        if roots.scope in actions:
+            action = actions[roots.scope]
 
             # Existing data for update/delete
             data = {}
 
-            if roots.scope_slug in ("update", "delete"):
+            if roots.scope in ("update", "delete"):
                 data = (
                     cls.get(
                         item_id,
@@ -301,12 +304,12 @@ class AClassSyllabus:
                     result = data
 
                 if result.get("redirect"):
-                    MetaData.redirect_url = "/admin/syllabus"
+                    request.state.metadata.redirect_url = "/admin/syllabus"
                     return "redirect"
 
                 data = result
 
-            app_context.response["data_querys"] = cls.addCollection(data)
+            request.state.response["data_querys"] = cls.addCollection(data)
 
             return "admin/add_syllabus"
 
@@ -314,6 +317,6 @@ class AClassSyllabus:
         # LIST
         # -----------------------------------------------------
 
-        app_context.response["data_querys"] = cls.get(True)
+        request.state.response["data_querys"] = cls.get(True)
 
         return "admin/syllabus"

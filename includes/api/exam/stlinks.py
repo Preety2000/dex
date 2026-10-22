@@ -1,8 +1,10 @@
 from dataclasses import asdict
-from includes.database.connection import active_exam_db
+
+from includes.src.request import Request
+from includes.database.connection import config_exam_db
 from includes.core.pagination import Pagination
 from includes.core.request_filter import RequestFilter
-from includes.database.models.db_exam import (
+from includes.database.models.exam import (
     _StudentTeacherAssociation,
     _TeacherProfile,
     ExamRequestSession,
@@ -15,7 +17,7 @@ async def with_details(
     record: StudentTeacherAssociation,
     teacher: _TeacherProfile,
 ):
-    db = await active_exam_db()
+    db = await config_exam_db()
     student = await MemberCache.getrollnumber(record.st_roll_no) or {}
 
     attempt = (
@@ -67,7 +69,7 @@ class StLinks:
         if key in STAMP:
             return STAMP[key]
 
-        db = await active_exam_db()
+        db = await config_exam_db()
         query = StLinks._query(db, data).first()
 
         if not query:
@@ -78,7 +80,7 @@ class StLinks:
 
     @staticmethod
     async def create(data: _StudentTeacherAssociation):
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         # Already exists
         if StLinks._query(db, data).first():
@@ -102,7 +104,7 @@ class StLinks:
 
     @staticmethod
     async def update(data: _StudentTeacherAssociation):
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         query = StLinks._query(db, data).first()
         if not query:
@@ -124,7 +126,7 @@ class StLinks:
 
     @staticmethod
     async def delete(data: _StudentTeacherAssociation):
-        db = await active_exam_db()
+        db = await config_exam_db()
         query = StLinks._query(db, data).first()
         if query is None:
             return {
@@ -247,10 +249,13 @@ class StLinksHendlar:
         )
 
     @staticmethod
-    async def get_list(teacher: _TeacherProfile, limit: int = 10):
-        db = await active_exam_db()
+    async def get_list(
+        teacher: _TeacherProfile, limit: int = 10, request: Request = None
+    ):
+        db = await config_exam_db()
 
         query = await RequestFilter.apply_request_filters(
+            request=request,
             model=StudentTeacherAssociation,
             request_type="referer",
             query=db.query(StudentTeacherAssociation).filter(
@@ -265,7 +270,7 @@ class StLinksHendlar:
 
         total = query.count()
 
-        pagination = Pagination("referer")
+        pagination = Pagination(request=request, request_type= "referer")
         await pagination.load(limit=limit)
         offset = pagination.get_offset()
 

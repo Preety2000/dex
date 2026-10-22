@@ -1,10 +1,11 @@
 from urllib.parse import urlparse
-from fastapi import Request
+from includes.src.request import Request
 
-class Cookie():
-    def __init__(self, request:Request):
+
+class Cookie:
+    def __init__(self, request: Request):
         self.request = request
-        
+
     def start(self):
         self.set_item = {}
 
@@ -16,7 +17,7 @@ class Cookie():
         # Remove subdomains if present
         for subdomain in ["www.", "history."]:
             if domain.startswith(subdomain):
-                domain = domain[len(subdomain):]
+                domain = domain[len(subdomain) :]
 
         return domain
 
@@ -24,30 +25,22 @@ class Cookie():
         return self.request.cookies.get(cookie_name, None)
 
     def insert(self, name, value, max_age=None):
-        self.set_item[name] = {
-            "value": value,
-            "max_age": max_age
-        }
+        self.set_item[name] = {"value": value, "max_age": max_age}
 
     def update(self, cookie_name, cookie_value, max_age=None):
         self.insert(cookie_name, cookie_value, max_age)
 
     def domain(self, name, value, max_age=None):
         domain = self.get_domain(self.request)
-        max_age = max_age * 60*60*24 if isinstance(max_age, (int, float)) else max_age
+        max_age = (
+            max_age * 60 * 60 * 24 if isinstance(max_age, (int, float)) else max_age
+        )
 
-        self.set_item[name] = {
-            "value": value,
-            "domain": domain,
-            "max_age": max_age
-        }
+        self.set_item[name] = {"value": value, "domain": domain, "max_age": max_age}
 
     def delete(self, cookie_name):
-        self.set_item[cookie_name] = {
-            "value": None,
-            "max_age": 0
-        }
-    
+        self.set_item[cookie_name] = {"value": None, "max_age": 0}
+
     async def setcookie(self, headers):
 
         for name, cookie in self.set_item.items():
@@ -86,8 +79,4 @@ class Cookie():
             header_value = "; ".join(parts)
 
             # Append header as bytes
-            headers.append((
-                b"set-cookie",
-                header_value.encode()
-            ))
-    
+            headers.append((b"set-cookie", header_value.encode()))

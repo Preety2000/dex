@@ -1,11 +1,12 @@
 import time
+from includes.src.request import Request
 from sqlalchemy import select
 from typing import Any, Iterable
 
 from includes.schemas.cache.likes import Likes
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import format_view_count
-from includes.database.connection import active_secondary_db, get_contry
+from includes.database.connection import config_secondary_db, get_contry
 from includes.database.models.secondary import ArticleView, QuizView
 
 VIEW_CACHE: dict[str, dict[int, dict[str, Any]]] = {
@@ -75,7 +76,7 @@ class MetricsManager:
 
     # Views
     async def _fetch_views(self, id: int) -> int:
-        db_session = await active_secondary_db()
+        db_session = await config_secondary_db()
         stmt = select(self.models.view_count).where(self.models.id == id)
         result = db_session.execute(stmt)
         val = result.scalar_one_or_none()
@@ -83,7 +84,7 @@ class MetricsManager:
         return val if val is not None else 0
 
     async def _sync_views(self, id: int, views: int = 1, country: str = None) -> int:
-        db_session = await active_secondary_db()
+        db_session = await config_secondary_db()
 
         stmt = select(self.models).where(self.models.id == id)
         result = db_session.execute(stmt)
@@ -104,7 +105,11 @@ class MetricsManager:
 
     @classmethod
     async def article_metrics(
-        cls, id: int, options: Iterable[str], servic=None
+        cls,
+        id: int,
+        options: Iterable[str],
+        request: Request = None,
+        servic=None,
     ) -> dict[str, Any]:
         result: dict[str, Any] = {}
         options_set = set(options)
@@ -119,14 +124,14 @@ class MetricsManager:
         if "likes" in options_set:
             result["likes"], result["feedback"] = await Likes.get_metrics(
                 article_id=id,
-                users_id=await app_context.setting.member("id"),
+                users_id=await request.state.setting.member("id"),
             )
 
         return result
 
     @classmethod
     async def practice_metrics(
-        cls, mcq_id: int, options: Iterable[str], servic=None
+        cls, mcq_id: int, options: Iterable[str], request: Request = None, servic=None
     ) -> dict[str, Any]:
         result: dict[str, Any] = {}
         options_set = set(options)

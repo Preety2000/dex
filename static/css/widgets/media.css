@@ -22,7 +22,7 @@
 .MEDIA svg {
   padding: 2px;
   margin: 0;
-  fill: var(--text-color-main);
+  fill: var(--text-primary);
 }
 
 .MEDIA .hrg {
@@ -59,7 +59,7 @@
   border-radius: 6px;
   overflow: hidden;
   cursor: pointer;
-  background: var(--background-active);
+  background: var(--bg-active);
 }
 
 .M024[aria-view="true"] {
@@ -86,12 +86,12 @@
   height: 36px;
   font-weight: 500;
   user-select: none;
-  color: var(--text-color-main);
+  color: var(--text-primary);
   z-index: 1;
 }
 
 .MEDIA button[aria-view="true"] {
-  background: var(--background-active);
+  background: var(--bg-active);
 }
 
 .M004 {
@@ -424,7 +424,7 @@
 }
 
 .option-button:hover {
-  background: var(--background-active);
+  background: var(--bg-active);
 }
 
 .IN094-vertical {
@@ -464,7 +464,7 @@
   right: auto;
   bottom: 0;
   top: auto;
-  background: var(--text-color-main);
+  background: var(--text-primary);
   color: var(--bg-muted);
   width: auto;
   /* font-size: 12px; */
@@ -733,6 +733,10 @@ video {
   background: var(--bg-muted);
 }
 
+.M017:hover {
+  background: var(--bg-active);
+}
+
 .M017 svg {
   padding: 6px;
 }
@@ -847,4 +851,11 @@ video {
   width: 70%;
   height: 40%;
   margin-top: 6px;
+}
+
+.MpCo {
+  display: block;
+  overflow: hidden;
+    min-width: 400px;
+    padding: 12px;
 }

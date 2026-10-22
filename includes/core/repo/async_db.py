@@ -3,18 +3,18 @@ from fastapi.responses import FileResponse
 import aiosqlite
 from io import BytesIO
 from fastapi import HTTPException
+
 # pip install svglib reportlab
 from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPM
 from io import BytesIO
 
-
 ALLOWED_EXTENSIONS = {
     "images": {"png", "jpg", "jpeg", "gif"},
     "svg": {"svg"},
     "pdf": {"pdf"},
-    "videos": {"mp4", "webm"},
-    "audios": {"mp3", "mp4"},
+    "video": {"mp4", "webm"},
+    "audio": {"mp3", "mp4"},
 }
 
 # Dictionary to map MIME types to category
@@ -181,6 +181,7 @@ async def main():
     await db.close()
     print("Database connection closed ✅")
 
+
 def svg_to_png_bytesio(svg_path: str, width: int = None, height: int = None) -> BytesIO:
     drawing = svg2rlg(svg_path)
 
@@ -198,7 +199,7 @@ def svg_to_png_bytesio(svg_path: str, width: int = None, height: int = None) -> 
     return buffer
 
 
-def videos(folder, filename):
+def video(folder, filename):
     file_path = os.path.join(folder, filename)
 
     if not os.path.isfile(file_path):

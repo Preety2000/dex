@@ -7,8 +7,8 @@ class AdminInsurt:
 
     @classmethod
     async def exiute(cls):
-        root = await get_post_value("root", None)
-        datatype = await get_post_value("datatype", None)
+        root = await get_post_value(request, "root", None)
+        datatype = await get_post_value(request, "datatype", None)
 
         if root is None:
             return {"error": "6a8473f9-73d4-83ea-ba81-6a76a0d9fd82"}

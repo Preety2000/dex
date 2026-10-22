@@ -1,7 +1,4 @@
 from sqlalchemy import func
-from sqlalchemy.orm import declarative_base
-
-
 from includes.core.config import (
     exam_database,
     main_database,
@@ -332,7 +329,7 @@ class DatabaseRouter:
 db = DatabaseRouter()
 
 
-async def active_exam_db():
+async def config_exam_db():
     """Active exam database"""
 
     if db.exam_session is None:
@@ -341,7 +338,7 @@ async def active_exam_db():
     return db.exam_session
 
 
-async def active_primary_db():
+async def config_primary_db():
     """Active primary database"""
 
     if db.main_session is None:
@@ -350,7 +347,7 @@ async def active_primary_db():
     return db.main_session
 
 
-async def active_secondary_db():
+async def config_secondary_db():
     """Active primary database"""
 
     if db.secondary_session is None:

@@ -1,11 +1,11 @@
 from sqlalchemy import select, func, desc
 
-from includes.core.globals.entry import app_context
-from includes.database.connection import active_exam_db
+from includes.src.request import Request
+from includes.database.connection import config_exam_db
 from includes.api.exam.index import get_exam_dick
 from includes.database.dataclass.dataclass import serialize
 from includes.database.models.utils import TimeStamp
-from includes.database.models.db_exam import (
+from includes.database.models.exam import (
     ExamDetails,
     ExamRecord,
     ExamRequestSession,
@@ -54,7 +54,7 @@ class ExamDashboard:
 
     @staticmethod
     async def get_rank_student(member_id: int):
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         stmt = (
             select(ExamRecord)
@@ -73,17 +73,14 @@ class ExamDashboard:
         )
 
         result = db.execute(stmt)
-
         records = result.scalars().all()
 
         return [get_list_student(item) for item in records]
 
     @staticmethod
-    async def get_exam_record(
-        member_id: int = None,
-    ):
+    async def get_exam_record(member_id: int = None):
 
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         # -------------------------------------------------
         # Total Exam Count
@@ -111,7 +108,7 @@ class ExamDashboard:
         students_joined = db.execute(students_joined_stmt).scalar_one()
 
         # -------------------------------------------------
-        # Total Student Requests
+        # Total Student Request
         # -------------------------------------------------
 
         student_requests_stmt = (
@@ -213,12 +210,10 @@ class ExamDashboard:
         }
 
     @staticmethod
-    async def get_dashboard_data():
+    async def get_dashboard_data(request:Request=None):
 
-        member = await app_context.setting.member()
-
+        member = await request.state.setting.member()
         records = await ExamDashboard.get_exam_record(member["id"])
-
         rank_student = await ExamDashboard.get_rank_student(member["id"])
 
         img = {

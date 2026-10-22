@@ -1,5 +1,6 @@
 from dataclasses import fields
 
+from includes.src.request import Request
 from sqlalchemy import desc
 from includes.api.exam.metadata import (
     AccessRestricted,
@@ -7,14 +8,15 @@ from includes.api.exam.metadata import (
     s_meta_value,
 )
 from includes.core.globals.entry import app_context
-from includes.database.connection import active_exam_db
-from includes.database.models.db_exam import _TeacherProfile, TeacherProfile
+from includes.database.connection import config_exam_db
+from includes.database.models.exam import _TeacherProfile, TeacherProfile
 from includes.utils.utils import get_post_value, json_response
+from includes.database.connection import db
 
 
 async def create_teacher_profile(insurt_data: _TeacherProfile, option: bool = None):
 
-    db = await active_exam_db()
+    db = await config_exam_db()
     query = db.query(TeacherProfile).filter(TeacherProfile.id == insurt_data.id).first()
 
     if option is True:
@@ -64,7 +66,7 @@ async def create_teacher_profile(insurt_data: _TeacherProfile, option: bool = No
     return json_response({"jump": "/exam/r/setting?qc=behaviors&required=true"})
 
 
-async def check_teacher_authorization(verification_status):
+async def check_teacher_authorization(verification_status, request: Request = None):
     """
     Validate member educational authorization and teacher setup status.
     Returns: (verification_status, response_payload)
@@ -72,11 +74,11 @@ async def check_teacher_authorization(verification_status):
     if not verification_status:
         return None
 
-    user_id = await app_context.setting.member("id")
-    language = await app_context.setting.get("language", "English")
+    user_id = await request.state.setting.member("id")
+    language = await request.state.setting.get("language", "English")
 
     # 1. Check educational authorization
-    edu_auth = await app_context.setting.member("eduAuth", False)
+    edu_auth = await request.state.setting.member("eduAuth", False)
 
     if not edu_auth:
         return json_response(AccessRestricted.get(language, "Access Restricted"))
@@ -87,7 +89,7 @@ async def check_teacher_authorization(verification_status):
     # 3. Teacher profile does not exist
     if teacher_meta is None:
         update = {
-            name: await get_post_value(name)
+            name: await get_post_value(request, name)
             for name in ["biography", "img", "signature", "name"]
         }
 
@@ -111,17 +113,17 @@ async def check_teacher_authorization(verification_status):
     # 4. Teacher profile exists but join_mode is not configured
     if teacher_meta.join_mode is None:
 
-        referer = app_context.request.referer.params
+        referer = request.state.referer.params
 
         if referer.get("qc") != "behaviors" or referer.get("required") != "true":
             return json_response({"jump": "/exam/r/setting?qc=behaviors&required=true"})
 
-        update = {"exam_category": await get_post_value("exam_category")}
+        update = {"exam_category": await get_post_value(request, "exam_category")}
 
         # Map submitted values to their index
         for name in ["join_mode", "open_request", "req_appr_mode", "result_visibility"]:
             values = s_meta_value.get(name, [])
-            value = await get_post_value(name)
+            value = await get_post_value(request, name)
 
             update[name] = values.index(value) if value in values else None
 
@@ -168,17 +170,13 @@ class Teachers:
         if id in TeachersMetaTamp:
             return TeachersMetaTamp[id]
 
-        query = (
-            app_context.db.query(TeacherProfile).filter(TeacherProfile.id == id).first()
-        )
+        query = db.query(TeacherProfile).filter(TeacherProfile.id == id).first()
         return await Teachers.with_catch(query) if query else None
 
     @staticmethod
     async def update(session: _TeacherProfile):
         record = (
-            app_context.db.query(TeacherProfile)
-            .filter(TeacherProfile.id == session.id)
-            .first()
+            db.query(TeacherProfile).filter(TeacherProfile.id == session.id).first()
         )
 
         record.name = session.name
@@ -191,6 +189,6 @@ class Teachers:
         record.result_visibility = session.result_visibility
         record.exam_category = session.exam_category
 
-        app_context.db.commit()
-        app_context.db.refresh(record)
+        db.commit()
+        db.refresh(record)
         return await Teachers.with_catch(record)

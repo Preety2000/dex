@@ -1,5 +1,6 @@
 from includes.core.globals.entry import app_context, GlobleCatch
-from includes.database.models.owner import Subject
+from includes.database.connection import config_primary_db, config_secondary_db
+from includes.database.models.primary import Subject
 from includes.database.models.secondary import QuizQuestion, QuizRelationships
 from includes.utils.utils import create_slug, get_post_value
 
@@ -18,7 +19,7 @@ class AdminApiMCQ:
             "subject",
         ]
 
-        data = {field: await get_post_value(field) for field in fields}
+        data = {field: await get_post_value(request, field) for field in fields}
 
         string_fields = [
             "title",
@@ -101,14 +102,15 @@ class AdminApiMCQ:
 
     @classmethod
     async def insert(cls):
-        replace = await get_post_value("replace")
+        replace = await get_post_value(request, "replace")
 
         data, error = await cls._get_data()
 
         if error:
             return {"error": error}
 
-        msb, db = await app_context.db.configure()
+        msb = await config_primary_db()
+        db = await config_secondary_db()
 
         # Subject find
         subject = msb.query(Subject).filter(Subject.name == data["subject"]).first()

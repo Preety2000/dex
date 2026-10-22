@@ -1,5 +1,8 @@
+from includes.src.request import Request
+
 from includes.core.globals.initialize import initialize_database
 from includes.core.globals.entry import app_context
+from includes.core.globals.route_context import Route
 from includes.core.security import _Security
 from includes.schemas.search import Search
 
@@ -14,66 +17,59 @@ from includes.utils.utils import get_post_value, json_null_response, json_respon
 class ADMIN_API:
     def __init__(self, request):
         self.request = request
-        self.state = request.state
         self.security = _Security
-        self.function = app_context.function
-        self.admin = Admin()
+        self.admin = Admin(request)
 
-    async def index(self):
+    async def index(self, request: Request = None, roots: Route = None):
 
-        print(app_context.route)
+        await initialize_database(request)
 
-        await initialize_database()
-
-        if await Admin.user_verifaction(app_context.route.resource_type):
+        if await Admin.user_verifaction(request.state.roote.entity):
             return json_response("Session End! 😒")
 
-        if "insert" == app_context.route.resource_type:
+        if "insert" == request.state.roote.entity:
             return await AdminInsurt.exiute()
 
-        if "category" == app_context.route.resource_type:
-            if app_context.route.resource_slug:
-                return await AdminApiCategory.execute(app_context.route.resource_slug)
+        if "category" == request.state.roote.entity:
+            if request.state.roote.action:
+                return await AdminApiCategory.execute(request.state.roote.action)
 
             return []
 
-        if "tags" == app_context.route.resource_type:
-            if app_context.route.resource_slug:
+        if "tags" == request.state.roote.entity:
+            if request.state.roote.action:
                 return await self.tags()
 
-        if "subject" == app_context.route.resource_type:
-            if app_context.route.resource_slug:
+        if "subject" == request.state.roote.entity:
+            if request.state.roote.action:
                 return json_response(
-                    await AdminApiSubject.execute(app_context.route.resource_slug)
+                    await AdminApiSubject.execute(request.state.roote.action)
                 )
 
-        if "content" == app_context.route.resource_type:
-            if app_context.route.resource_slug:
+        if "content" == request.state.roote.entity:
+            if request.state.roote.action:
                 return await self.content()
 
         # Action Form Js Request
-        if (
-            app_context.route.resource_type == "auth"
-            and app_context.route.resource_slug == "t"
-        ):
-            return await ActionForm.index(app_context.route.resource_type)
+        if request.state.roote.entity == "auth" and request.state.roote.action == "t":
+            return await ActionForm.index(request.state.roote.entity)
 
         return [
-            app_context.route.resource_type,
-            app_context.route.resource_slug,
-            app_context.route.resource_type,
+            request.state.roote.entity,
+            request.state.roote.action,
+            request.state.roote.entity,
         ]
 
     async def content(self):
-        tags = await get_post_value("tags")
-        types = await get_post_value("type")
-        slug = await get_post_value("slug")
-        title = await get_post_value("title")
-        content = await get_post_value("content")
-        subject = await get_post_value("subject")
-        excerpt = await get_post_value("excerpt")
-        parameter = await get_post_value("parameter")
-        category = await get_post_value("category[]")
+        tags = await get_post_value(self.request, "tags")
+        types = await get_post_value(self.request, "type")
+        slug = await get_post_value(self.request, "slug")
+        title = await get_post_value(self.request, "title")
+        content = await get_post_value(self.request, "content")
+        subject = await get_post_value(self.request, "subject")
+        excerpt = await get_post_value(self.request, "excerpt")
+        parameter = await get_post_value(self.request, "parameter")
+        category = await get_post_value(self.request, "category[]")
 
         query = {
             "tags": tags,
@@ -90,21 +86,21 @@ class ADMIN_API:
         return json_response([{"query": query, "fatching_key": "g.params.key"}, 200])
 
     async def tags(self):
-        if "search" == app_context.route.resource_slug:
+        if "search" == self.request.state.roote.action:
             search = Search(self.request)
-            search_term = await get_post_value("q")
+            search_term = await get_post_value(self.request, "q")
             suggestion_query = search.suggestion(search_term, 20)
 
             return json_response(
                 [{"query": suggestion_query, "fatching_key": "g.params.key"}, 200]
             )
 
-        return [app_context.route.resource_slug, str(self.admin.subject.get(True))]
+        return [self.request.state.roote.action, str(self.admin.subject.get(True))]
 
     async def category(self):
 
-        if "insert" == app_context.route.resource_slug:
-            subject = await get_post_value("subject")
+        if "insert" == self.request.state.roote.action:
+            subject = await get_post_value(self.request, "subject")
             if not subject:
                 return json_null_response(
                     details="Subject is not selected please select subject.",
@@ -121,14 +117,16 @@ class ADMIN_API:
 
             post_values = {
                 "subject_id": subject.id,
-                "name": await get_post_value("name"),
-                "slug": await get_post_value("slug"),
-                "topic": await get_post_value("topic"),
-                "app_context.route.resource_type": await get_post_value(
-                    "app_context.route.resource_type"
+                "name": await get_post_value(self.request, "name"),
+                "slug": await get_post_value(self.request, "slug"),
+                "topic": await get_post_value(self.request, "topic"),
+                "request.state.roote.entity": await get_post_value(
+                    self.request, "request.state.roote.entity"
                 ),
-                "image_src": await get_post_value("image_src", "empty.png"),
-                "description": await get_post_value("description", ""),
+                "image_src": await get_post_value(
+                    self.request, "image_src", "empty.png"
+                ),
+                "description": await get_post_value(self.request, "description", ""),
             }
 
             check = None

@@ -1,9 +1,11 @@
 from sqlalchemy import asc
 
 from includes.core.globals.entry import app_context
+
 from includes.core.globals.coreutils import slugify
+from includes.core.globals.route_context import Route
+from includes.database.connection import db
 from includes.database.models.secondary import Courses
-from includes.schemas.router_schema import DynamicURLRoute
 
 
 class ClassCourses:
@@ -27,7 +29,7 @@ class ClassCourses:
 
     @classmethod
     def get(cls, query=None, raw=False):
-        courses = app_context.db.query(Courses)
+        courses = db.query(Courses)
 
         # Get all courses
         if query is True:
@@ -52,7 +54,7 @@ class ClassCourses:
 
     @classmethod
     def insert(cls, data):
-        if app_context.response["error"]:
+        if request.state.response["error"]:
             return data
 
         title = data.get("title")
@@ -91,13 +93,13 @@ class ClassCourses:
                 university=(int(university) if university else 0),
             )
 
-            app_context.db.add(course)
-            app_context.db.commit()
+            db.add(course)
+            db.commit()
 
         except Exception:
-            app_context.db.rollback()
+            db.rollback()
 
-            app_context.response["pop_message"] = "Course could not be created."
+            request.state.response["pop_message"] = "Course could not be created."
 
             return data
 
@@ -112,13 +114,13 @@ class ClassCourses:
 
     @classmethod
     def update(cls, data):
-        if app_context.response["error"]:
+        if request.state.response["error"]:
             return data
 
         item_id = data.get("id")
 
         if not item_id:
-            item_id = app_context.function.getRequestInt("item")
+            item_id = get_post_value(request, "item")
 
         course = cls.get(item_id, raw=True)
 
@@ -143,12 +145,12 @@ class ClassCourses:
             course.university = int(university)
 
         try:
-            app_context.db.commit()
+            db.commit()
 
         except Exception:
-            app_context.db.rollback()
+            db.rollback()
 
-            app_context.response["pop_message"] = "Course could not be updated."
+            request.state.response["pop_message"] = "Course could not be updated."
 
             return data
 
@@ -161,7 +163,7 @@ class ClassCourses:
         item_id = data.get("id")
 
         if not item_id:
-            item_id = app_context.function.getRequestInt("item")
+            item_id = get_post_value(request, "item")
 
         course = cls.get(item_id, raw=True)
 
@@ -169,13 +171,13 @@ class ClassCourses:
             return "Not any query found."
 
         try:
-            app_context.db.delete(course)
-            app_context.db.commit()
+            db.delete(course)
+            db.commit()
 
         except Exception:
-            app_context.db.rollback()
+            db.rollback()
 
-            app_context.response["pop_message"] = "Course could not be deleted."
+            request.state.response["pop_message"] = "Course could not be deleted."
 
             return data
 
@@ -186,13 +188,13 @@ class ClassCourses:
     # INDEX
 
     @classmethod
-    async def index(cls, roots: DynamicURLRoute):
+    async def index(cls, roots: Route):
 
         # -----------------------------------------------------
         # API POST
         # -----------------------------------------------------
 
-        if app_context.function.is_api() and app_context.function.is_post():
+        if request.method == "POST" and request.query_params("key"):
             parameter = getattr(
                 app_context.admin,
                 "parameter",
@@ -208,8 +210,8 @@ class ClassCourses:
                 None,
             )
 
-            if app_context.response["error"]:
-                return [{"error": app_context.response["error"]}]
+            if request.state.response["error"]:
+                return [{"error": request.state.response["error"]}]
 
             if callable(bind_function):
                 result = bind_function(app_context.data_querys)
@@ -222,6 +224,6 @@ class ClassCourses:
         # ADMIN
         # -----------------------------------------------------
 
-        app_context.response["data_querys"] = cls.get(True)
+        request.state.response["data_querys"] = cls.get(True)
 
         return "admin/courses"

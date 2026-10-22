@@ -1,14 +1,15 @@
 from includes.api.exam.index import Exam
 from includes.api.exam.results.results_conducted import IS_RESULTS
-from includes.database.connection import active_exam_db
-from includes.database.models.db_exam import _ExamRecord, ExamDetails
+from includes.database.connection import config_exam_db
+from includes.database.models.exam import _ExamRecord, ExamDetails
 
 
-async def get_id_exam_json(record: _ExamRecord):
+async def get_id_exam_json(record: _ExamRecord, request):
     if not record:
         return None
 
-    result_data = await IS_RESULTS.get_result(record, True)
+    is_result = IS_RESULTS(request)
+    result_data = await is_result.get_result(record, True)
     result = {
         "result_no": result_data[0][0],
         "exam_name": result_data[0][1],

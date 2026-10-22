@@ -1,17 +1,20 @@
 from sqlalchemy import or_, select
 
+from includes.src.request import Request
 from includes.utils._sub import configure_page
 from includes.core.config import main_database
 from includes.core.globals.entry import app_context
-from includes.core.metadata import MetaData
-from includes.database.models.owner import Members, MemberSession
-from includes.utils.utils import get_post_value, get_query_value
+from includes.database.models.primary import Members, MemberSession
+from includes.utils.utils import get_post_value
 from includes.services.member.logout import LogoutHandler
 from includes.services.member.login_service import complete_login
 
 
 class Login:
     MAX_DEVICES = 2
+
+    def __init__(self, request: Request):
+        self.request = request
 
     @staticmethod
     def get_member(db, username: str):
@@ -40,36 +43,24 @@ class Login:
         return errors
 
     @staticmethod
-    def log_failed_login(
-        db,
-        member,
-        device_id,
-    ):
+    def log_failed_login(self, db, member, device_id):
         db.add(
             MemberSession(
-                user_id=member.id,
-                device_id=device_id,
-                ip_address=app_context.request.ip,
+                user_id=member.id, device_id=device_id, ip_address=self.request.ip
             )
         )
 
         db.commit()
 
-    @staticmethod
-    def create_logout_url(
-        member,
-        device_id,
-    ):
-        sep = "&" if "?" in app_context.request.full_path else "?"
+    def create_logout_url(self, member, device_id):
+        sep = "&" if "?" in self.request.full_path else "?"
 
         return (
-            f"{app_context.request.full_path}"
-            f"{sep}lq=true&nq={member.tk_id}&dv={device_id}"
+            f"{self.request.full_path}" f"{sep}lq=true&nq={member.tk_id}&dv={device_id}"
         )
 
-    @staticmethod
-    async def login_for_token(access_token):
-        logout = get_query_value("lq")
+    async def login_for_token(self, access_token):
+        logout = self.request.query_params.get("lq")
 
         if logout != "true" or not access_token:
             return None
@@ -92,42 +83,26 @@ class Login:
 
             db.commit()
 
-            return await complete_login(
-                member,
-                db,
-            )
+            return await complete_login(member, db, self.request)
 
-    @staticmethod
-    async def authenticate():
-        configure_page(
-            title="Login",
-            suffix=True,
-        )
+    async def authenticate(self):
+        configure_page(self.request.state.metadata, title="Login", suffix=True)
 
         # Device Logout Login
-        login_token = get_query_value("nq")
+        login_token = self.request.query_params.get("nq")
 
         if login_token:
-            return await Login.login_for_token(login_token)
+            return await self.login_for_token(login_token)
 
         template = "member/login"
-
-        device_id = app_context.client_info.get("device_id")
-
-        if not app_context.function.is_post():
+        device_id = self.request.state.client_info.get("device_id")
+        if not self.request.is_post:
             return template
 
-        username = await get_post_value(
-            "username",
-            "",
-        )
+        username = await get_post_value(self.request, "username", "")
+        password = await get_post_value(self.request, "password", "")
 
-        password = await get_post_value(
-            "password",
-            "",
-        )
-
-        app_context.response.update(
+        self.request.state.response.update(
             {
                 "email": username,
                 "password": password,
@@ -140,42 +115,34 @@ class Login:
         )
 
         # Validation
-        errors = Login.validate_credentials(
-            username,
-            password,
-        )
-
+        errors = Login.validate_credentials(username, password)
         if errors.get("username"):
-            app_context.response["username_class"] = "error"
+            self.request.state.response["username_class"] = "error"
 
         if errors.get("password"):
-            app_context.response["password_class"] = "error"
+            self.request.state.response["password_class"] = "error"
 
         if errors:
             return template
 
         with main_database() as db:
 
-            member = Login.get_member(
-                db,
-                username,
-            )
-
+            member = Login.get_member(db, username)
             if not member:
-                app_context.response["message_username"] = "Couldn’t find your account"
+                self.request.state.response["message_username"] = (
+                    "Couldn’t find your account"
+                )
 
                 return template
 
             if not member.check_password(password):
 
-                Login.log_failed_login(
-                    db,
-                    member,
-                    device_id,
-                )
-
-                app_context.response["message_password"] = app_context.function.utc(
-                    "Wrong password. Try again or click " "Forgot password to reset it."
+                Login.log_failed_login(db, member, device_id)
+                self.request.state.response["message_password"] = (
+                    app_context.function.utc(
+                        "Wrong password. Try again or click "
+                        "Forgot password to reset it."
+                    )
                 )
 
                 return template
@@ -183,13 +150,8 @@ class Login:
             # Device Limit Check
             if len(member.device) >= Login.MAX_DEVICES:
 
-                logout_url = Login.create_logout_url(
-                    member,
-                    device_id,
-                )
-
-                MetaData.redirect_url = None
-
+                logout_url = self.create_logout_url(member, device_id)
+                self.request.state.metadata.redirect_url = None
                 msg_template = app_context.function.utc(
                     "This account is already active on two "
                     "another device. Continuing will log you "
@@ -197,7 +159,7 @@ class Login:
                     "logging in, {start_tag}click here{end_tag}."
                 )
 
-                app_context.response.update(
+                self.request.state.response.update(
                     {
                         "email": "",
                         "password": "",
@@ -210,7 +172,4 @@ class Login:
 
                 return template
 
-            return await complete_login(
-                member,
-                db,
-            )
+            return await complete_login(member, db, self.request)

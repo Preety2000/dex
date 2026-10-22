@@ -4,6 +4,8 @@ from functools import lru_cache
 from datetime import datetime
 from dataclasses import asdict, dataclass, field, fields
 from typing import Any, Dict
+
+from includes.src.request import Request
 from includes.core.repo.dir_manager import folder
 
 
@@ -20,8 +22,8 @@ def get_config_metadata() -> dict:
 
 
 @dataclass
-class Metadata:
-    # --- Basic Content Metadata ---
+class MetaData:
+    # --- Basic Content MetaData ---
     title: str | None = None
     excerpt: str | None = None
     description: str | None = None  # SEO Meta Description
@@ -74,7 +76,7 @@ class Metadata:
     client_info: dict[str, str] = field(default_factory=dict)
 
     # Config Load Method
-    def load_config(self, force_reload: bool = False) -> "Metadata":
+    def load_config(self, force_reload: bool = False) -> "MetaData":
         if force_reload:
             get_config_metadata.cache_clear()
 
@@ -85,9 +87,15 @@ class Metadata:
         return self
 
     # Reset Method
-    async def reset(self, reload_json: bool = False) -> "Metadata":
+    async def get(self, reload_json: bool = False) -> "MetaData":
         # Global default values restore karna
-        default_instance = Metadata()
+        default_instance = MetaData()
+        return default_instance
+
+    # Reset Method
+    async def reset(self, reload_json: bool = False) -> "MetaData":
+        # Global default values restore karna
+        default_instance = MetaData()
         for field_name in asdict(default_instance):
             setattr(self, field_name, getattr(default_instance, field_name))
 
@@ -95,9 +103,9 @@ class Metadata:
         self.load_config(force_reload=reload_json)
         return self
 
-    async def update(self, data: dict[str, Any]) -> "Metadata":
+    async def update(self, data: dict[str, Any]) -> "MetaData":
         """
-        Metadata instance ko update karta hai using provided dictionary.
+        MetaData instance ko update karta hai using provided dictionary.
         Sirf valid attributes ko update karega.
         """
         if not data or not isinstance(data, dict):
@@ -115,8 +123,8 @@ class Metadata:
         return asdict(self)
 
     # Instance Method for Updating Attributes
-    def update_from_dict(self, data: dict[str, Any]) -> "Metadata":
-        """Dictionary se Metadata instance attributes ko update karta hai."""
+    def update_from_dict(self, data: dict[str, Any]) -> "MetaData":
+        """Dictionary se MetaData instance attributes ko update karta hai."""
         if not data or not isinstance(data, dict):
             return self
 
@@ -135,16 +143,12 @@ class Metadata:
         return self
 
 
-# Global Instance
-MetaData = Metadata(title="Error 404")
-
-
-async def set_article_context(data: dict) -> None:
+async def set_article_context(request: Request, data: dict) -> None:
     """
     Update metadata fields using article-specific data.
     Only existing metadata attributes are updated.
     """
+    return "edite on"
     for field in asdict(MetaData):
         if field in data:
-            setattr(MetaData, field, data[field])
-
+            setattr(request.state.metadata, field, data[field])

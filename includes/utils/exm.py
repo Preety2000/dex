@@ -1,7 +1,7 @@
 from datetime import datetime
 import time
 from typing import Union
-from fastapi import Request
+from includes.src.request import Request
 from num2words import num2words
 from collections import Counter, defaultdict
 
@@ -62,7 +62,7 @@ def calculate_marks(all_q, marks_q, correct, ratio=None):
 def get_timestamp_and_year(timestamp):
     if timestamp is None:
         timestamp = TimeStamp.now_iso()
-    
+
     dt = TimeStamp.timestamp(timestamp)
     return dt.strftime("%d %B, %Y at %I:%M %p"), dt.strftime("%Y")
 
@@ -519,7 +519,9 @@ def calculate_exam_stats(t):
     }
 
 
-async def get_exam_status_message(message_status: str) -> dict | None:
+async def get_exam_status_message(
+    message_status: str, request: Request = None
+) -> dict | None:
     message_group = {
         ExamRqStatus.REQUEST_REJECTED: {
             "English": {
@@ -573,7 +575,7 @@ async def get_exam_status_message(message_status: str) -> dict | None:
         },
     }
 
-    language = await app_context.setting.get("language") or "English"
+    language = await request.state.setting.get("language") or "English"
 
     return message_group.get(message_status, {}).get(language)
 

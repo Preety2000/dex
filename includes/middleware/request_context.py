@@ -1,49 +1,53 @@
 import datetime as dt
-from fastapi import Request, WebSocket
-
-
-from includes.core.deviceinfo import DeviceInfo
-from includes.function import load_svg_files
-from includes.core.ip import IP
-from includes.core.globals.entry import app_context
-from includes.core.metadata import MetaData
-from includes.core.globals.fun import load_json
-from includes.schemas.cookie import Cookie
-from includes.schemas.router_schema import DynamicURLRoute
-from includes.src.request import Requests
-from includes.src.setting import Setting
 from starlette.middleware.base import BaseHTTPMiddleware
+
+
+from includes.function import load_svg_files
+from includes.schemas.cookie import Cookie
+
+from includes.core.ip import IP
+from includes.core.metadata import MetaData
+from includes.core.deviceinfo import DeviceInfo
+from includes.core.globals.fun import load_json
+from includes.core.globals.entry import app_context, fetchTime
+from includes.core.globals.route_context import Route
+
+from includes.src.referer import Referer
+from includes.src.setting import Setting
+from includes.src.request import Request
+from includes.src.request import WebSocket
 
 
 class DataBaseConnectionMiddleware(BaseHTTPMiddleware):
 
     def __init__(self, app):
         super().__init__(app)
-        self.app = app
 
-    async def _load_setup_context(self):
-        app_context.route = DynamicURLRoute.parse(app_context.request.path)
+    async def _load_setup_context(self, request):
+        request.state.metadata = await request.state.metadata.get()
 
     # Shared Context Setup
-    async def _setup_context(self, request_or_ws):
-        app_context.request = Requests(request_or_ws)
-        app_context.cookie = Cookie(request_or_ws)
-        app_context.setting = Setting(request_or_ws)
+    async def _setup_context(self, request):
+        fetchTime.resate(dt.datetime.now())
 
-        await MetaData.reset()
+        request.state.roote = Route(request)
+        request.state.cookie = Cookie(request)
+        request.state.setting = Setting(request)
+        request.state.referer = Referer(request)
+        request.state.metadata = MetaData(request)
+        request.state.divice_info = DeviceInfo(request)
 
-        await self._load_app_context()
-        await self._load_setup_context()
+        await self._load_app_context(request)
+        await self._load_setup_context(request)
 
-        IP.get_info()
-        DeviceInfo.reset(request_or_ws)
+        IP.get_info(request)
 
-    async def _load_app_context(self):
-        app_context.cookie.start()
-        app_context.response = {"start_time": dt.datetime.now()}
+    async def _load_app_context(self, request):
+        request.state.cookie.start()
+        request.state.response = {"start_time": dt.datetime.now()}
 
         if not hasattr(app_context, "svg_lists"):
-            app_context.svg_lists = await load_svg_files(app_context)
+            app_context.svg_lists = await load_svg_files()
 
         if not hasattr(app_context, "config"):
             app_context.config = await load_json(app_context.folder, "config")
@@ -52,13 +56,11 @@ class DataBaseConnectionMiddleware(BaseHTTPMiddleware):
             app_context.language = await load_json(app_context.folder, "lang")
 
     # HTTP Response Wrapper
-    async def _http_send_wrapper(self, send):
+    async def _http_send_wrapper(self, send, request):
         async def wrapper(message):
             if message["type"] == "http.response.start":
                 headers = message.setdefault("headers", [])
-
                 headers_dict = {k.decode().lower(): v.decode() for k, v in headers}
-
                 if headers_dict.get("content-type") == "image/x-icon":
                     headers.append((b"cache-control", b"public, max-age=86400"))
 
@@ -77,10 +79,7 @@ class DataBaseConnectionMiddleware(BaseHTTPMiddleware):
                     ]
                 )
 
-                await app_context.cookie.setcookie(headers)
-
-                # print(headers)
-
+                await request.state.cookie.setcookie(headers)
             await send(message)
 
         return wrapper
@@ -108,17 +107,17 @@ class DataBaseConnectionMiddleware(BaseHTTPMiddleware):
         return True
 
     # Client Verification
-    async def _verify_client(self, send) -> tuple[bool, str]:
+    async def _verify_client(self, send, request: Request) -> tuple[bool, str]:
 
         reason = None
-        client_info = app_context.client_info or {}
+        client_info = request.state.client_info or {}
         security = client_info.get("security", {})
         classification = client_info.get("classification", {})
 
         risk_score = security.get("risk_score", 0)
 
         # Known bot
-        if DeviceInfo.is_bot:
+        if request.state.divice_info.is_bot:
             reason = "Bot detected"
 
         # High risk traffic
@@ -144,15 +143,15 @@ class DataBaseConnectionMiddleware(BaseHTTPMiddleware):
             request = Request(scope, receive)
             await self._setup_context(request)
 
-            if await self._verify_client(send):
+            if await self._verify_client(send, request):
                 return
 
-            await self.app(scope, receive, await self._http_send_wrapper(send))
+            await self.app(scope, receive, await self._http_send_wrapper(send, request))
 
         elif scope_type == "websocket":
             websocket = WebSocket(scope, receive, send)
             await self._setup_context(websocket)
-            if await self._verify_client(send):
+            if await self._verify_client(send, websocket):
                 return
 
             await self.app(scope, receive, send)
@@ -161,7 +160,7 @@ class DataBaseConnectionMiddleware(BaseHTTPMiddleware):
             request = Request(scope, receive)
             await self._setup_context(request)
 
-            if await self._verify_client(send):
+            if await self._verify_client(send, request):
                 return
 
             await self.app(scope, receive, send)

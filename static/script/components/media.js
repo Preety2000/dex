@@ -167,7 +167,7 @@ const dataContainer = new $(function dataContainer(e) {
         var action_button, selects, right_session;
         image.event.on(function () {
             image_containers.toggle("select");
-            if (action_button = dataContainer.element.right_header_session.choose("action-button")) {
+            if (action_button = dataContainer.element.right_header_session.pick("action-button")) {
                 action_button.remove()
             }
             selects = image_containers.parentElement.children.filter(e => e.isclass("select"));
@@ -281,12 +281,12 @@ const dataContainer = new $(function dataContainer(e) {
 
                 player.ready(() => {
                     var playerElement = $.bindFunction(player.el_);
-                    var videoElement = playerElement.choose("video", false)
+                    var videoElement = playerElement.pick("video", false)
                     for (const element of [playerElement]) {
                         element.style.width = container.get.px("width")
                     }
                     // setTimeout(() => {
-                    //     playerElement.choose("vjs-picture-in-picture-control").click()
+                    //     playerElement.pick("vjs-picture-in-picture-control").click()
                     // }, 100);
                 });
 
@@ -322,10 +322,10 @@ const dataContainer = new $(function dataContainer(e) {
             isLoading = false;
         }
         this.request_library.finish = function (data) {
-            var load_more_button, library_content = dataContainer.element.data_container.choose("library-content");
+            var load_more_button, library_content = dataContainer.element.data_container.pick("library-content");
             if (dataContainer.element.data_container.get("data-type") != request.search.get("path")) {
                 dataContainer.element.data_container.clear()
-                library_content = dataContainer.element.data_container.choose("library-content") || dataContainer.element.data_container.create("library-content")
+                library_content = dataContainer.element.data_container.pick("library-content") || dataContainer.element.data_container.create("library-content")
                 load_more_button = dataContainer.element.data_container.create("load-more-button").create("span", "button");
                 load_more_button.in("Load More")
                 dataContainer.element.data_container.add("data-type", request.search.get("path"));
@@ -348,11 +348,11 @@ const dataContainer = new $(function dataContainer(e) {
         $.fch('/media/library' + request.url.search + "&page=" + page, e => dataContainer.mainProgresr(e))
             .then(response => response.json())
             .then(data => {
-                var load_more_button, library_content = dataContainer.element.data_container.choose("library-content");
+                var load_more_button, library_content = dataContainer.element.data_container.pick("library-content");
 
                 if (dataContainer.element.data_container.get("data-type") != request.search.get("path")) {
                     dataContainer.element.data_container.clear()
-                    library_content = dataContainer.element.data_container.choose("library-content") || dataContainer.element.data_container.create("library-content")
+                    library_content = dataContainer.element.data_container.pick("library-content") || dataContainer.element.data_container.create("library-content")
                     load_more_button = dataContainer.element.data_container.create("load-more-button").create("span", "button");
                     load_more_button.in("Load More")
                     dataContainer.element.data_container.add("data-type", request.search.get("path"));
@@ -554,11 +554,11 @@ dataContainer.element.file_upload.addEventListener('change', dataContainer.previ
 $.event("media-group", function (e) {
     const request = new $.request();
     dataContainer.importClass(["title", "session-container"]);
-    dataContainer.importNodes("media_group", e.weres("list"))
-    dataContainer.importElement(e.p.choose("indector"));
+    dataContainer.importNodes("media_group", e.picks("list"))
+    dataContainer.importElement(e.p.pick("indector"));
 
     var upload;
-    $.weres("list").filter(e => e.get("aria-label") == "upload").for(e => upload = e);
+    $.picks("list").filter(e => e.get("aria-label") == "upload").for(e => upload = e);
 
     upload.event.on(function () {
         request.search.set("path", "upload");
@@ -576,7 +576,7 @@ $.event("media-group", function (e) {
         var button_position, path = this.search.get("path");
         if (!path) { request.search.set("path", "all_media") }
 
-        $.weres("a", false).filter(e => e.get("aria-label") == path).for(e => button_position = e.get())
+        $.picks("a", false).filter(e => e.get("aria-label") == path).for(e => button_position = e.get())
         dataContainer.element.title.in(button_position.target.innerHTML)
         button_position.target.p.append(dataContainer.element.indector)
         button_position.set_preant()

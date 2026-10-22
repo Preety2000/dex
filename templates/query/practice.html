@@ -192,7 +192,7 @@
 {% block script %}
 <script>
     $.isfor("get-ans", function () {
-        let option = this.p.weres("option");
+        let option = this.p.picks("option");
         for (const element of option) {
             if (element.isclass("FxtMrq")) {
                 option = element;

@@ -1,7 +1,7 @@
 (!function (ed) {
     const { B, E, ks } = ed.getFunction()
         , sd = ks(ed.cookie("_md_trg", 1, 1))
-        , rq = new ed.URLState(!1, "https://myapplication .com")
+        , rq = new ed.URLState(!1, "https://myapplication.com")
         , ru = e => (rq.e = false, e(rq), rq.e = true)
         , cn = e => {
             const n = "header", l = "hrg"
@@ -30,7 +30,7 @@
             return { p, h, g }
         }
         , sc = (a, b, c) => {
-            const d = a.choose(b), r = d || a.create(b);
+            const d = a.pick(b), r = d || a.create(b);
             return (!d && typeof c == "function" && c(r)) || r;
         }
         , cm = e => {
@@ -40,11 +40,105 @@
                 r: f.create("right")
             }
         }
+        , tr = e => { try { e() } catch (e) { } }
+        , pd = e => { try { return window.parent.document } catch (e) { return document } }
+
+    let player = e => { }
+    $.DOMContentLoaded(() => {
+        $.require("cdn/video.min", a => {
+
+            const doc = pd()
+                , c = a.getComponent("Component");
+
+            class d extends c {
+                constructor(e, f) {
+                    super(e, f);
+                    const g = f.data,
+                        h = $.create("vis-header"),
+                        q = h.create.div(null, g.name),
+                        i = h.create("close-btn").event.on(() => (tr(() => e.pause()), e.el().style.display = "none")).addIcon("ic_close");
+
+                    let j = 0,
+                        k = 0,
+                        l = 0,
+                        m = 0,
+                        n = false;
+                    h.onmousedown = o => {
+                        if (o.target === i || i.contains(o.target))
+                            return;
+
+                        n = true;
+                        l = o.clientX;
+                        m = o.clientY;
+                        doc.onmousemove = o => {
+                            if (!n) return;
+                            j += o.clientX - l;
+                            k += o.clientY - m;
+                            l = o.clientX;
+                            m = o.clientY;
+
+                            const p = e.el()
+                                , q = doc.documentElement.clientWidth - p.offsetWidth
+                                , r = doc.documentElement.clientHeight - p.offsetHeight;
+
+                            j = Math.max(0, Math.min(j, q));
+                            k = Math.max(0, Math.min(k, r));
+                            p.style.transform = `translate(${j}px,${k}px)`;
+                        };
+
+                        doc.onmouseup = () => {
+                            n = false;
+                            doc.onmousemove = null;
+                            doc.onmouseup = null;
+                        };
+                    };
+                    e.el().appendChild(h);
+                }
+            }
+
+            let b = null;
+            a.registerComponent("PlayerHeader", d);
+            player = e => {
+                if (b) {
+                    b.src({ src: e.src, type: e.file_type });
+                    b.el().style.display = "";
+                    b.load();
+                    b.ready(() => { b.play().catch(f => { console.log("Play blocked:", f); }); });
+                    return b;
+                }
+                const f = $.create("video", {
+                    class: "video-js vjs-default-skin",
+                    controls: true,
+                    width: 720,
+                    height: 360,
+                });
+                f.create("source", {
+                    src: e.src,
+                    type: e.file_type,
+                });
+
+                doc.body.appendChild(f);
+                b = a(f, {
+                    controls: true,
+                    responsive: true,
+                    fluid: false
+                });
+
+                b.dimensions(300, 200);
+                b.addChild("PlayerHeader", { data: e });
+                b.ready(() => {
+                    console.log("Video ready");
+                    b.play().catch(f => { console.log("Autoplay blocked:", f); });
+                });
+                return b;
+            };
+            for (const href of ["/static/css/media.css", "/static/css/video.css"])
+                doc.head.append($.create("link", { href, rel: "stylesheet" }));
+        });
+    });
 
     function Media(m, cb) {
-
         const te = a => { throw new Error(a) };
-
         const RootId = {};
         const er = [
             [!new.target, "Media must be called with new"],
@@ -52,16 +146,10 @@
         ]
         const sl = e => e.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
         const M = ed(function M() {
+            const c = () => p.p.close();
 
             this.Ev = () => {
-
-                console.log(p.g.find("h2")
-                    || p.g.create("h2", null, 0), M.rT);
-
-                (p.g.find("h2")
-                    || p.g.create("h2", null, 0)
-                ).in(M.rT, true);
-
+                (p.g.find("h2") || p.g.create("h2", null, 0)).in(M.rT, true);
             }
             this.Tc = (a, b) => {
                 let m = 0, t = 0, j = this, c = "Js";
@@ -80,9 +168,15 @@
                 rq.path(sl(a));
             }
             this.gC = a => {
-                const b = this.Cn.choose(a) || this.Cn.create(a);
+                const b = this.Cn.pick(a) || this.Cn.create(a);
                 this.Cn.children.for(e => e != b && e.remove())
                 return b
+            }
+            this.La = e => {
+
+                player(e)
+                // typeof cb == "function" ? (cb(e), tr(c))
+                //     : player(e), console.log("Load action edite", e)
             }
             return this;
         })
@@ -96,7 +190,7 @@
             const n = p.p.create("M001")
                 , b = n.create("M002")
                 , f = n.create("M003")
-                , g = (c, i, t) => c = c.create.button(null, ed.create("flexCenter")
+                , g = (c, i, t) => c = c.create.button(null, ed.create("DIS01")
                     .addIcon(i)
                     .create.span(null, t).p)
                     .event.on(() => M.Tc.call(M, t, c));
@@ -154,18 +248,17 @@
                 ? a.name.split(".").pop().toUpperCase()
                 : "FILE";
 
-            console.log(a);
-
-
             h.create("M015").in(`${i} • ${formatFileSize(a.size_bytes) || ""}`);
-            d.ac = d.create("M016")
-                .create.button("M017", b)
-
+            d.ac = d.create("M016").create.button("M017", b)
             return [d, k];
         }
         const image_sowing_container = (a, b, c) => {
             const [d, e] = createFileCard(a, b, c);
-            e.event.dblclick(() => { let a = d.get("id"); if (!a) return; console.log("dblclick") });
+            e.event.dblclick(() => {
+                let i = d.get("id");
+                if (!i) return;
+                M.La(a, i);
+            });
             e.event.on(() => {
                 if (!d.get("id")) return;
                 const a = () => sc(f.r, "M018", e => e.create.button(null, "Action"));
@@ -189,11 +282,11 @@
                 , k = () => sc(M.Cn, "M022");
 
             M.abortFiles ??= {};
-            !M.Cn.choose("M009") && M.Cn.clear();
+            !M.Cn.pick("M009") && M.Cn.clear();
 
             for (const [i, v] of Object.entries(M.abortFiles)) {
                 if (v.name == b.name) {
-                    j = k().choose(i, !0);
+                    j = k().pick(i, !0);
                     break;
                 }
             }
@@ -207,16 +300,16 @@
                 i = e => { let a = e.loaded, b = e.total, c = (Date.now() - f) / 1e3, d = a / c; return { progress: (a / b * 100).toFixed(1), speed: g(d), elapsed: h(c), remaining: h(d ? (b - a) / d : 0), uploaded: g(a) } };
             $.fch("/api/v1/media/upload?" + q, { method: "POST", body: d }, a => {
                 const q = e.create("M020")
-                    , c = e.choose("M015").create.span()
+                    , c = e.pick("M015").create.span()
                     , f = r => {
-                        e.set("wrong", true), e.choose("M013")
+                        e.set("wrong", true), e.pick("M013")
                             .create.p("error-file-message")
                             .addIcon("ice_alert").create.span(null, r);
                     }
                     , g = r => {
                         const id = getRootNewId(), q = ed.create.button("M017");
                         e.ac.replace(q); q.addIcon("ic_dotsmv")
-                        at(q); e.set("id", id); RootId[id] = r;
+                        at(q, r); e.set("id", id); RootId[id] = r;
                     };
 
                 a.upload.onprogress = e => {
@@ -294,8 +387,26 @@
 
             return n
         }
+        const ev = (e, { v: { name, icon } }, r) => {
+            const h = $.create("DIS01"), p = $.popup(h, "MPOP"), c = p.create("MpCo")
+            h.addIcon(icon).append(name);
+            if (name == "Rename") {
+                const i = c.create({ tagName: "input", name: "ti", value: r.name }), b = c.create.button(null, "Save").event.on((e) => {
+                    console.log(b, i.value);
+                    b.loader(true)
+                });
+            };
+            return true;
+        }
 
-        const at = e => e.event.on(e => $.menuexitue(e).executed([{ icon: "ic_delete_profile", name: "Block" }, { icon: "ic_delete_profile", name: "Delete" }, { icon: "ic_remove_profile", name: "Remove" }]))
+        const at = (e, r) => e.event.on(e => $.menuexitue(e).executed([
+            { icon: "ic_link", name: "Open", event: e => (M.La(r, e) || !0) },
+            { icon: "ice_share", name: "Share", event: (e, v) => ev(e, v, r) },
+            { icon: "ice_edit", name: "Rename", event: (e, v) => ev(e, v, r) },
+            { icon: "ice_download", name: "Download", event: (e, v) => ev(e, v, r) },
+            { icon: "ice_trash-delete", name: "Delete", event: (e, v) => ev(e, v, r) },
+            { icon: "ice_circle_info", name: "Properties", event: (e, v) => ev(e, v, r) }
+        ]))
 
         let b = 0;
         const lmf = () => {
@@ -327,11 +438,11 @@
                 e.files.forEach(a => {
                     let id = getRootNewId(), e = image_sowing_container(a, $.create.span().addIcon("ic_dotsmv"));
                     e.set("id", id); k.in(e); M.sf ??= []; RootId[id] = a; M.sf.some(x => x.src === a.src) && e.add("select");
-                    at(e.ac);
+                    at(e.ac, a);
                 });
                 e.total > e.end ? (c = g(m)) : m.remove();
                 b = 0; M.cp++;
-            }).catch(e => (console.error(e), b = 0));
+            }).catch(e => (console.warn(e), b = 0));
         }
 
         rq.onChange(u => {
@@ -346,17 +457,18 @@
             if (i) return te(n);
         Object.assign(this, m);
 
+        console.log(this.c);
 
-        this.c.clear()
-        const p = cn();
+        const p = E(this.c)
+            ? (this.c.clear(), cn(this.c.create("med"))) : cn();
+
         const f = cm(p.p);
-        // const p = cn(this.c.create("med"));
-
         p.p.append(g(this));
         M.Tc.call(M, "Media Files");
         // M.Tc.call(M, "Upload");
 
         return this;
     }
-    // return ed.define("widgets/media", Media);
+
+    return ed.define("widgets/media", Media);
 }($))

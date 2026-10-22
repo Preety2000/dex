@@ -1,5 +1,5 @@
 $.define("dm/action", function Action(ED) {
-    var category = $.weres("category");
+    var category = $.picks("category");
     const { N, E, A, B, F } = $.getFunction();
     var ve = '[{"title":"स्वतंत्रता प्राप्ति के समय महात्मा गांधी थे।","correct_answer":"कांग्रेस के सदस्य नहीं थे","incorrect_answer":["कांग्रेस कार्यसमिति के सदस्य","कांग्रेस के महासचिव","कांग्रे्रेस के अध्यक्ष"],"subject":"History","category":["इस्लामिक समाज","भारत छोड़ो आन्दोलन"]},{"title":"स्वतंत्रता प्राप्ति के समय महात्मा गांधी थे।","correct_answer":"कांग्रेस के सदस्य नहीं थे","incorrect_answer":["कांग्रेस कार्यसमिति के सदस्य","कांग्रेस के महासचिव","कांग्रे्रेस के अध्यक्ष"],"subject":"History","category":["इस्लामिक समाज","भारत छोड़ो आन्दोलन"]}]'
     const request = $.apirequest("/api/admin/insert", true);
@@ -49,9 +49,9 @@ $.define("dm/action", function Action(ED) {
 
             c.addIcon("ic_loader");
             request.error = q => {
-                c.choose("icon", false)?.remove(); a.submitError(q.error), n(false);
+                c.pick("icon", false)?.remove(); a.submitError(q.error), n(false);
                 if (b.datatype) {
-                    const x = g.p.choose("sskip") || g.p.create("sskip DIS01");
+                    const x = g.p.pick("sskip") || g.p.create("sskip DIS01");
                     x.in($.create.button(null, "Skip").event.on((e) => { e.preventDefault(); f(); }), true);
                     x.in($.create.button(null, "Replace").event.on((e) => {
                         e.preventDefault(), a.input({ name: "replace", value: "replace", class: "hidden" }); g.click();
@@ -59,7 +59,7 @@ $.define("dm/action", function Action(ED) {
                 }
             };
 
-            n(true); request.send({ ...b, root: e }, q => { c.choose("icon", false)?.remove(); d.push(q.res); f(q.res), n(false); });
+            n(true); request.send({ ...b, root: e }, q => { c.pick("icon", false)?.remove(); d.push(q.res); f(q.res), n(false); });
         }
         , zc = (a, b, c) => {
             if (a.status && a.jsonValue) {
@@ -95,7 +95,7 @@ $.define("dm/action", function Action(ED) {
             if (!sv) return;
             const a = $("categorychecklist", true);
             if (!category || category.length < 0) {
-                category = $.weres("category")
+                category = $.picks("category")
             }
             for (const i of category || []) {
                 i.remove();
@@ -118,7 +118,7 @@ $.define("dm/action", function Action(ED) {
             return rq;
         }
         , gl = (a, b) => {
-            var list, button = $.weres("[jsname]").find(e => e.get("jsname") == a.jsname && e.get("data-content-len") == a.id);
+            var list, button = $.picks("[jsname]").find(e => e.get("jsname") == a.jsname && e.get("data-content-len") == a.id);
             if (button && (list = button.parentFilter(e => e.nodeName == "TR"))) {
                 list.set("class", null);
                 button.in(a.inner, true);
@@ -189,38 +189,57 @@ $.define("dm/action", function Action(ED) {
     }
 
     var d, script_data = {};
-    for (const e of $.weres("script", false)) {
+    for (const e of $.picks("script", false)) {
         e.get("data-content-len")
             ? (d = JSON.parse(e.textContent), script_data[d.id] = d)
             : null;
     }
 
 
-    $.event("insert-media-button", e => e.event.on(function () {
-        console.log(this);
 
-        zd("Media", (f, m) => {
-            var iframe = m.create({
-                tagName: "iframe",
-                class: "myFrame add-media",
-                src: "/container/media",
-                height: true,
-            });
-            iframe.css({
-                minHeight: 500,
-                minWidth: 840,
-            });
 
-            var uplode = iframe.create.a("option-button", "Uplode")
-            var select = iframe.create.a("option-button", "Select")
 
-            console.log(iframe, uplode);
 
-        });
-    }), true)
+    const Am = (i, b, c) => $.require("widgets/media", f => {
+        const it = (a, b) => {
+            if (!a) return;
+            let t = b.file_type
+                , g = {
+                    "image/": "img",
+                    "video/": "video",
+                    "audio/": "audio",
+                    "application/pdf": "iframe"
+                }
+                , T = Object.keys(g).find(x => t.startsWith(x))
+                , n = g[T] || "a"
+                , m = {
+                    tagName: n,
+                    src: b.src,
+                    width: b.width,
+                    height: b.height,
+                    title: b.name,
+                    controls: true
+                };
+            if (n == "a") m.href = b.src;
+            a.setRangeText($.create(m).outerHTML, a.selectionStart, a.selectionEnd, "end");
+            a.focus();
+        }
+        return new f(B(c) ? c : {}, e => {
+            const u = typeof b == "function" ? b(e) : e;
+            i.tagName == "TEXTAREA" ? it(i, u) : i.value = u;
+        })
+    }).css();
+
+    $.event("insert-media", e => e.event.on(() => Am($("editor-area"))), true)
+    $.event('[name="image_src"]', e => {
+        const s = $('[name="slug"]')
+            , n = s && s.value ? s.value : null
+            , b = e.p.pick("p", false).create.a();
+        b.create.span(null, " Add Media");
+        b.event.on(() => Am(e, e => e.src.replace("/media/img/category/", ""), { location: "category", name: n }))
+    })
 
     return $(function Action() {
-        var a;
         const _ = this, ep = (a, b) => this.add(a, b);
         ep(function ACANC(a, b) {
             return zd("Add New Category", (f, m) => {
@@ -239,7 +258,7 @@ $.define("dm/action", function Action(ED) {
                         let m = a.parentFilter(e => e.isclass("inside"));
                         if (!m) { return; }
 
-                        let b = m.choose("categorychecklist", true)
+                        let b = m.pick("categorychecklist", true)
                             .create.li("category")
                             .add("id", "category" + d.id)
                             .add("sub-id", d.subject_id),
@@ -566,10 +585,7 @@ $.define("dm/action", function Action(ED) {
                     adminSetting($, database)
                 })
             })
-        })
-
-        console.log(this);
-
+        });
         return this
     })
 }())
@@ -590,8 +606,8 @@ $.define("actionForm", function actionForm(was, extend, modules) {
     const { E, F, FlEXMAP } = $.getFunction();
     // function dtg(form, id, array, groli, popup) {
     //     let forse = form.getFormSession();
-    //     let submit = forse.choose("submit");
-    //     var group = forse.choose(id, true) || forse.create("IN0104");
+    //     let submit = forse.pick("submit");
+    //     var group = forse.pick(id, true) || forse.create("IN0104");
     //     var bind = function () {
     //         array.forEach(function (insex, index) {
     //             if (!groli[insex]) {
@@ -764,7 +780,7 @@ $.define("actionForm", function actionForm(was, extend, modules) {
         });
         console.log(popupWindow.container.get("height"));
 
-        return
+        // return
         var uplode = navigation.create.a("option-button", "Uplode")
         var select = navigation.create.a("option-button", "Select")
         var contentContainer = popupWindow.container.create("content-container");

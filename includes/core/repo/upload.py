@@ -11,11 +11,13 @@ from PIL import Image
 from rembg import new_session, remove
 from io import BytesIO
 from pathlib import Path
+from includes.src.request import Request
 from fastapi import UploadFile as FastAPIUploadFile
 from starlette.datastructures import UploadFile as StarletteUploadFile
 
 from werkzeug.utils import secure_filename
 from includes.core.globals.entry import app_context
+from includes.core.repo.author import _FileAuthor
 from includes.core.security import _Security
 
 from includes.services.member.identity import Identity
@@ -33,14 +35,14 @@ from includes.utils.file import (
     valid_signature_message,
 )
 from includes.utils.meb import get_email_folder_info
-from includes.utils.utils import get_query_value, json_response
+from includes.utils.utils import json_response
 
 ALLOWED_EXTENSIONS = {
     "images": {"png", "jpg", "jpeg", "gif"},
     "svg": {"svg"},
     "pdf": {"pdf"},
-    "videos": {"mp4", "webm"},
-    "audios": {"mp3", "mp4"},
+    "video": {"mp4", "webm"},
+    "audio": {"mp3", "mp4"},
 }
 
 
@@ -51,8 +53,8 @@ def allowed_file(filename, filetype):
     )
 
 
-async def extract_uploaded_files(field_name: str | None = None):
-    form = await app_context.request.form()
+async def extract_uploaded_files(field_name: str | None = None, request=None):
+    form = await request.form()
     files = {
         name: file
         for name, file in form.items()
@@ -67,16 +69,16 @@ class FileUpload:
         "images": folder.image_folder,
         "svg": folder.svg_folder,
         "pdf": folder.pdf_folder,
-        "videos": folder.video_folder,
-        "audios": folder.audio_folder,
+        "video": folder.video_folder,
+        "audio": folder.audio_folder,
     }
 
     allowed_extensions = {
         "images": {"jpg", "jpeg", "png", "gif", "webp", "bmp", "avif"},
         "svg": {"svg"},
         "pdf": {"pdf"},
-        "videos": {"mp4", "webm", "mkv", "avi", "mov"},
-        "audios": {"mp3", "wav", "ogg", "m4a", "aac", "flac"},
+        "video": {"mp4", "webm", "mkv", "avi", "mov"},
+        "audio": {"mp3", "wav", "ogg", "m4a", "aac", "flac"},
     }
 
     ALLOWED_IMAGE_EXTENSION: list = ["jpg", "png", "gif", "webp"]
@@ -85,6 +87,7 @@ class FileUpload:
     async def process_image_upload(
         *,
         file,
+        request: Request = None,
         upload_dir: str | Path,
         crop: bool | None = None,
         save_original: bool = True,
@@ -129,7 +132,7 @@ class FileUpload:
 
         # CROP PROCESSING LOGIC
         if crop is True:
-            is_cropped, image = ImageProcessor.apply_crop(image)
+            is_cropped, image = ImageProcessor.apply_crop(image, request=request)
 
         # RESIZE LOGIC
         width, height = resize
@@ -190,10 +193,10 @@ class FileUpload:
         }
 
     @staticmethod
-    async def upload_profile_image():
+    async def upload_profile_image(request: Request = None):
         global folder
 
-        active_member = await app_context.setting.member()
+        active_member = await request.state.setting.member()
         decode_email, upload_dir = get_email_folder_info(active_member.get("id"), True)
 
         os.makedirs(upload_dir, exist_ok=True)
@@ -205,6 +208,7 @@ class FileUpload:
         data = await FileUpload.process_image_upload(
             file=file,
             crop=True,
+            request=request,
             resize=(300, 300),
             save_original=True,
             upload_dir=upload_dir,
@@ -225,11 +229,11 @@ class FileUpload:
         return json_response(None, message="Failed to update profile image")
 
     @staticmethod
-    async def upload_examiner_image():
+    async def upload_examiner_image(request):
         global folder
 
-        name = get_query_value("name")
-        uid = get_query_value("key")
+        name = request.query_params.get("name")
+        uid = request.query_params.get("key")
         user_dir = folder.ensure_directory(folder.exnr, uid)
 
         bind = None
@@ -254,6 +258,7 @@ class FileUpload:
         data = await FileUpload.process_image_upload(
             file=file,
             resize=resize,
+            request=request,
             save_original=False,
             upload_dir=user_dir,
             output_filename=name,
@@ -268,10 +273,10 @@ class FileUpload:
             )
 
     @staticmethod
-    async def upload_category_image():
+    async def upload_category_image(request):
         global folder
 
-        name = get_query_value("name")
+        name = request.query_params.get("name")
         category_dir = folder.ensure_directory(folder.static_img, "category")
 
         bind = None
@@ -283,6 +288,7 @@ class FileUpload:
 
         data = await FileUpload.process_image_upload(
             file=file,
+            request=request,
             save_original=False,
             upload_dir=category_dir,
             output_filename=name,
@@ -300,7 +306,7 @@ class FileUpload:
             return data
 
     @staticmethod
-    async def upload_verify_indentity_document():
+    async def upload_verify_indentity_document(request):
         global folder
 
         def pdf_to_icon(path, output):
@@ -335,7 +341,7 @@ class FileUpload:
         if not is_valid_document(file):
             return {"error": "Please upload a valid PDF, JPG, or PNG document."}
 
-        uid = _Security.short_encode(await app_context.setting.member("id"))
+        uid = _Security.short_encode(await request.state.setting.member("id"))
         user_dir = folder.ensure_directory(folder.exnr, uid)
 
         # Save original document
@@ -408,26 +414,21 @@ class FileUpload:
         return {"error": "Invalid file"}
 
     @classmethod
-    async def upload(cls, files):
-        request = app_context.request
-
+    async def upload(cls, files, request: Request = None):
         if not files:
             return request.abort(400, "No file uploaded")
 
         result = {}
 
         for field, file in files.items():
-
             if not file or not file.filename:
                 continue
 
             filename = secure_filename(file.filename)
-
             if not filename:
                 return request.abort(400, "Invalid filename")
 
             ext = Path(filename).suffix.lower().lstrip(".")
-
             if not ext:
                 return request.abort(415, "File extension is missing")
 
@@ -446,7 +447,6 @@ class FileUpload:
 
             # Folder mapping
             directory = cls.directories.get(file_type)
-
             if not directory:
                 return request.abort(
                     500, f"Upload directory not configured: {file_type}"
@@ -454,7 +454,6 @@ class FileUpload:
 
             # Folder nahi hai to create hoga
             os.makedirs(directory, exist_ok=True)
-
             file_path = posixpath.join(directory, filename)
 
             try:
@@ -494,8 +493,9 @@ class FileUpload:
         return result
 
     @staticmethod
-    async def execute():
-        location = get_query_value("location")
+    async def execute(request):
+        location = _FileAuthor(request).get("l")
+        location = request.query_params.get("location")
         roots = {
             "examiner": FileUpload.upload_examiner_image,
             "category": FileUpload.upload_category_image,
@@ -503,13 +503,14 @@ class FileUpload:
             "verify_indentity": FileUpload.upload_verify_indentity_document,
         }
 
+        print("location", location)
         callback = roots.get(location)
         if callable(callback):
-            return await callback()
+            return await callback(request)
 
         uploaded_files = await extract_uploaded_files()
 
-        return await FileUpload.upload(uploaded_files)
+        return json_response(await FileUpload.upload(uploaded_files))
         # uploaded_files = await self.request.form()
 
         # files = uploaded_files.getlist("files")

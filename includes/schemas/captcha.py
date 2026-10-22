@@ -3,6 +3,7 @@ import random
 import string
 
 from io import BytesIO
+from includes.src.request import Request
 from fastapi.responses import StreamingResponse
 from includes.core.globals.fun import random_string
 from includes.core.globals.entry import app_context
@@ -95,7 +96,7 @@ class Captcha:
         return await self.insert(code)
 
     @staticmethod
-    async def create() -> StreamingResponse | FileNotFoundError:
+    async def create(request: Request = None) -> StreamingResponse | FileNotFoundError:
         width, height = 300, 100
 
         resource = generate_captcha_text(6)
@@ -184,10 +185,10 @@ class Captcha:
         image_io.seek(0)
 
         # Create new cookie if missing
-        cookies = app_context.cookie.get("_cf_mt")
+        cookies = request.state.cookie.get("_cf_mt")
         if not cookies:
             cookies = "Ent.5." + random_string(40)
-            app_context.cookie.insert("_cf_mt", cookies)
+            request.state.cookie.insert("_cf_mt", cookies)
 
         # Save CAPTCHA
         captcha_storage = Captcha(cookies)
@@ -207,15 +208,15 @@ class Captcha:
         return response
 
 
-async def captcha_verification():
-    form_data = await app_context.request.form()
+async def captcha_verification(request: Request = None):
+    form_data = await request.form()
     # captcha_code = form_data.get("captcha")
-    captcha_code = await get_post_value("captcha")
+    captcha_code = await get_post_value(request, "captcha")
     return True
     if not captcha_code:
         return False
 
-    cookie_catutm = app_context.request.cookies.get("_cf_mt")
+    cookie_catutm = request.cookies.get("_cf_mt")
     if not cookie_catutm:
         return False
 

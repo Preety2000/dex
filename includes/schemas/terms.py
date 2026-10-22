@@ -11,6 +11,7 @@ from includes.database.models.secondary import (
 from includes.schemas.cache.terms import TermsCache
 from includes.schemas.objective import get_mini_mcq_json
 from includes.utils.arti import get_mini_article_json
+from includes.database.connection import db
 
 
 def get_terms_json(item):
@@ -24,7 +25,7 @@ def get_terms_json(item):
             "img": (
                 image_src if "/" in image_src else f"/media/img/category/{image_src}"
             ),
-            "url": f"{app_context.request.host_url}questions/tagged/{item.slug}",
+            "url": f"{app_context.host_url}questions/tagged/{item.slug}",
         }
     )
 
@@ -33,7 +34,7 @@ class ClassTerms:
 
     @staticmethod
     def get(**filters):
-        terms = app_context.db.query(Terms)
+        terms = db.query(Terms)
 
         for key, value in filters.items():
             if hasattr(Terms, key) and value is not None:
@@ -64,7 +65,7 @@ class ClassTerms:
     async def get_all(*, limit=None, **filters):
         grouped = []
 
-        terms_query = app_context.db.query(Terms)
+        terms_query = db.query(Terms)
         # dynamic filters
         for key, value in filters.items():
             if hasattr(Terms, key) and value is not None:
@@ -78,12 +79,12 @@ class ClassTerms:
         for terms in all_query:
             term_data = serialize(terms)
             mcq_qs = (
-                app_context.db.query(QuizQuestion)
+                db.query(QuizQuestion)
                 .join(QuizRelationships, QuizRelationships.quiz_id == QuizQuestion.id)
                 .filter(QuizRelationships.terms_id == terms.id)
             )
             article_qs = (
-                app_context.db.query(Article)
+                db.query(Article)
                 .join(TermsRelationship, TermsRelationship.article_id == Article.id)
                 .filter(TermsRelationship.terms_id == terms.id)
             )

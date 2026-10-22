@@ -6,9 +6,9 @@ from includes.api.exam.controller import ExamController, get_exam_request_sessio
 from includes.utils.exm import get_exam_id
 from includes.api.exam.request.exam_setting import CreateStore
 from includes.api.exam.session.ev import ExamEventManager
-from includes.database.connection import active_exam_db
+from includes.database.connection import config_exam_db
 from includes.database.dataclass.dataclass import ExamRqStatus
-from includes.database.models.db_exam import ExamRequestSession
+from includes.database.models.exam import ExamRequestSession
 
 
 def get_exam_ids(detail):
@@ -53,7 +53,7 @@ class requestRoute:
         exam_id: int, payload: list, joined_status: list, use_filter: callable = None
     ) -> dict:
         offset, limit = payload
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         query = db.query(ExamRequestSession).filter(
             ExamRequestSession.exam_id == exam_id,
@@ -117,7 +117,7 @@ class requestRoute:
 
     @staticmethod
     async def studentReqsAptAll(exam_id, method: str):
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         query = db.query(ExamRequestSession).filter(
             ExamRequestSession.exam_id == exam_id,

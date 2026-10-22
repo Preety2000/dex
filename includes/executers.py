@@ -3,17 +3,19 @@ import copy
 import inspect
 import datetime as dt
 from typing import Any
+from includes.src.request import Request
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
-from includes.core.deviceinfo import DeviceInfo
+
+from includes.core.globals.route_context import Route
 from includes.utils._sub import apply_session_updates, configure_page
 from includes.database.dataclass.dataclass import serialize, to_dict
 
 from includes.core.cache import AppCache
-from includes.core.config import app_context
 from includes.core.security import _Security
-
-from includes.core.metadata import MetaData, set_article_context
+from includes.core.metadata import set_article_context
+from includes.core.globals.entry import app_context, fetchTime
 from includes.core.globals.initialize import initialize_database
+
 from includes.dispatcher import STATIC_HANDLERS, RequestDispatcher
 
 from includes.schemas.terms import ClassTerms
@@ -45,16 +47,20 @@ async def get_terms_by_resource_cached(resource_id):
     return resources.get(resource_id, None)
 
 
-async def execute_home_page(roots: Any = None) -> dict[str, Any]:
+async def execute_home_page(request: Request = None) -> dict[str, Any]:
 
     # Predicate lambda for filtering
     term_filter = lambda r: r.article_count > 0
 
     # Desktop Execution (Parallel DB Queries for Maximum Speed)
-    configure_page(template="index", title="Welcome", suffix=True)
+    configure_page(
+        request.state.metadata, template="index", title="Welcome", suffix=True
+    )
 
     terms_task = ClassTerms.get_all_record(limit=16, topic=1, bind=term_filter)
-    articles_task = ArticleService.get_filtered_articles(limit=12, desc="id")
+    articles_task = ArticleService.get_filtered_articles(
+        limit=12, desc="id", request=request
+    )
 
     # Both DB calls run concurrently
     all_term_list, articles = await asyncio.gather(terms_task, articles_task)
@@ -72,11 +78,13 @@ async def build_http_response(result, templates, request):
         # Track response timing safely
         # ---------------------------------------------------------
         end_time = dt.datetime.now()
-        app_context.response["end_time"] = end_time
+        request.state.response["end_time"] = end_time
 
-        start_time = app_context.response.get("start_time")
+        start_time = request.state.response.get("start_time")
         if start_time:
-            app_context.response["fetch_time"] = (end_time - start_time).total_seconds()
+            request.state.response["fetch_time"] = (
+                end_time - start_time
+            ).total_seconds()
 
         # ---------------------------------------------------------
         # Direct responses
@@ -103,7 +111,7 @@ async def build_http_response(result, templates, request):
                 "request": request,
                 "security": _Security,
                 "app_context": app_context,
-                "response": app_context.response,
+                "response": request.state.response,
                 "svg": getattr(app_context, "svg_lists", None),
                 "config": getattr(app_context, "config", None),
                 "function": getattr(app_context, "function", None),
@@ -113,7 +121,7 @@ async def build_http_response(result, templates, request):
         # ---------------------------------------------------------
         # Add metadata
         # ---------------------------------------------------------
-        metadata = MetaData.to_dict()
+        metadata = request.state.metadata.to_dict()
 
         if isinstance(metadata, dict):
             template_context.update(metadata)
@@ -124,7 +132,7 @@ async def build_http_response(result, templates, request):
         # ---------------------------------------------------------
         # Handle redirect
         # ---------------------------------------------------------
-        redirect_url = MetaData.redirect_url
+        redirect_url = request.state.metadata.redirect_url
 
         if redirect_url:
             return templates.TemplateResponse(
@@ -134,6 +142,7 @@ async def build_http_response(result, templates, request):
                     "request": request,
                     "redirect": redirect_url,
                     "response": None,
+                    "svg": getattr(app_context, "svg_lists", {}),
                 },
             )
 
@@ -167,10 +176,14 @@ async def build_http_response(result, templates, request):
 
         # request must be present in context
         template_context["request"] = request
-        template_context["device_info"] = DeviceInfo.to_dict()
+        template_context["device_info"] = request.state.divice_info.to_dict()
         # ---------------------------------------------------------
         # Render template
         # ---------------------------------------------------------
+        # Float me milliseconds ke liye
+        ms = (end_time - fetchTime.start).total_seconds() * 1000
+        print(f"TR {ms} MS")
+
         return templates.TemplateResponse(
             request=request,
             name=f"{template_name}.html",
@@ -199,29 +212,35 @@ async def build_http_response(result, templates, request):
                 print(f"secondary_session close error: {e}")
 
 
-async def enrich_request_response(response):
-    auth_session = await app_context.setting.member()
+async def enrich_request_response(response, request: Request = None):
+    auth_session = await request.state.setting.member()
     response.update({"auth_session": auth_session})
 
     return response
 
 
-async def handle_request_with_cache(*, allow_catch: bool = True, **binds):
+async def handle_request_with_cache(
+    request: Request = None,
+    roots: Route = None,
+    *,
+    allow_catch: bool = True,
+    **binds,
+):
     # Base initialization
-    await initialize_database()
+    await initialize_database(request)
 
-    route_type = app_context.route.scope_type
-    app_context.response["resource"] = route_type
+    route_type = request.state.roote.section
+    request.state.response["resource"] = route_type
 
-    MetaData.template = "error"
+    request.state.metadata.template = "error"
 
     # Pehle static routes check karein
-    static_response = await StaticRouteHandler.handle_static_route(route_type)
+    static_response = await StaticRouteHandler.handle_static_route(request, route_type)
     if static_response is not None:
         return static_response
 
     # Encrypted Cache Key generation
-    request_url_str = str(app_context.request.url)
+    request_url_str = str(request.url)
     encrypted_url = _Security.short_encode(request_url_str)
 
     # Cache Check & Fallback Handler Execution
@@ -229,21 +248,24 @@ async def handle_request_with_cache(*, allow_catch: bool = True, **binds):
 
     if session and metadata:
         # Cache me se mile metadata se MetaData class ko update karein
-        MetaData.update_from_dict(metadata)
+        request.state.metadata.update_from_dict(metadata)
         response.pop("start_time", None)
-        app_context.response.update(response)
+        request.state.response.update(response)
     else:
-        # Request execute karein aur updated MetaData.to_dict() ke saath cache karein
+        # Request execute karein aur updated request.state.metadata.to_dict() ke saath cache karein
         handler = binds.get("callback", execute_request)
-        session = await handler(app_context.route)
+        session = await handler(request)
 
-        if allow_catch is True:
-            AppCache.add(
-                encrypted_url, (MetaData.to_dict(), session, app_context.response)
-            )
+        # if allow_catch is True:
+        #     AppCache.add(
+        #         encrypted_url,
+        #         (request.state.metadata.to_dict(), session, request.state.response),
+        #     )
 
     # Response Enrichment & Processing
-    app_context.response = await enrich_request_response(app_context.response)
+    request.state.response = await enrich_request_response(
+        request.state.response, request
+    )
 
     # Deepcopy ki jagah shallow copy ya lightweight dictionary copy try karein agar session safe ho
     try:
@@ -253,57 +275,63 @@ async def handle_request_with_cache(*, allow_catch: bool = True, **binds):
 
         session_data = {}
 
-    processed_response = await apply_session_updates(session_data)
+    processed_response = await apply_session_updates(session_data, request=request)
 
-    await set_article_context(processed_response)
+    await set_article_context(request, processed_response)
 
     if isinstance(processed_response, dict):
-        app_context.response.update(processed_response)
+        request.state.response.update(processed_response)
 
-    return app_context.response
+    return request.state.response
 
 
-async def execute_request(roots=None):
-    scope_type = app_context.route.scope_type
-
+async def execute_request(request: Request = None):
     # Edge Case: Custom route checking (like container/media)
-    if scope_type == "container" and app_context.route.scope_slug == "media":
-        return await RequestDispatcher.handle_container_media(app_context)
+    if (
+        request.state.roote.section == "container"
+        and request.state.roote.scope == "media"
+    ):
+        return await RequestDispatcher.handle_container_media(request)
 
     # Check Static Handlers Registry (O(1) lookup)
-    if scope_type in STATIC_HANDLERS:
-        return await STATIC_HANDLERS[scope_type](app_context)
+    if request.state.roote.section in STATIC_HANDLERS:
+        return await STATIC_HANDLERS[request.state.roote.section](request)
 
     # 3. Dynamic Query Execution (Resource Query Fallback)
-    resource_query = await get_terms_by_resource_cached(scope_type)
+    resource_query = await get_terms_by_resource_cached(request.state.roote.section)
 
     if resource_query:
-        if not app_context.route.scope_slug:
+        if not request.state.roote.scope:
             article = await ArticleService.get_filtered_articles(
-                limit=12, desc="id", parameter=resource_query.id
+                request=request, limit=12, desc="id", parameter=resource_query.id
             )
             configure_page(
-                template="query/parameter", title=resource_query.name, suffix=True
+                request.state.metadata,
+                template="query/parameter",
+                title=resource_query.name,
+                suffix=True,
             )
             return {"page_type": "page", "data_querys": article}
 
-        if app_context.route.scope_slug == "tagged" and app_context.route.resource_type:
-            resource = await TermsCache.get_by_slug(app_context.route.resource_type)
+        if request.state.roote.scope == "tagged" and request.state.roote.entity:
+            resource = await TermsCache.get_by_slug(request.state.roote.entity)
 
             if resource is None:
                 return {}
 
             article = await ArticleService.find_article_by_terms(
+                request=request,
                 terms_id=resource.id,
                 parameter=resource_query,
                 desc="id",
                 limit=12,
             )
             practice = await get_mcq_by_terms_id(
-                terms_id=resource.id, limit=6, desc="id"
+                request=request, terms_id=resource.id, limit=6, desc="id"
             )
 
             configure_page(
+                request.state.metadata,
                 template="query/tagged",
                 title=f"Questions tagged [ {resource.name} ]",
             )
@@ -317,29 +345,36 @@ async def execute_request(roots=None):
 
         # Article Session
         response = await ArticleService.find_article(
-            slug=app_context.route.scope_slug,
+            slug=request.state.roote.scope,
             parameter=resource_query.id,
         )
         if response:
             response.pop("mdata", None)
             types = response.get("type")
             response["reseant_parameter"] = await ArticleService.get_filtered_articles(
-                parameter=resource_query.id, limit=10
+                request=request, parameter=resource_query.id, limit=10
             )
             if isinstance(types, dict) and types.get("Id"):
                 response["reseant_type"] = await ArticleService.get_filtered_articles(
-                    type=types["Id"], limit=10
+                    request=request, type=types["Id"], limit=10
                 )
             configure_page(
-                template="query/second_parameter", title=response["title"], suffix=True
+                request.state.metadata,
+                template="query/second_parameter",
+                title=response["title"],
+                suffix=True,
             )
             return response
 
     # Fallback Article Lookup
-    data = await ArticleService.find_article(slug=scope_type, parameter=0)
+    data = await ArticleService.find_article(
+        slug=request.state.roote.section, parameter=0
+    )
     if data:
         page_list = await ArticleService.get_page_lists(desc="id", limit=6)
-        configure_page(template="query/page", title=data.get("title"))
+        configure_page(
+            request.state.metadata, template="query/page", title=data.get("title")
+        )
         return {
             "page_type": "article",
             "data_querys": data,
@@ -349,9 +384,11 @@ async def execute_request(roots=None):
     return {}
 
 
-async def process_account(request=None):
-    await initialize_database()
+async def process_account(request: Request = None, roots: Route = None):
+    await initialize_database(request)
 
-    MetaData.template = await ClassUser.get_template()
-    app_context.response["resource"] = app_context.route.scope_type
-    return await enrich_request_response(app_context.response)
+    request.state.metadata.template = await ClassUser(request).get_template(
+        request, roots
+    )
+    request.state.response["resource"] = request.state.roote.section
+    return await enrich_request_response(request.state.response, request)

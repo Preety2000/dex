@@ -1453,6 +1453,34 @@ form .button-container button,
 }
 
 
+.T059 {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 21px;
+    top: -3px;
+    border-radius: 5px;
+    background: var(--danger-bg);
+    color: var(--danger-light);
+    padding: 2px 4px;
+    font-size: 90%;
+    gap: 2px;
+    border: solid 2px;
+}
+
+.T059 svg {
+    fill: var(--danger-light);
+    width: 18px;
+    height: 18px;
+}
+
+.T060 {
+    font-family: monospace;
+    line-height: 1;
+}
+
+
+
 
 .EXAME_COUNT01 {
     width: 18px !important;
@@ -1497,4 +1525,4 @@ form .button-container button,
     overflow-y: scroll !important;
 }
 
-/* last F0047 */
+/* last F0047, T060 */

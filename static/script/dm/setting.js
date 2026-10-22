@@ -4,11 +4,11 @@ var loader = function (a = $) {
 
 // This code defines a function `option_container` that sets up a UI component for selecting and managing options.
 // It provides a session for tooltips, option groups, and handles edit/save functionality.
-const option_container = function OptionContainer(choose = $, option) {
+const option_container = function OptionContainer(pick = $, option) {
 
     // Declare variables, including the currently active database (activedatabese), and the session structure.
     let activedatabese,
-        session = choose.create("choose-session"), // Create the main session element.
+        session = pick.create("pick-session"), // Create the main session element.
         tolltip = session.create("tolltip"),           // Create a tooltip element inside the session.
         group = session.create("IN0104");               // Create a group element inside the session.
 
@@ -27,7 +27,7 @@ const option_container = function OptionContainer(choose = $, option) {
         let value = option.function(activedatabese);
         if (value) {
             // If a value is returned, update the tooltip with the active database's title.
-            tolltip.choose("optioner").in(activedatabese.title);
+            tolltip.pick("optioner").in(activedatabese.title);
             group.removed("active");  // Remove 'active' class from the group.
             button.in("edit");        // Set the button text to 'edit'.
         } else {

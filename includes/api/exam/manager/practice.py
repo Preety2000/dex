@@ -1,21 +1,21 @@
-from datetime import datetime, time
-import random
 import re
+import random
 import asyncio
+from datetime import datetime, time
 
-from sqlalchemy import select, or_, desc, func
+from sqlalchemy import select, desc, func
 
-from includes.database.connection import active_primary_db, active_secondary_db
+from includes.database.connection import config_primary_db, config_secondary_db
 from includes.utils._sub import distribute_amount
 from includes.api.exam.results.results_practice import SELF_RESULTS
 from includes.core.config import exam_database
-from includes.core.globals.entry import app_context
-from includes.database.models.db_exam import (
+from includes.src.request import Request
+from includes.database.models.exam import (
     _ExamRecord,
     PracticeExamRecord,
 )
 from includes.function import get_unique_id
-from includes.database.models.owner import Subject
+from includes.database.models.primary import Subject
 from includes.database.models.secondary import (
     QuizQuestion,
     QuizRelationships,
@@ -32,7 +32,6 @@ from includes.schemas.cache.terms import TermsCache
 from includes.schemas.cache.subject import SubjectCache
 from includes.utils.utils import (
     get_post_value,
-    get_query_value,
     get_referer_value,
     json_response,
 )
@@ -132,9 +131,8 @@ async def get_exam_json(record: _ExamRecord):
 
 class SELF_EXAM_MANAGER:
 
-    def __init__(self):
-        self.request = app_context.request
-        self.function = app_context.function
+    def __init__(self, request: Request):
+        self.request = request
 
     async def insert_self_exam_row_data(
         self,
@@ -191,7 +189,7 @@ class SELF_EXAM_MANAGER:
         quiz_stmt = select(QuizQuestion)
 
         # Category filter
-        db = await active_secondary_db()
+        db = await config_secondary_db()
         if category != "default":
 
             terms_stmt = select(Terms).where(Terms.slug == category)
@@ -215,7 +213,7 @@ class SELF_EXAM_MANAGER:
             else:
                 subject_stmt = select(Subject).where(Subject.name == subject)
 
-            db2 = await active_primary_db()
+            db2 = await config_primary_db()
             db_subject = db2.execute(subject_stmt).scalar_one_or_none()
 
             if db_subject:
@@ -281,11 +279,9 @@ class SELF_EXAM_MANAGER:
         )
 
     async def index(self, response):
-        post = get_post_value
+        roll_no = await self.request.state.setting.member("roll_no")
 
-        roll_no = await app_context.setting.member("roll_no")
-
-        language = await app_context.setting.get("language")
+        language = await self.request.state.setting.get("language")
 
         daily_limit, monthly_limit = await Student.has_submission_limit_exceeded(
             roll_no
@@ -297,10 +293,10 @@ class SELF_EXAM_MANAGER:
             response["content"] = limitStatusHtml[language]["content"]
 
         else:
-            timing = await post("timing")
-            subject = await post("subject")
-            category = await post("category")
-            nim_que = await post("Nq")
+            nim_que = await get_post_value(self.request, "Nq")
+            timing = await get_post_value(self.request, "timing")
+            subject = await get_post_value(self.request, "subject")
+            category = await get_post_value(self.request, "category")
 
             if subject and category and nim_que:
 
@@ -377,15 +373,15 @@ class SELF_EXAM_MANAGER:
                     response["category"],
                 ) = await build_subject_category()
 
-                if get_referer_value("isme"):
-                    response["__ac"] = 101
-                else:
-                    response["__ac"] = 100
+                # if get_referer_value(self.request, "isme"):
+                response["__ac"] = 101
+                # else:
+                #     response["__ac"] = 100
 
         return json_response(response)
 
     async def get(self, keys):
-        roll_no = await app_context.setting.member("roll_no")
+        roll_no = await self.request.state.setting.member("roll_no")
 
         exam = await Student.get_by_exam_key(
             keys,

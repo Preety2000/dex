@@ -45,7 +45,7 @@ function createInputField(options, parent = $, ps) {
     // Error handler
     input.showError = function (message) {
         let errorBox =
-            wrapper.choose(input_error) ||
+            wrapper.pick(input_error) ||
             $.create.p(input_error);
 
         errorBox.in(message);
@@ -53,7 +53,7 @@ function createInputField(options, parent = $, ps) {
         wrapper.insertBefore(errorBox, input);
     };
 
-    // Metadata
+    // MetaData
     input.wrapper = wrapper;
     input.header = wrapper;
 

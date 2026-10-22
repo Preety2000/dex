@@ -1,15 +1,17 @@
+from includes.src.request import Request
 from sqlalchemy import func, select
 from includes.core.paginator import NewQueryPaginator
-from includes.database.connection import active_secondary_db
+from includes.database.connection import config_secondary_db
 from includes.database.models.secondary import Article, ArticleView
 from includes.utils.arti import get_mini_article_json
+
 
 class ArticleTrendingService:
 
     @staticmethod
     async def get_article_rank(article_id: int) -> int | None:
-        db_session = await active_secondary_db()
-        
+        db_session = await config_secondary_db()
+
         rank_column = (
             func.row_number()
             .over(
@@ -31,8 +33,8 @@ class ArticleTrendingService:
         return None
 
     @staticmethod
-    async def get_articles(*, limit=12, **more):
-        db = await active_secondary_db()
+    async def get_articles(*, limit=12, request: Request = None, **more):
+        db = await config_secondary_db()
 
         rank_column = (
             func.row_number()
@@ -54,6 +56,7 @@ class ArticleTrendingService:
             query=query,
             model=Article,
             limit=limit,
+            request=request,
             db=db,
             transform=lambda item: get_mini_article_json(item, excerpt=True),
             **more,

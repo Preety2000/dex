@@ -239,7 +239,7 @@ $.require("widgets/forms", (f, m = $.popup("Add New Category")) => {
             if (!a?.id) return;
 
             let b = sdd.parentFilter(e => e.isclass("inside"))
-                .choose("categorychecklist", true)
+                .pick("categorychecklist", true)
                 .create.li("category")
                 .add("id", "category" + a.id)
                 .add("sub-id", a.subject_id),
@@ -279,11 +279,11 @@ $.require("widgets/forms", (f, m = $.popup("Add New Category")) => {
             typeof cb == "function" && cb(true);
 
             request.error = q => {
-                lo.choose("icon", false)?.remove();
+                lo.pick("icon", false)?.remove();
                 f.submitError(q.error);
                 typeof cb == "function" && cb(false);
 
-                e.datatype && (sub.p.choose("sskip") || sub.p.create("sskip"))
+                e.datatype && (sub.p.pick("sskip") || sub.p.create("sskip"))
                     .in(
                         $.create.button(null, "Skip")
                             .event.on(() => r(e)),
@@ -292,7 +292,7 @@ $.require("widgets/forms", (f, m = $.popup("Add New Category")) => {
             };
 
             request.send({ ...e, root: "cot" }, q => {
-                lo.choose("icon", false)?.remove();
+                lo.pick("icon", false)?.remove();
                 sd.push(q.res);
                 r(e, q.res);
                 typeof cb == "function" && cb(false);
@@ -407,14 +407,14 @@ $.require("widgets/forms", (f, m = $.popup("Add Questions")) => {
         const c = nx?.loader;
         typeof c == "function" && c(1);
         request.error = e => {
-            l.choose("icon", 0)?.remove(), f.submitError(e.error),
+            l.pick("icon", 0)?.remove(), f.submitError(e.error),
                 typeof c == "function" && c(0),
-                e.datatype && (nx.p.choose("sskip") || nx.p.create("sskip")).in(
+                e.datatype && (nx.p.pick("sskip") || nx.p.create("sskip")).in(
                     $.create.button(null, "Skip").event.on(() => n(e)), 1
                 )
         };
         return request.send({ ...v, root: "practice" }, e => {
-            l.choose("icon", 0)?.remove(), s.push(e.res), n(v, e.res),
+            l.pick("icon", 0)?.remove(), s.push(e.res), n(v, e.res),
                 typeof c == "function" && c(0)
         })
     }, r = () => {
@@ -479,7 +479,7 @@ $.require("widgets/forms", (f, m = $.popup("Add Questions")) => {
 
     , oa = function (a) {
         let c = "T001", t = $(c);
-        th.homeIndex ??= t.choose("index", true);
+        th.homeIndex ??= t.pick("index", true);
         t.clear();
         t.removed("class");
         t.add([c, a]);
@@ -569,7 +569,7 @@ $.require("widgets/forms", (f, m = $.popup("Add Questions")) => {
         n = Ej();
 
         id = g.id;
-        st = $.weres(tagName, false).find(e => e.id === id) || $.bindFunction(document.head).create({ id, tagName, rel: "stylesheet" });
+        st = $.picks(tagName, false).find(e => e.id === id) || $.bindFunction(document.head).create({ id, tagName, rel: "stylesheet" });
         st.textContent = Object.entries(n).map(([c, s]) => `.${c}{${s}}`).join('\n');
 
         if (typeof this == "string") {

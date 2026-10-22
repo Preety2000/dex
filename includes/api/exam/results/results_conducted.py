@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
 from num2words import num2words
+from includes.src.request import Request
 from includes.database.models.utils import TimeStamp
-from includes.core.globals.entry import app_context
-from includes.database.connection import active_exam_db
-from includes.database.models.db_exam import ExamDetails, ExamRecord, TeacherProfile
+from includes.database.connection import config_exam_db
+from includes.database.models.exam import ExamDetails, ExamRecord, TeacherProfile
 from includes.schemas.cache.member import MemberCache
 from includes.utils.exm import (
     calculate_exam_score,
@@ -98,12 +98,12 @@ def calculate_marks(all_q, marks_q, correct, ratio=None):
 
 
 class IS_RESULTS:
-    def __init__(self):
-        self.request = app_context.request
-        self.function = app_context.function
+
+    def __init__(self, request: Request):
+        self.request = request
 
     async def get(self, key):
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         record = db.query(ExamRecord).filter_by(key=key).first()
         if record:
@@ -111,9 +111,8 @@ class IS_RESULTS:
             return record
         return
 
-    @staticmethod
-    async def get_result(record, by_pass: bool = None, is_verfy: bool = None):
-        db = await active_exam_db()
+    async def get_result(self, record, by_pass: bool = None, is_verfy: bool = None):
+        db = await config_exam_db()
         controller_query = (
             db.query(ExamDetails).filter(ExamDetails.id == record.exam_id).first()
         )
@@ -122,7 +121,7 @@ class IS_RESULTS:
             return None
 
         if is_verfy is True:
-            id = await app_context.setting.member("id")
+            id = await self.request.state.setting.member("id")
             if controller_query.teacher_id != id:
                 return None
 
@@ -149,7 +148,7 @@ class IS_RESULTS:
 
     @staticmethod
     async def get_ans_seet(record):
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         controller_query = (
             db.query(ExamDetails).filter(ExamDetails.id == record.exam_id).first()
@@ -187,7 +186,9 @@ class IS_RESULTS:
         if record.is_submitted != True:
             return {"__ac": [302, result_not_public_message()]}
 
-        data = await IS_RESULTS.get_result(record)
+        is_result = IS_RESULTS(self.request)
+        data = await is_result.get_result(record)
+
         if isinstance(data, list):
             return {"__ac": [301, data]}
 

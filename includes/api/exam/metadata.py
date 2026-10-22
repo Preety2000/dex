@@ -1,8 +1,8 @@
 from typing import List
+from includes.src.request import Request
 from includes.core.security import AUTH_TOKEN, _Security
 from includes.utils.exm import get_folder_key
-from includes.core.globals.entry import app_context
-from includes.database.models.db_exam import _ExamDetails, _TeacherProfile
+from includes.database.models.exam import _ExamDetails, _TeacherProfile
 from includes.utils.utils import get_post_value
 from includes.database.models.utils import TimeStamp
 
@@ -362,11 +362,11 @@ def get_class_name(code):
     return "Default"
 
 
-async def exam_setting_setter(record, values=None):
+async def exam_setting_setter(record, values=None, request=None):
     update = False
     for i in ["join_mode", "open_request", "req_appr_mode", "result_visibility"]:
         optin = s_meta_value.get(i, [])
-        value = values.pop(i, None) if values else await get_post_value(i)
+        value = values.pop(i, None) if values else await get_post_value(request, i)
         if value and value in optin:
             update = True
             setattr(record, i, optin.index(value))
@@ -385,7 +385,10 @@ def get_mode_option_title(name, value: str, language: str = "English") -> str | 
 
 
 async def build_settings_page(
-    language, record: _TeacherProfile | _ExamDetails | None = None, message: bool = None
+    language,
+    record: _TeacherProfile | _ExamDetails | None = None,
+    message: bool = None,
+    request: Request = None,
 ):
     behavior_items = []
 
@@ -500,7 +503,7 @@ async def build_settings_page(
             }
         )
     else:
-        member = await app_context.setting.member()
+        member = await request.state.setting.member()
         account_section["key"] = get_folder_key(int(member.get("id")))
         account_section["name"] = member.get("name")
         account_section["biography"] = member.get("biography")

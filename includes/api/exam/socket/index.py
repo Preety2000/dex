@@ -5,6 +5,8 @@ import random
 from attr import dataclass
 from enum import IntEnum
 
+from includes.src.request import Request
+
 from includes.api.exam.controller import (
     get_exam_request_session,
     push_exam_event_by_joined_status,
@@ -20,7 +22,7 @@ from includes.api.router import DynamicSokitURLRoute
 from includes.core.globals.coreutils import generate_unique_uuid
 from includes.core.globals.entry import app_context
 from includes.database.dataclass.dataclass import ExamRqStatus
-from includes.database.models.db_exam import ExamRequestSession, _ExamDetails, _ExamRecord
+from includes.database.models.exam import ExamRequestSession, _ExamDetails, _ExamRecord
 from includes.database.models.utils import TimeStamp
 from includes.utils.exm import (
     block_exam_message,
@@ -105,6 +107,7 @@ async def init_exam_session(
     ser_st: ExamRequestSession, exam_details: _ExamDetails
 ) -> ExamRequestSession | None:
     """Initialize student exam record and randomize question options."""
+
     async def callback(record, q):
         record.has_key = generate_unique_uuid()
         record.srec_kry = await Student.insert(
@@ -170,7 +173,7 @@ class ExamSocket:
             await asyncio.sleep(1)
             self.temp_store["countdown"] = True
             days = total_seconds // (60 * 60 * 24)
-            
+
             if days <= 0:
                 return {
                     "__ac": {
@@ -185,16 +188,18 @@ class ExamSocket:
             return format_close_response(exam_not_started_message(target_time))
 
         student = self.websocket.state.member
-        returns.update({
-            "option_name": "कखगघ",
-            "stu_img": student.get("img"),
-            "reg_no": student.get("reg_no"),
-            "roll_no": student.get("roll_no"),
-            "stu_name": student.get("name"),
-            "position": session_query.position,
-            "pe_point": session_query.pe_point,
-            "submit": session_query.content,
-        })
+        returns.update(
+            {
+                "option_name": "कखगघ",
+                "stu_img": student.get("img"),
+                "reg_no": student.get("reg_no"),
+                "roll_no": student.get("roll_no"),
+                "stu_name": student.get("name"),
+                "position": session_query.position,
+                "pe_point": session_query.pe_point,
+                "submit": session_query.content,
+            }
+        )
 
         await ExamEventManager.update_student_status(
             session_query.exam_id, session_query.roll_no
@@ -221,7 +226,9 @@ class ExamSocket:
                 sno += 1
                 q["sno"] = sno
 
-        end_time = stu_rec.timestamp + (info[0] * 60 * 1000) if info else stu_rec.timestamp
+        end_time = (
+            stu_rec.timestamp + (info[0] * 60 * 1000) if info else stu_rec.timestamp
+        )
         student = self.websocket.state.member
 
         return {
@@ -269,7 +276,7 @@ class ExamSocket:
 
         async def on_disconnect(record: _ExamRecord = stu_rec):
             record_type = RecordType.INVIGILATOR if exm else RecordType.STUDENT
-            return await Student.update(record, record_type)
+            return await Student.update(self.websocket, record, record_type)
 
         self.websocket.state.disconnect_callback["stu_rec_update"] = on_disconnect
 
@@ -281,7 +288,9 @@ class ExamSocket:
 
             if exm and stu_rec.exam_id == exm.id and update_data:
                 update_d = await on_disconnect(stu_rec)
-                completed, joined, requests = await StudentRequestSession.get_with_is_joined(stu_rec.exam_id)
+                completed, joined, requests = (
+                    await StudentRequestSession.get_with_is_joined(stu_rec.exam_id)
+                )
 
                 record = get_exam_request_session(update_data)
                 record.append(update_d.allmarks)
@@ -310,7 +319,7 @@ class ExamSocket:
 
         return None
 
-    async def connect_exam(self, socket_ses: SocketSession):
+    async def connect_exam(self, socket_ses: SocketSession, request: Request = None):
         """Handles student connection and timeout validation."""
         if not hasattr(self.websocket, "rto"):
             setattr(self.websocket, "rto", TimeStamp.now_timestamp() + 50000)
@@ -351,14 +360,13 @@ class ExamSocket:
                 }
 
             record = await init_exam_session(ser_st, exam_details)
-            origin = app_context.request.headers.get("origin", "")
             ACTIVE_STUDENTS[roll_no] = socket_ses.session_id
 
             return {
                 "status": "open",
                 "infoMessage": "Request accepted",
                 "statusCode": ser_st.joined_status,
-                "joinLink": f"{origin}/exam?hx={record.has_key}",
+                "joinLink": f"/exam?hx={record.has_key}",
             }
 
         await asyncio.sleep(2)
@@ -423,7 +431,9 @@ class ExamSocket:
                         if await StudentRequestSession.update(req_sess):
                             await push_exam_event_by_joined_status(req_sess)
 
-                self.websocket.state.disconnect_callback["req_sess_update"] = on_disconnect
+                self.websocket.state.disconnect_callback["req_sess_update"] = (
+                    on_disconnect
+                )
 
                 req_sess.joined_status = ExamRqStatus.STUDENT_JOINED_EXAM
                 req_sess.join_timestamps.append(TimeStamp.now_timestamp())

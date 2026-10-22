@@ -15,7 +15,6 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.ext.declarative import declarative_base
 
 # Local Imports
 from includes.database.base import ExamDb

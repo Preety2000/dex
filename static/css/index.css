@@ -89,7 +89,7 @@
   --bg-main: #f4f8fc;
   --bg-muted: #ffffff;
   --bg-soft: #f8fafc;
-  --bg-active: #ffffff;
+  --bg-active: #def8ff;
   --bg-secondary: #eef5fa;
   /* TEXT*/
   --text-title: #2f4468;
@@ -1091,7 +1091,7 @@ button *,
   top: 0;
   left: 0;
   display: block;
-  width: -webkit-fill-available;
+  width: 100%;
   height: 100%;
   background: #0000001c;
   z-index: 999;
@@ -1156,7 +1156,7 @@ button *,
 }
 
 .IN031 .hrg button:hover {
-  background: var(--btn-primary-hover);
+  background: var(--bg-active);
   border-color: var(--border-light);
 }
 
@@ -1355,9 +1355,18 @@ button *,
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  background: var(--bg-muted);
 }
 
-.IN051 {
+.IN050 .close {
+  position: absolute;
+  right: 24px;
+  top: 23px;
+  cursor: pointer;
+}
+
+.IN051,
+.IN0051 {
   width: 150px;
   height: 150px;
 }

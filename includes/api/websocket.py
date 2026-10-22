@@ -22,16 +22,19 @@ import asyncio
 import json
 import logging
 import time
-from fastapi import WebSocket
+from includes.src.request import Request
 from fastapi.websockets import WebSocketState
 from redis import asyncio as aioredis
-from fastapi import WebSocket, WebSocketDisconnect
+from fastapi import WebSocketDisconnect
 from includes.api.chat.socket.index import ChatSokete
 from includes.api.router import DynamicSokitURLRoute
 from includes.core.globals.entry import app_context
 from includes.api.exam.session.ev import STUDENT_LIVE_IN_EXAME
 from includes.api.exam.socket.index import ExamSocket
+from includes.core.globals.route_context import Route
 from includes.middleware.auth_websocket import AuthWebsocket
+
+from includes.src.request import Request, WebSocket
 from includes.src.chat.relationships import ChatRelationships
 
 # Global dictionary to store state for each connection
@@ -156,12 +159,12 @@ class APIWS:
 
         return None, None
 
-    async def index(self, root):
+    async def index(self, request: Request = None, roots: Route = None):
         # scope_type/scope_slug/resource_type/resource_slug/sub_action/child_entity/modifier
         # authWebsocket = AuthWebsocket(self.websocket)
 
         is_time = time.time()
-        self.websocket.state.member = await app_context.setting.member()
+        self.websocket.state.member = await request.state.setting.member()
         if not self.websocket.state.member:
             await self.websocket.close(code=1008)
             print("Connection rejected: Unauthorized access")
@@ -193,7 +196,7 @@ class APIWS:
 
                 # Initialize the outgoing data based on the received input
                 outgoing, callBack = await self.entry(
-                    incoming, DynamicSokitURLRoute.parse(root)
+                    incoming, DynamicSokitURLRoute.parse(roots)
                 )
                 if outgoing:
                     is_time = time.time()  # Reset counter after sending logger action

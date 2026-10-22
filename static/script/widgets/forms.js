@@ -280,7 +280,7 @@
             i.event.input(e => body.change(e, form));
             d && w.create.p("description", getString(d));
             i.showError = e => {
-                const x = w.choose(input_error) || $.create.p(input_error);
+                const x = w.pick(input_error) || $.create.p(input_error);
                 x.in(e);
                 w.add("IN0101");
                 w.insertBefore(x, i);
@@ -353,9 +353,9 @@
             e.preventDefault();
             let values = form.getValue();
             let bind = form.submit || function () { }
-            let required = body.weres("input", false).filter(ev => ev.required);
+            let required = body.picks("input", false).filter(ev => ev.required);
 
-            body.weres("F0024").for(ev => ev.removed("F0024"));
+            body.picks("F0024").for(ev => ev.removed("F0024"));
             required.forEach((input, index) => required.findIndex(i => i.name === input.name) === index ? function (input) {
                 if (!values[input.name]) {
                     submit = false;
@@ -365,7 +365,7 @@
 
             if (submit === false) form.submitError();
 
-            all_error_item = body.weres(input_error);
+            all_error_item = body.picks(input_error);
             all_error_item.for(item => (item.remove(), item.p.removed("IN0101")));
 
 
@@ -384,14 +384,14 @@
 
         body.change = function (element, action) {
             let hooks = form.Forms$Hooks || []
-            body.weres("F0017").for(ev => ev.remove());
+            body.picks("F0017").for(ev => ev.remove());
             for (const cb of hooks)
                 cb.call(element.target, element, action);
         }
 
         form.add("submitError", function (e) {
             const m = (form.errorContainer || getContainer(form))
-            return (m.choose("F0017") || m.create.p("F0017", 0)).in(e || form.requiredmessage || "Please select a value that meets the requirements. *")
+            return (m.pick("F0017") || m.create.p("F0017", 0)).in(e || form.requiredmessage || "Please select a value that meets the requirements. *")
         })
 
 
@@ -888,7 +888,7 @@
                     , l = i => i.get().width;
 
                 let max = l(buttn);
-                for (const i of g.weres("button")) {
+                for (const i of g.picks("button")) {
                     max = Math.max(max, l(i));
                 }
 
@@ -1048,16 +1048,16 @@
             return body;
         });
         form.add("getFormSession", function getFormSession() {
-            return body.choose("F0021");
+            return body.pick("F0021");
         });
         form.add("getFormId", function getFormId(idsession) {
             return $.makeid(idsession || 8);
         });
         form.add("getElement", function getElement(a, b, c) {
-            return body.choose(a, b, c);
+            return body.pick(a, b, c);
         });
         form.add("getInputs", function getInputs() {
-            const inputList = body.weres("input", false) || [];
+            const inputList = body.picks("input", false) || [];
             ai.forEach(input => {
                 if (!inputList.includes(input)) {
                     inputList.push(input);

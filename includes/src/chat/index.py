@@ -1,6 +1,6 @@
 from typing import List
-from fastapi import WebSocket
-
+from includes.src.request import Request
+from includes.src.request import WebSocket
 
 class ChatManager :
     def __init__(self):

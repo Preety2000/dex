@@ -4,7 +4,7 @@ from includes.utils._sub import get_code_to_subject
 from includes.api.exam.student import RecordType, Student
 from includes.core.config import exam_database
 from includes.core.globals.entry import app_context
-from includes.database.models.db_exam import _ExamRecord, PracticeExamRecord
+from includes.database.models.exam import _ExamRecord, PracticeExamRecord
 from includes.database.models.secondary import QuizQuestion, QuizRelationships, Terms
 from includes.schemas.cache.member import MemberCache
 from includes.utils.exm import (
@@ -15,6 +15,7 @@ from includes.utils.exm import (
 )
 from includes.api.exam.results.utils import _question_stats
 from includes.schemas.cache.mcq_question import QuizQuestionCache
+from includes.database.connection import db
 
 
 async def question_stats(answer_key, responses):
@@ -44,9 +45,7 @@ async def question_stats(answer_key, responses):
 
 
 class SELF_RESULTS:
-    def __init__(self):
-        self.request = app_context.request
-        self.function = app_context.function
+
 
     @staticmethod
     async def _result_info(record: _ExamRecord):
@@ -147,7 +146,7 @@ class SELF_RESULTS:
         # Map correct answers
         correct_map = {
             q.id: q.correct_answer
-            for q in app_context.db.query(QuizQuestion).filter(
+            for q in db.query(QuizQuestion).filter(
                 QuizQuestion.id.in_(q_ids)
             )
         }
@@ -215,7 +214,7 @@ class SELF_RESULTS:
         # Map correct answers
         correct_map = {
             q.id: [q.question, q.correct_answer, q.subject_id]
-            for q in app_context.db.query(QuizQuestion).filter(
+            for q in db.query(QuizQuestion).filter(
                 QuizQuestion.id.in_(q_ids)
             )
         }

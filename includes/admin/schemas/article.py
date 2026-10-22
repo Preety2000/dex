@@ -2,15 +2,18 @@ import copy
 from datetime import datetime
 from typing import Any, List, Optional, Tuple, Union
 
+from includes.src.request import Request
 from sqlalchemy import case, delete, desc, func, select, text, update
 
 from includes.admin.modals import checked, emptyMessage
 from includes.admin.schemas.backup import ClassBeckup
 from includes.core.globals.coreutils import is_empty, slugify
 from includes.core.globals.entry import app_context
-from includes.core.metadata import MetaData
+
+from includes.core.globals.route_context import Route
+
 from includes.core.paginator import NewQueryPaginator
-from includes.database.connection import active_secondary_db
+from includes.database.connection import config_secondary_db
 from includes.database.dataclass.dataclass import _Terms, serialize
 from includes.database.models.secondary import (
     Article,
@@ -26,9 +29,8 @@ from includes.database.models.utils import TimeStamp
 from includes.metrics import MetricsManager
 from includes.schemas.cache.subject import SubjectCache
 from includes.schemas.cache.terms import TermsCache
-from includes.schemas.router_schema import DynamicURLRoute
 from includes.utils.arti import get_artical_url, get_mini_article_json
-from includes.utils.utils import get_post_value, get_query_value, set_response
+from includes.utils.utils import get_post_value, set_response
 
 
 def get_timestamp() -> Tuple[Any, int, int]:
@@ -74,7 +76,7 @@ async def json(query: Article) -> Optional[dict[str, Any]]:
         if not mdata:
             return {}
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
         subject = await SubjectCache.get_by_id(mdata.subject_id)
         suggestion_ints = list(map(int, filter(None, mdata.tags_group or [])))
 
@@ -119,33 +121,35 @@ async def json(query: Article) -> Optional[dict[str, Any]]:
     return metadata_dict
 
 
-class ArticleService:
+class AdminArticleService:
+
+    def __init__(self, request):
+        self.request = request
 
     @staticmethod
     def get_timestamp() -> Tuple[Any, int, int]:
         return get_timestamp()
 
-    @staticmethod
-    async def gets(limit: int) -> List[dict[str, Any]]:
-        db = await active_secondary_db()
+    async def gets(self, limit: int) -> List[dict[str, Any]]:
+        db = await config_secondary_db()
         stmt = select(
             func.count(Article.id).label("total"),
             func.count(case((Article.status == "Draft", 1))).label("draft"),
-            func.count(case((Article.status == "Publish", 1))).label("publish")
+            func.count(case((Article.status == "Publish", 1))).label("publish"),
         )
-        
+
         # Single query execution
         result = db.execute(stmt).one()
-        
-        # Response set karein
-        set_response("total", result.total)
-        set_response("draft", result.draft)
-        set_response("publish", result.publish)
 
+        # Response set karein
+        set_response(self.request, "total", result.total)
+        set_response(self.request, "draft", result.draft)
+        set_response(self.request, "publish", result.publish)
 
         data = await NewQueryPaginator.paginate(
             db=db,
             limit=limit,
+            request=self.request,
             types="query",
             model=Article,
             query=select(Article),
@@ -154,9 +158,8 @@ class ArticleService:
 
         return data.records
 
-    @staticmethod
     async def returns_error(
-        query: Article, error_type: str, data_querys: dict[str, Any]
+        self, query: Article, error_type: str, data_querys: dict[str, Any]
     ):
         parameters = await TermsCache.get_by_id(query.parameter)
         record = serialize(query)
@@ -172,9 +175,9 @@ class ArticleService:
             f"Please change the slug and save. You can view the article "
             f"<a target='_blank' href='/{uri}'>here</a>."
         )
-        app_context.response["error"] = error_msg
+        self.request.state.response["error"] = error_msg
 
-        if app_context.function.is_api():
+        if self.request.method == "POST" and self.request.query_params.get("key"):
             return [{"error": error_msg, "matching": record}]
         return data_querys
 
@@ -184,7 +187,9 @@ class ArticleService:
         categories = [int(c) for c in data_querys.get("category", [])]
 
         # Bulk delete existing TermsRelationship for this article
-        db.execute(delete(TermsRelationship).where(TermsRelationship.article_id == article_id))
+        db.execute(
+            delete(TermsRelationship).where(TermsRelationship.article_id == article_id)
+        )
         db.flush()
         # Add new TermsRelationships
         terms_relationships = [
@@ -211,7 +216,7 @@ class ArticleService:
             tag_list = list(set(raw_tags or []))
 
         remaining_tags = copy.deepcopy(tag_list)
-        
+
         # db.execute(text("DROP TABLE IF EXISTS suggestion"))
         # db.commit()
 
@@ -253,30 +258,25 @@ class ArticleService:
             for item in all_suggestions
         ]
 
-    @staticmethod
-    async def insert(data_querys: dict[str, Any]):
-        if app_context.response.get("error"):
+    async def insert(self, data_querys: dict[str, Any]):
+        if self.request.state.response.get("error"):
             return data_querys
 
         slug = data_querys.get("slug")
         title = data_querys.get("title")
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         # Check slug collision
         stmt_slug = select(Article).where(Article.slug == slug)
         existing_slug = db.execute(stmt_slug).scalar_one_or_none()
         if existing_slug:
-            return await ArticleService.returns_error(
-                existing_slug, "slug", data_querys
-            )
+            return await self.returns_error(existing_slug, "slug", data_querys)
 
         # Check title collision
         stmt_title = select(Article).where(Article.title == title)
         existing_title = db.execute(stmt_title).scalar_one_or_none()
         if existing_title:
-            return await ArticleService.returns_error(
-                existing_title, "title", data_querys
-            )
+            return await self.returns_error(existing_title, "title", data_querys)
 
         article_query = Article(
             title=title,
@@ -295,37 +295,36 @@ class ArticleService:
         db.refresh(article_query)
 
         article_id = int(article_query.id)
-        await ArticleService.other_exit_data(db, article_id, data_querys)
+        await AdminArticleService.other_exit_data(db, article_id, data_querys)
         db.commit()
 
         data_querys.update({"redirect": True})
-        if app_context.function.is_api():
+        if self.request.method == "POST" and self.request.query_params.get("key"):
             article_serialized = await json(article_query)
             return [{"insert": True, "querys": article_serialized}]
 
         return data_querys
 
-    @staticmethod
-    async def update(data_querys: dict[str, Any]):
+    async def update(self, data_querys: dict[str, Any]):
         error_msg = (
             "No articles found. You can add a new article here: "
             '<a href="/admin/content/insert">Create Article</a>'
         )
-        query_id = app_context.function.getRequestInt("item")
+        query_id = self.request.query_params.get("item")
 
-        if app_context.response.get("error"):
+        if self.request.state.response.get("error"):
             return
 
         if not query_id:
-            app_context.response["error"] = error_msg
+            self.request.state.response["error"] = error_msg
             return data_querys
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         stmt = select(Article).where(Article.id == int(query_id))
         article_query = db.execute(stmt).scalar_one_or_none()
         if not article_query:
-            app_context.response["error"] = error_msg
+            self.request.state.response["error"] = error_msg
             return data_querys
 
         slug = data_querys.get("slug")
@@ -337,9 +336,7 @@ class ArticleService:
         )
         slug_collision = db.execute(stmt_slug).scalars().first()
         if slug_collision:
-            return await ArticleService.returns_error(
-                slug_collision, "slug", data_querys
-            )
+            return await self.returns_error(slug_collision, "slug", data_querys)
 
         # Check title duplicate excluding current article
         stmt_title = select(Article).where(
@@ -347,9 +344,7 @@ class ArticleService:
         )
         title_collision = db.execute(stmt_title).scalars().first()
         if title_collision:
-            return await ArticleService.returns_error(
-                title_collision, "title", data_querys
-            )
+            return await self.returns_error(title_collision, "title", data_querys)
 
         # Update article fields
         article_query.slug = slug or article_query.slug
@@ -363,14 +358,14 @@ class ArticleService:
             "comment_status", article_query.comment_status
         )
 
-        await ArticleService.other_exit_data(db, article_query.id, data_querys)
+        await AdminArticleService.other_exit_data(db, article_query.id, data_querys)
         db.commit()
 
-        app_context.response["message"] = (
+        self.request.state.response["message"] = (
             "Update Article <a href='/admin/content'>Back</a>"
         )
 
-        if app_context.function.is_api():
+        if self.request.method == "POST" and self.request.query_params.get("key"):
             article_serialized = await json(article_query)
             return [{"insert": True, "querys": article_serialized}]
 
@@ -378,7 +373,7 @@ class ArticleService:
 
     @staticmethod
     async def get_trending_articles(limit: int = 10) -> List[dict[str, Any]]:
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         rank_column = (
             func.row_number()
@@ -418,7 +413,7 @@ class ArticleService:
         if not query:
             return None
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         if isinstance(query, int):
             stmt = select(Article).where(Article.id == query)
@@ -430,8 +425,10 @@ class ArticleService:
         return db.execute(stmt).scalar_one_or_none()
 
     @staticmethod
-    async def getCollection(query: Union[int, str, Article] = None,) -> Optional[dict[str, Any]]:
-        article_query = await ArticleService.get_article(query)
+    async def getCollection(
+        query: Union[int, str, Article] = None,
+    ) -> Optional[dict[str, Any]]:
+        article_query = await AdminArticleService.get_article(query)
         if not article_query:
             return None
 
@@ -441,9 +438,11 @@ class ArticleService:
             if parameters and parameters.id != 0
             else article_query.slug
         )
-        
-        db = await active_secondary_db()
-        metadata_stmt = select(ArticleMetadata).where(ArticleMetadata.id == article_query.id)
+
+        db = await config_secondary_db()
+        metadata_stmt = select(ArticleMetadata).where(
+            ArticleMetadata.id == article_query.id
+        )
         mdata = db.execute(metadata_stmt).scalars().first()
         if mdata is None:
             mdata = ArticleMetadata(
@@ -451,7 +450,7 @@ class ArticleService:
                 tags_group=[],
                 subject_id=0,
                 excerpt="",
-                secret_key=""
+                secret_key="",
             )
 
         suggestion_ints = list(map(int, filter(None, mdata.tags_group or [])))
@@ -494,14 +493,13 @@ class ArticleService:
             "category": [item.id for item in term_query],
         }
 
-    @staticmethod
-    async def addCollection(querys: dict[str, Any]) -> dict[str, Any]:
+    async def addCollection(self, querys: dict[str, Any]) -> dict[str, Any]:
         query_type = querys.get("type", 0)
         parameter = querys.get("parameter", 0)
         subject_id = querys.get("subject_id", 0)
         query_categories = [int(i) for i in querys.get("category", [])]
 
-        app_context.response["subjects"] = []
+        self.request.state.response["subjects"] = []
         for subject in await SubjectCache.get_all():
             dictionary = {
                 "id": subject.id,
@@ -511,10 +509,10 @@ class ArticleService:
             if checked(subject.id == int(subject_id), dictionary):
                 querys["subject_name"] = subject.name
 
-            app_context.response["subjects"].append(dictionary)
+            self.request.state.response["subjects"].append(dictionary)
 
-        app_context.response["resources"] = []
-        app_context.response["category"] = []
+        self.request.state.response["resources"] = []
+        self.request.state.response["category"] = []
 
         terms = await TermsCache.get_all()
         for term in terms:
@@ -530,18 +528,17 @@ class ArticleService:
                 checked(term.id in query_categories, category_dict)
                 if int(query_type) == term.id:
                     category_dict["type"] = "checked"
-                app_context.response["category"].append(category_dict)
+                self.request.state.response["category"].append(category_dict)
 
             if term.resource == 1:
                 resource_dict = dictionary.copy()
                 checked(int(parameter) == term.id, resource_dict)
-                app_context.response["resources"].append(resource_dict)
+                self.request.state.response["resources"].append(resource_dict)
 
         return querys
 
-    @staticmethod
-    async def action(id: int, action_type: str) -> Optional[bool]:
-        db = await active_secondary_db()
+    async def action(self, id: int, action_type: str) -> Optional[bool]:
+        db = await config_secondary_db()
 
         stmt = select(Article).where(Article.id == int(id))
         article = db.execute(stmt).scalar_one_or_none()
@@ -552,7 +549,7 @@ class ArticleService:
             return True
 
         if article and action_type == "delete":
-            data_querys = await ArticleService.getCollection(article)
+            data_querys = await AdminArticleService.getCollection(article)
             if await ClassBeckup.insert(data_querys, "article"):
                 db.execute(
                     delete(ArticleMetadata).where(ArticleMetadata.id == article.id)
@@ -571,30 +568,29 @@ class ArticleService:
                 db.commit()
                 return True
 
-            app_context.response["pop_message"] = {
+            self.request.state.response["pop_message"] = {
                 "title": "This 'article' could not be deleted. Error code: Ae8349",
                 "url": "/admin/content",
             }
             return None
 
-        app_context.response["pop_message"] = {
+        self.request.state.response["pop_message"] = {
             "title": "This 'article' could not be deleted. Error code: Ae8340",
             "url": "/admin/content",
         }
         return None
 
-    @staticmethod
-    async def index(roots: DynamicURLRoute):
-        item = app_context.function.getRequestInt("item")
-        action = get_query_value("action")
+    async def index(self, roots: Route):
+        item = self.request.query_params.get("item")
+        action = self.request.query_params.get("action")
 
         if item and action:
-            if await ArticleService.action(item, action):
-                MetaData.redirect_url = "/admin/content"
+            if await self.action(item, action):
+                self.request.state.metadata.redirect_url = "/admin/content"
                 return "redirect"
 
-        if roots.scope_slug not in ("insert", "update"):
-            app_context.response["data_querys"] = await ArticleService.gets(10)
+        if roots.scope not in ("insert", "update"):
+            self.request.state.response["data_querys"] = await self.gets(10)
             return "admin/articles"
 
         date, hour, minute = get_timestamp()
@@ -633,14 +629,14 @@ class ArticleService:
         integer_fields = {"type", "subject_id", "parameter"}
 
         article_data = None
-        if item and not app_context.function.is_post():
-            article_data = await ArticleService.getCollection(int(item))
+        if item and not self.request.is_post:
+            article_data = await self.getCollection(int(item))
 
-        if app_context.function.is_post():
+        if self.request.is_post:
             keys_list = list(default_fields.keys())
             defaults_list = list(default_fields.values())
 
-            article_data = await get_post_value(keys_list, defaults_list)
+            article_data = await get_post_value(self.request, keys_list, defaults_list)
             option_slug = (
                 article_data.get("title")
                 if is_empty(article_data.get("slug"))
@@ -653,9 +649,9 @@ class ArticleService:
 
             for key, value in article_data.items():
                 if is_empty(value) and key not in optional_fields:
-                    current_error = app_context.response.get("error")
-                    app_context.response["error"] = current_error or emptyMessage(
-                        key, roots.scope_slug
+                    current_error = self.request.state.response.get("error")
+                    self.request.state.response["error"] = (
+                        current_error or emptyMessage(key, roots.scope)
                     )
 
         elif not article_data:
@@ -674,8 +670,8 @@ class ArticleService:
 
         article_data["update_timestamp"] = date_object
 
-        if app_context.function.is_post():
-            bind_function = getattr(ArticleService, roots.scope_slug, None)
+        if self.request.is_post:
+            bind_function = getattr(self, roots.scope, None)
 
             if callable(bind_function):
                 bind_value = await bind_function(article_data)
@@ -683,14 +679,14 @@ class ArticleService:
                 if bind_value:
                     if isinstance(bind_value, dict):
                         if bind_value.get("redirect"):
-                            MetaData.redirect_url = "/admin/content"
+                            self.request.state.metadata.redirect_url = "/admin/content"
                             return "redirect"
-                        app_context.response["data_querys"] = bind_value
+                        self.request.state.response["data_querys"] = bind_value
 
                     elif isinstance(bind_value, list):
                         return bind_value
 
-        app_context.response["data_querys"] = await ArticleService.addCollection(
+        self.request.state.response["data_querys"] = await self.addCollection(
             article_data
         )
         return "admin/add_articles"

@@ -1,8 +1,9 @@
+from includes.src.request import Request
 from sqlalchemy import and_, select
 from includes.core.globals.entry import app_context
-from includes.database.connection import active_primary_db
+from includes.database.connection import config_primary_db
 from includes.database.dataclass.dataclass import MemberRole, TeacherStatus
-from includes.database.models.owner import Members, VerifyIdentity
+from includes.database.models.primary import Members, VerifyIdentity
 from includes.schemas.cache.member import MemberCache
 from includes.database.models.utils import TimeStamp
 
@@ -14,23 +15,21 @@ from includes.utils.utils import get_post_value, json_response
 class ActionForm:
 
     @staticmethod
-    async def verify_teacher_identity():
-        email = await get_post_value("email")
-        verification_id = await get_post_value("id")
-        approve = await get_post_value("verify", False)
-        block_private = await get_post_value("block_private")
-        block_teacher = await get_post_value("block_teacher")
-        rejection_message = await get_post_value("rejection_message")
-        reasons = await get_post_value("reasons")
+    async def verify_teacher_identity(request):
+        email = await get_post_value(request, "email")
+        verification_id = await get_post_value(request, "id")
+        approve = await get_post_value(request, "verify", False)
+        block_private = await get_post_value(request, "block_private")
+        block_teacher = await get_post_value(request, "block_teacher")
+        rejection_message = await get_post_value(request, "rejection_message")
+        reasons = await get_post_value(request, "reasons")
 
         if not verification_id or not email:
             return {"status": False, "message": "Missing required fields"}
 
-        db = await active_primary_db()
-        identity = db.execute( 
-            select(VerifyIdentity).where(
-                VerifyIdentity.id == verification_id
-            )
+        db = await config_primary_db()
+        identity = db.execute(
+            select(VerifyIdentity).where(VerifyIdentity.id == verification_id)
         ).scalar_one_or_none()
 
         if not identity:
@@ -87,9 +86,9 @@ class ActionForm:
             label = "Verify"
             css = None
 
-        app_context.db.commit()
-        app_context.db.refresh(member)
-        app_context.db.refresh(identity)
+        db.commit()
+        db.refresh(member)
+        db.refresh(identity)
 
         await MemberCache.delete_cache(member.id)
 
@@ -104,12 +103,12 @@ class ActionForm:
         }
 
     @staticmethod
-    async def index(detail):
+    async def index(detail, request: Request = None):
         if (
-            app_context.request.referer
-            and app_context.request.referer.path == "/admin/teacher-verify-indentity"
+            request.state.referer
+            and request.state.referer.path == "/admin/teacher-verify-indentity"
         ):
-            query = await ActionForm.verify_teacher_identity()
+            query = await ActionForm.verify_teacher_identity(request)
             return json_response(query)
 
         return {}

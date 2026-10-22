@@ -7,7 +7,7 @@ $.DOMContentLoaded(query => $.require("worker", function (module) {
             , d = function () { c === true ? e() : f() }
             , e = function () { c = false, drawer_layout.removeAttribute("style"), a.close() }
             , f = function () { c = true, drawer_layout.style.left = 0, a = $.windows(null, { container: drawer_layout, functions: e, noremove: true }, true) };
-        $.weres("IN040").for(e => e.event.on(d));
+        $.picks("IN040").for(e => e.event.on(d));
     })
 
     $.event("IN056", function (scrolltopButton) {
@@ -20,8 +20,8 @@ $.DOMContentLoaded(query => $.require("worker", function (module) {
         window.onscroll = scrolling;
     })
 
-    $.weres("tallbar").for(e => e.event.on(function (button) {
-        button = this.p.choose("options");
+    $.picks("tallbar").for(e => e.event.on(function (button) {
+        button = this.p.pick("options");
         if (this.p.get("aria-expanded") == "true") {
             height = 0;
             marginTop = 0;
@@ -41,10 +41,10 @@ $.DOMContentLoaded(query => $.require("worker", function (module) {
     }))
 
 
-    $.weres("label-link").for(a => a.event.mouseover(function () {
-        const g = a.p.choose("tag-info");
+    $.picks("label-link").for(a => a.event.mouseover(function () {
+        const g = a.p.pick("tag-info");
         g && $.tooltip(this, null).executed(
-            $.create("tag-tooltip", a.p.choose("tag-info").innerHTML)
+            $.create("tag-tooltip", a.p.pick("tag-info").innerHTML)
         );
     }))
 
@@ -71,14 +71,17 @@ $.DOMContentLoaded(query => $.require("worker", function (module) {
             rec.interimResults = false;
             rec.maxAlternatives = 1;
             voice.event.on(e => str(rec, forms))
-        }(new spr(), function (rec, forms, win = $.popup()) {
+        }(new spr(), function (rec, forms) {
+            const win = $.create("IN031");
+            win.close = e => win.remove()
+            win.create("close").event.on(win.close).addIcon("ic_close")
             win.add("IN050")
                 , win.create("IN051").addIcon("anm_voice")
                 , win.create("see-text", "Listening...")
                 , rec.start()
                 , rec.onresult = function (event) {
                     search.value = event.results[0][0].transcript.toLocaleLowerCase()
-                        , (forms.choose("IN058") || forms.choose("IN049")).click()
+                        , (forms.pick("IN058") || forms.pick("IN049")).click()
                         , win.close();
                 }
                 , rec.onerror = (e) => {
@@ -92,6 +95,8 @@ $.DOMContentLoaded(query => $.require("worker", function (module) {
                     console.error("SpeechRecognition error:", e.error);
                     win?.close();
                 }
+
+            document.body.append(win)
 
         }) : null
     }(window.SpeechRecognition || window.webkitSpeechRecognition, $('[type="search"]')));
@@ -123,7 +128,7 @@ $.DOMContentLoaded(query => $.require("worker", function (module) {
         });
 
         x(function exquiter(e) {
-            $.weres("IN028").for(a => {
+            $.picks("IN028").for(a => {
                 if (a.scrollHeight <= a.clientHeight || a.p.querySelector('.IN029')) return;
                 const b = a.p.create('IN029'), c = b.create('IN030');
                 a.style.position = 'relative'; a.add('scro');
@@ -148,7 +153,7 @@ $.DOMContentLoaded(query => $.require("worker", function (module) {
                 u();
             });
 
-            $.weres("[jsname]", false).for(b => b.module || (m.clickAction(b), b.module = true));
+            $.picks("[jsname]", false).for(b => b.module || (m.clickAction(b), b.module = true));
         });
 
         new MutationObserver(e => m.exquiter(e)).observe(document.body, { childList: true, subtree: true });

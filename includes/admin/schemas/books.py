@@ -3,12 +3,11 @@ from sqlalchemy import select
 from includes.admin.modals import checked, emptyMessage
 from includes.core.globals.coreutils import is_empty, slugify
 from includes.core.globals.entry import app_context
-from includes.core.metadata import MetaData
-from includes.database.models.owner import Subject
+from includes.core.globals.route_context import Route
+from includes.database.models.primary import Subject
 from includes.database.models.secondary import Books
-from includes.schemas.router_schema import DynamicURLRoute
 from includes.utils.utils import get_post_value
-from includes.database.connection import active_secondary_db
+from includes.database.connection import config_secondary_db
 
 
 class ClassBooks:
@@ -44,13 +43,9 @@ class ClassBooks:
 
     @classmethod
     async def getList(cls, limit=10):
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
-        books_stmt = (
-            select(Books)
-            .order_by(Books.id.desc())
-            .limit(limit)
-        )
+        books_stmt = select(Books).order_by(Books.id.desc()).limit(limit)
 
         books = db.execute(books_stmt).scalars().all()
 
@@ -66,8 +61,7 @@ class ClassBooks:
                 "name": name,
                 "slug": slug,
             }
-            for subject_id, name, slug
-            in db.execute(subjects_stmt).all()
+            for subject_id, name, slug in db.execute(subjects_stmt).all()
         }
 
         return [
@@ -87,16 +81,9 @@ class ClassBooks:
         if value is None:
             return None
 
-        stmt = (
-            select(Books)
-            .where(
-                (Books.id == value)
-                | (Books.slug == value)
-            )
-            .limit(1)
-        )
-        
-        db = await active_secondary_db()
+        stmt = select(Books).where((Books.id == value) | (Books.slug == value)).limit(1)
+
+        db = await config_secondary_db()
 
         query = db.execute(stmt).scalar_one_or_none()
 
@@ -108,7 +95,7 @@ class ClassBooks:
 
     @classmethod
     async def insert(cls, data):
-        if app_context.response["error"]:
+        if request.state.response["error"]:
             return data
 
         name = data.get("name")
@@ -130,7 +117,7 @@ class ClassBooks:
 
         writer = data.get("writer_id")
         subject = data.get("subject_id")
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         try:
             book = Books(
@@ -148,9 +135,7 @@ class ClassBooks:
         except Exception:
             db.rollback()
 
-            app_context.response["pop_message"] = (
-                "Book could not be created."
-            )
+            request.state.response["pop_message"] = "Book could not be created."
 
             return data
 
@@ -167,7 +152,7 @@ class ClassBooks:
 
     @classmethod
     async def update(cls, data):
-        if app_context.response["error"]:
+        if request.state.response["error"]:
             return data
 
         item_id = data.get("id")
@@ -178,7 +163,7 @@ class ClassBooks:
         book = cls.get(item_id, raw=True)
 
         if book is None:
-            app_context.response["error"] = "Not any query found."
+            request.state.response["error"] = "Not any query found."
             return data
 
         if data.get("slug"):
@@ -205,22 +190,18 @@ class ClassBooks:
         if data.get("image_src") is not None:
             book.image_src = data["image_src"]
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
         try:
             db.commit()
 
         except Exception:
             db.rollback()
 
-            app_context.response["pop_message"] = (
-                "Book could not be updated."
-            )
+            request.state.response["pop_message"] = "Book could not be updated."
 
             return data
 
-        app_context.response["message"] = (
-            "Updated <a href='/admin/books'>Back</a>"
-        )
+        request.state.response["message"] = "Updated <a href='/admin/books'>Back</a>"
 
         return data
 
@@ -238,7 +219,7 @@ class ClassBooks:
         book = cls.get(item_id, raw=True)
 
         if book is None:
-            app_context.response["pop_message"] = "Book not found."
+            request.state.response["pop_message"] = "Book not found."
             return {"redirect": True}
 
         book_json = cls.json(book)
@@ -250,10 +231,10 @@ class ClassBooks:
         # )
 
         backup = None
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         if not backup:
-            app_context.response["pop_message"] = (
+            request.state.response["pop_message"] = (
                 "This 'books' id not delete. Error code Xe742524"
             )
             return {"redirect": True}
@@ -265,7 +246,7 @@ class ClassBooks:
         except Exception:
             db.rollback()
 
-            app_context.response["pop_message"] = (
+            request.state.response["pop_message"] = (
                 "This 'books' id not delete. Error code Xe742524"
             )
 
@@ -282,7 +263,7 @@ class ClassBooks:
     @classmethod
     async def getCollection(cls):
         item_id = cls.function.getRequestInt("item")
-        is_post = cls.function.is_post()
+        is_post = request.is_post
 
         data = cls.get(item_id)
 
@@ -306,6 +287,7 @@ class ClassBooks:
 
         if is_post:
             data = await get_post_value(
+                request,
                 fields,
                 defaults,
             )
@@ -320,12 +302,11 @@ class ClassBooks:
 
             for key, value in data.items():
                 if is_empty(value) and key != "excerpt":
-                    app_context.response["error"] = (
-                        app_context.response["error"]
-                        or emptyMessage(
-                            key,
-                            "cls.admin.defaults,",
-                        )
+                    request.state.response["error"] = request.state.response[
+                        "error"
+                    ] or emptyMessage(
+                        key,
+                        "cls.admin.defaults,",
                     )
 
         if not data and not is_post:
@@ -346,16 +327,13 @@ class ClassBooks:
         except (TypeError, ValueError):
             subject_id = 0
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
-        stmt = (
-            select(
-                Subject.id,
-                Subject.name,
-                Subject.slug,
-            )
-            .order_by(Subject.name)
-        )
+        stmt = select(
+            Subject.id,
+            Subject.name,
+            Subject.slug,
+        ).order_by(Subject.name)
 
         rows = db.execute(stmt).all()
 
@@ -382,29 +360,29 @@ class ClassBooks:
     # =========================================================
 
     @classmethod
-    async def index(cls, roots: DynamicURLRoute):
+    async def index(cls, roots: Route):
 
-        if roots.scope_slug in (
+        if roots.scope in (
             "insert",
             "update",
             "delete",
         ):
             cls.data_querys = await cls.getCollection()
 
-            bind_function = getattr(cls,roots.scope_slug,None)
-            if callable(bind_function) and ( cls.function.is_post() or bind_function == cls.delete):
+            bind_function = getattr(cls, roots.scope, None)
+            if callable(bind_function) and (
+                request.is_post or bind_function == cls.delete
+            ):
                 result = await bind_function(cls.data_querys)
 
-                if (isinstance(result, dict) and result.get("redirect")):
-                    MetaData.redirect_url = "/admin/books"
+                if isinstance(result, dict) and result.get("redirect"):
+                    request.state.metadata.redirect_url = "/admin/books"
                     return "redirect"
 
-            app_context.response["data_querys"] = (
-                cls.addCollection(cls.data_querys)
-            )
+            request.state.response["data_querys"] = cls.addCollection(cls.data_querys)
 
             return "admin/add_books"
 
-        app_context.response["data_querys"] = cls.getList(10)
+        request.state.response["data_querys"] = cls.getList(10)
 
         return "admin/books"

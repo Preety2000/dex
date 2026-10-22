@@ -287,7 +287,7 @@ $(function Setting(r) {
     }
 
     s.load_image = function () {
-        let profile_image = this.p.choose("img") || s.each.get("member_atr");
+        let profile_image = this.p.pick("img") || s.each.get("member_atr");
         uploadImage(profile_image, this)
     }
 
@@ -658,10 +658,10 @@ $(function Setting(r) {
         return true;
     });
 
-    var buttons = $.weres("a", false)
+    var buttons = $.picks("a", false)
     s.add(function window(a) {
         var j = "jsname";
-        buttons.combined($.weres("a", false)).filter(insex => !insex.get(j) && (0 <= insex.href.search("settings"))).for(function (insex) {
+        buttons.combined($.picks("a", false)).filter(insex => !insex.get(j) && (0 <= insex.href.search("settings"))).for(function (insex) {
             let uri = new URL(insex.href);
             insex.href = uri;
             insex.add(j, false)

@@ -1,5 +1,5 @@
 (!function (query, sub) {
-    const body = $.bindFunction(document.body), main_body = $.choose("main-body")
+    const body = $.bindFunction(document.body), main_body = $.pick("main-body")
     const request = $.apirequest("/api/admin/insert", true);
     const { E, F, FlEXMAP } = $.getFunction();
     const cr = (a, b, c, d) => (a || $).create(b, c, d)
@@ -11,7 +11,7 @@
 
 
     var d, script_data = {};
-    for (const e of $.weres("script", false)) {
+    for (const e of $.picks("script", false)) {
         e.get("data-content-len")
             ? (d = JSON.parse(e.textContent), script_data[d.id] = d)
             : null;
@@ -87,11 +87,11 @@
             c.addIcon("ic_loader");
 
             request.error = q => {
-                c.choose("icon", false)?.remove();
+                c.pick("icon", false)?.remove();
                 a.submitError(q.error), n(false);
 
                 if (b.datatype) {
-                    const x = g.p.choose("sskip") || g.p.create("sskip DIS01");
+                    const x = g.p.pick("sskip") || g.p.create("sskip DIS01");
                     x.in($.create.button(null, "Skip").event.on((e) => {
                         e.preventDefault();
                         f();
@@ -106,7 +106,7 @@
 
             n(true);
             request.send({ ...b, root: e }, q => {
-                c.choose("icon", false)?.remove();
+                c.pick("icon", false)?.remove();
                 d.push(q.res);
                 f(q.res), n(false);
             });
@@ -151,7 +151,7 @@
     var category;
     const ga = (sv) => {
         if (!category || !category.length <= 0) {
-            category = $.weres("category")
+            category = $.picks("category")
         }
         for (const i of category || [])
             i.get("sub-id") == sv || sv == 0 ? i.removed("hidden") : i.add("hidden")
@@ -159,7 +159,7 @@
 
 
     actionMap.add(1001, function (a, b) {
-        var list, button = $.weres("[jsname]").find(e => e.get("jsname") == a.jsname && e.get("data-content-len") == a.id);
+        var list, button = $.picks("[jsname]").find(e => e.get("jsname") == a.jsname && e.get("data-content-len") == a.id);
         if (button && (list = button.parentFilter(e => e.nodeName == "TR"))) {
             list.set("class", null);
             button.in(a.inner, true);
@@ -217,10 +217,10 @@
 
 
 
-    for (const button of $.weres("a", false).filter(function (a) { return a.get("href") == "javascript:void(0)" })) {
+    for (const button of $.picks("a", false).filter(function (a) { return a.get("href") == "javascript:void(0)" })) {
 
         button.inclass("edit", e => e.event.on(function (e) {
-            const span = this.choose("span"), option = this.p.choose(this.get("aria-label"), true)
+            const span = this.pick("span"), option = this.p.pick(this.get("aria-label"), true)
             span.in(option.isclass("hidden") ? "Ok" : "Edit")
             option.toggle("hidden")
             console.log(span, option.isclass("hidden"));
@@ -239,7 +239,7 @@
 
 
     $.require("dm/action", e => {
-        for (const i of $.weres("[jsname]") || []) {
+        for (const i of $.picks("[jsname]") || []) {
             const b = e.export(i.get("jsname"));
             i.event.on(() => typeof b == "function" && b(i, i.get("data-content-len") || 0));
         }

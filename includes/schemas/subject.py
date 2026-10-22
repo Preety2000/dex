@@ -5,18 +5,19 @@ from sqlalchemy import asc
 
 from includes.core.globals.entry import app_context, GlobleCatch
 from includes.admin.api.schemas import subject
-from includes.database.models.owner import Subject
+from includes.database.models.primary import Subject
 from includes.database.dataclass.dataclass import to_dict
 from includes.schemas.cache.mcq_question import QuizQuestionCache
 from includes.schemas.cache.terms import TermsCache
 from includes.schemas.cache.subject import SubjectCache
+from includes.database.connection import db
 
 
 class ClassSubject:
 
     @staticmethod
     def get(query=None, quet=None):
-        subject =app_context.db.query(Subject)
+        subject =db.query(Subject)
 
         if query is True and isinstance(query, bool):
             all_subjects = subject.order_by(asc(Subject.name)).all()

@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from attr import asdict
-from fastapi import Request
+from includes.src.request import Request
 
 
 @dataclass

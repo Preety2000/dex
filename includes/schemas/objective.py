@@ -1,13 +1,14 @@
 import inspect
 from typing import Tuple, Optional, List
 
+from includes.src.request import Request
 from sqlalchemy import asc, func, select
 
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import format_view_count
 from includes.core.paginator import NewQueryPaginator
 from includes.core.request_filter import RequestFilter
-from includes.database.connection import active_secondary_db
+from includes.database.connection import config_secondary_db
 from includes.database.dataclass.dataclass import serialize, to_dict
 from includes.database.models.secondary import (
     QuizQuestion,
@@ -21,16 +22,16 @@ from includes.schemas.subject import ClassSubject
 
 async def get_mcq_json(
     item: Optional[QuizQuestion] = None,
-    *,
-    subject=None,
     title=None,
+    subject=None,
+    request: Request = None,
     **more,
 ) -> dict:
 
     if not item:
         return {}
 
-    await item.next_prev_question()
+    await item.next_prev_question(request)
 
     response = to_dict(await item.to_dict(**more))
 
@@ -100,9 +101,10 @@ async def get_mini_mcq_json(
 
 
 async def get_mcq_by_terms_id(
+    request: Request = None,
     *,
     terms_id,
-    limit=4,
+    limit: int = 4,
     **more,
 ):
     if terms_id is None:
@@ -111,7 +113,7 @@ async def get_mcq_by_terms_id(
     if hasattr(terms_id, "id"):
         terms_id = terms_id.id
 
-    db = await active_secondary_db()
+    db = await config_secondary_db()
 
     query = (
         select(QuizQuestion)
@@ -141,14 +143,12 @@ async def get_mcq_by_terms_id(
         else:
             remaining_kwargs[key] = value
 
-    async def transform_quiz(item):
-        return await item.to_dict()
-
     data = await NewQueryPaginator.paginate(
         types="query",
         query=query,
         model=QuizQuestion,
         limit=limit,
+        request=request,
         db=db,
         transform=lambda item: get_mini_mcq_json(item),
         **remaining_kwargs,
@@ -160,9 +160,9 @@ async def get_mcq_by_terms_id(
 class ClassObjective:
 
     @staticmethod
-    async def get(*, terms_id=None, **more):
+    async def get(*, terms_id=None, request: Request = None, **more):
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         query = select(QuizQuestion)
 
@@ -195,17 +195,19 @@ class ClassObjective:
         return await get_mcq_json(
             record,
             subject=True,
+            request=request,
         )
 
     @staticmethod
     async def getmcq_list(
         term_slug=None,
+        request: Request = None,
         *,
         limit=10,
         **more,
     ):
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         # Default questions
         if not term_slug or term_slug == "default":
@@ -217,6 +219,7 @@ class ClassObjective:
                 query=query,
                 model=QuizQuestion,
                 limit=limit,
+                request=request,
                 db=db,
                 transform=lambda item: get_mini_mcq_json(item),
                 **more,
@@ -255,6 +258,7 @@ class ClassObjective:
             model=QuizQuestion,
             limit=limit,
             db=db,
+            request=request,
             transform=lambda item: get_mini_mcq_json(item),
             **more,
         )
@@ -264,15 +268,16 @@ class ClassObjective:
     @staticmethod
     async def at_tests(
         subject,
-        category,
-        limit=10,
-        ids=None,
+        limit: int = 10,
+        ids: list = None,
+        category: str = None,
+        request: Request = None,
         *,
         co_search=None,
         **options,
     ):
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         query = select(QuizQuestion)
 
@@ -356,6 +361,7 @@ class ClassObjective:
         # ----------------------------------
 
         query = await RequestFilter.apply_request_filters(
+            request=request,
             model=QuizQuestion,
             request_type="referer",
             query=query,
@@ -398,6 +404,7 @@ class ClassObjective:
                 model=QuizQuestion,
                 limit=limit,
                 db=db,
+                request=request,
                 transform=enrich_student,
                 request_type="referer",
                 **options,

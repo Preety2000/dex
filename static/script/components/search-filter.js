@@ -48,7 +48,7 @@ $.define("components/search-filter", $(function SearchFilter(a) {
                 maxHeight: 400,
                 overflowY: "scroll"
             });
-            for (const i of p.weres("F0019"))
+            for (const i of p.picks("F0019"))
                 i.css({
                     margin: 0
                 });
@@ -57,7 +57,7 @@ $.define("components/search-filter", $(function SearchFilter(a) {
     })
     this.add(function gsSearch(r) {
         const b = $.create("T003"), g = (i, fm, v) => {
-            const bt = $.choose("T004") || b.create.span("button T004").addIcon("ice_close-x").event.on(e => (r.delete("gs", e.gs), i.value = null, bt.remove()))
+            const bt = $.pick("T004") || b.create.span("button T004").addIcon("ice_close-x").event.on(e => (r.delete("gs", e.gs), i.value = null, bt.remove()))
             v ? fm.container.in(bt) : bt.remove()
         };
         $.require("widgets/forms", e => {

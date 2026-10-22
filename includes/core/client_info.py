@@ -1,9 +1,10 @@
+from includes.src.request import Request
 import requests
 import socket
 from user_agents import parse
 
 from includes.core.device_encoder import encode_device
-from includes.core.deviceinfo import DeviceInfo
+
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
 
@@ -39,28 +40,26 @@ def generate_fingerprint(ip, ua, lang, timezone):
 # -------------------------
 # Main Function (FIXED + COMPLETE)
 # -------------------------
-def collect_user_signals(ip):
+def collect_user_signals(request: Request = None):
 
     # -------------------------
     # Headers (FIXED: consistent variables)
     # -------------------------
-    user_agent_string = app_context.request.headers.get("User-Agent", "")
-    accept_language = app_context.request.headers.get("Accept-Language", "")
-    client_timezone = app_context.request.headers.get("X-Timezone", "")
-
-    DeviceInfo.reset(app_context.request)
-    device_info = DeviceInfo.to_dict()
+    user_agent_string = request.headers.get("User-Agent", "")
+    accept_language = request.headers.get("Accept-Language", "")
+    client_timezone = request.headers.get("X-Timezone", "")
+    device_info = request.state.divice_info.to_dict()
     # -------------------------
     # IP APIs
     # -------------------------
-    ipinfo = safe_get_json(f"https://ipinfo.io/{ip}/json") or {}
-    ipapi = safe_get_json(f"http://ip-api.com/json/{ip}") or {}
+    ipinfo = safe_get_json(f"https://ipinfo.io/{request.ip}/json") or {}
+    ipapi = safe_get_json(f"http://ip-api.com/json/{request.ip}") or {}
 
     # -------------------------
     # Hostname
     # -------------------------
     try:
-        hostname = socket.gethostbyaddr(ip)[0].lower()
+        hostname = socket.gethostbyaddr(request.ip)[0].lower()
     except:
         hostname = ""
 
@@ -113,7 +112,7 @@ def collect_user_signals(ip):
     if not isp:
         risk_score += 20
 
-    if DeviceInfo.device == "Other":
+    if request.state.divice_info.device == "Other":
         risk_score += 10
 
     if "bot" in user_agent_string.lower():
@@ -134,7 +133,7 @@ def collect_user_signals(ip):
     # Fingerprint ID (FIXED VARIABLE)
     # -------------------------
     fingerprint_id = generate_fingerprint(
-        ip, user_agent_string, accept_language, timezone or ""
+        request.ip, user_agent_string, accept_language, timezone or ""
     )
 
     # -------------------------
@@ -149,7 +148,7 @@ def collect_user_signals(ip):
             "client_timezone": client_timezone,
         },
         "network": {
-            "ip": ip,
+            "ip": request.ip,
             "isp": isp,
             "city": city,
             "region": region,

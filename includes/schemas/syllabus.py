@@ -1,7 +1,8 @@
+from includes.src.request import Request
 from sqlalchemy import select
 
 from includes.core.paginator import NewQueryPaginator
-from includes.database.connection import active_secondary_db
+from includes.database.connection import config_secondary_db
 from includes.utils._sub import configure_page
 from includes.core.globals.entry import app_context
 from includes.database.models.secondary import Syllabus
@@ -26,7 +27,7 @@ class ClassSyllabus:
         return {
             "id": query.id,
             "slug": query.slug,
-            "url": app_context.request.host_url
+            "url": app_context.host_url
             + "syllabus/"
             + is_university.slug
             + "/"
@@ -39,11 +40,11 @@ class ClassSyllabus:
         }
 
     @classmethod
-    async def get(cls, query=None, **more):
+    async def get(cls, query=None, request: Request = None, **more):
 
         syllabus = select(Syllabus)
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         # If no query, return all syllabuses
         if query is True and isinstance(query, bool):
@@ -52,6 +53,7 @@ class ClassSyllabus:
                 types="query",
                 model=Syllabus,
                 query=syllabus,
+                request=request,
                 transform=lambda item: cls.json(item, True),
                 **more
             )
@@ -71,15 +73,15 @@ class ClassSyllabus:
         if not subresource:
             ClassUniversity.add_syllabus = True
             university = ClassUniversity.get(True)
-            configure_page(title="Syllabus", suffix=True)
+            configure_page(request.state.metadata, title="Syllabus", suffix=True)
 
-            app_context.response["data_querys"] = university
+            request.state.response["data_querys"] = university
             return "widget/syllabus"
 
         if detail:
             syllabus = await cls.get(detail)
-            configure_page(title=syllabus.get("title"))
-            app_context.response["data_querys"] = syllabus
+            configure_page(request.state.metadata, title=syllabus.get("title"))
+            request.state.response["data_querys"] = syllabus
             return "query/syllabus_view"
 
         return "error.html"

@@ -6,7 +6,7 @@ $.define("mobile", function Mobile(documentbody) {
 
 
         const dotsContainer = $('dots');
-        const slides = $.weres('slide');
+        const slides = $.picks('slide');
         const numSlides = slides.length;
         const scrollInterval = 3000;
         let currentIndex = 0;
@@ -19,7 +19,7 @@ $.define("mobile", function Mobile(documentbody) {
             dotsContainer.appendChild(dot);
         }
 
-        const dots = dotsContainer.weres('dot');
+        const dots = dotsContainer.picks('dot');
         dots[0].add('active');
 
         // Function to update dots based on scroll position
@@ -77,8 +77,8 @@ $.define("mobile", function Mobile(documentbody) {
         , c = b.search.get("q")
         , d = $.create("button IN059")
         , s = $.create("button IN058")
-        , e = m.choose("input", false)
-        , f = m.choose("IN047")
+        , e = m.pick("input", false)
+        , f = m.pick("IN047")
         , g = function (ev) {
             documentbody.removed(a);
             d.remove();
@@ -108,7 +108,7 @@ $.define("mobile", function Mobile(documentbody) {
 
 
     // TOC Worker 
-    $.weres('toc_a', (m, a, b
+    $.picks('toc_a', (m, a, b
         , c = false
         , d = m.get("href")
         , e = { behavior: 'smooth' }

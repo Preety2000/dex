@@ -64,13 +64,13 @@
 
     var title_show = function (a) {
         if (!body.inclass("collapsed_nav")) { return $.create("title-show") }
-        var titleshow = navigation.choose("title-show") || navigation.create("title-show")
+        var titleshow = navigation.pick("title-show") || navigation.create("title-show")
         if (a == true) { titleshow.remove() }
         return titleshow;
     }
 
     var URLState = new $.URLState()
-    var menu_button = navigation.weres("list").filter(function (e) { return e.parentFilter(function (e) { return e.isclass("main-manu") }) });
+    var menu_button = navigation.picks("list").filter(function (e) { return e.parentFilter(function (e) { return e.isclass("main-manu") }) });
     var activeQuery = function (element, option) {
         if (option && element.p.childrens.for(menu => menu.removed("active")));
         return (element.href && (0 <= location.href.search(element.href)))
@@ -100,7 +100,7 @@
         })
         element.event.on(e => {
             e.preventDefault(); element.href && URLState.navigate(element.href);
-            element.p.choose("indector")?.css({ top: get_top_position(-6) });
+            element.p.pick("indector")?.css({ top: get_top_position(-6) });
             activeQuery(element, true); URLState.reload(); return !1
         })
 
@@ -108,9 +108,9 @@
 
 
     // Content Function 
-    $.event("cb-select-all", function (choose) {
-        var cb_select = $.weres("cb-select");
-        var action_selector = $.choose("bulk-action-choose-top", true)
+    $.event("cb-select-all", function (pick) {
+        var cb_select = $.picks("cb-select");
+        var action_selector = $.pick("bulk-action-pick-top", true)
         console.log(action_selector);
 
 
@@ -119,7 +119,7 @@
                 return;
             }
             var container_close = function (p, q = $("IN033") || $.create()) { p.remove(), q.click() }
-            var container = body.choose("fixed-container") || body.create("fixed-container");
+            var container = body.pick("fixed-container") || body.create("fixed-container");
             var form = container.create("form", "add-quiz");
             var title = form.create("F0006").create("hndle", "Add Json Data")
             var IN0100 = title.p.create("handle-actions").event.on(e => container_close(container));
@@ -140,10 +140,10 @@
             question_status_option.p.create("label",).add("for", input_$.id)
 
 
-            var category_container = form.create("category-container", $.choose("categorydiv", true).innerHTML);
+            var category_container = form.create("category-container", $.pick("categorydiv", true).innerHTML);
             form.create("submit", "Update All Questions").add("button").event.on(function () {
 
-                var category = form.weres("category-input");
+                var category = form.picks("category-input");
                 var categorys_value = [];
                 var data = [];
                 category.for(function (category) {
@@ -198,8 +198,8 @@
             $.windows(form, o => container_close(container), true)
         }
 
-        choose.event.on(function () {
-            cb_select.for(option => option.checked = choose.checked);
+        pick.event.on(function () {
+            cb_select.for(option => option.checked = pick.checked);
             action_selector.value = -1;
         });
 
@@ -209,8 +209,8 @@
             cb_select.for(function (items) {
                 if (items.checked) {
                     let data = {};
-                    data.id = items.p.choose("quick-edites").id;
-                    data.question = items.p.p.choose("query-title").innerText;
+                    data.id = items.p.pick("quick-edites").id;
+                    data.question = items.p.p.pick("query-title").innerText;
                     cb_data.push(data);
                 }
             })
@@ -252,33 +252,35 @@
         })
     }
 
-    var imageInput, jshendler;
-    if ((imageInput = $('[name="image_src"]')) && (jshendler = $.makeid(20))) {
-        let button = imageInput.add("jshendler", jshendler).p.choose("p", false)
-            .create.span("media-button")
-            .create.a("insert-media add_media");
+    // var imageInput, jshendler;
+    // if ((imageInput = $('[name="image_src"]')) && (jshendler = $.makeid(20))) {
 
-        button.add("data-editor", "content");
-        button.add("type", "button");
-        button.add("jsname", "addMedia");
+    //     let button = imageInput.add("jshendler", jshendler).p.pick("p", false)
+    //     .create.span("media-button")
+    //         .create.a("insert-media add_media");
 
-        // button.create.span("media-buttons-icon");
-        button.create.span("media-buttons-title", "Add Media");
-        button.event.on(e => $.require("widgets/media", f => {
-            const data = new f({
-                c: $("main-body"),
-                name: "indian-economay",
-                location: "category",
-                cb: function (e) {
-                    console.log(e, this);
-                }
+    //     button.add("data-editor", "content");
+    //     button.add("type", "button");
+    //     button.add("jsname", "addMedia");
 
-
-            })
-            console.log(data);
+    //     console.log(button);
+    //     // button.create.span("media-buttons-icon");
+    //     button.create.span("media-buttons-title", "Add Media");
+    //     button.event.on(e => $.require("widgets/media", f => {
+    //         const data = new f({
+    //             c: $("main-body"),
+    //             name: "indian-economay",
+    //             location: "category",
+    //             cb: function (e) {
+    //                 console.log(e, this);
+    //             }
 
 
-        }).css());
-        button.click()
-    }
+    //         })
+    //         console.log(data);
+
+
+    //     }).css());
+    //     button.click()
+    // }
 }($ || window.$))

@@ -9,8 +9,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 from includes.core.globals.entry import app_context
-from includes.database.models.db_exam import ExamDb
-from includes.database.models.owner import BaseOwner
+from includes.database.models.exam import ExamDb
+from includes.database.models.primary import BaseOwner
 from includes.database.models.secondary import BaseSecondary
 
 from includes.database.dir import (

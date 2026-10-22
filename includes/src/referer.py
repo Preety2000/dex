@@ -1,131 +1,68 @@
-from __future__ import annotations
-from typing import Any, Optional
-from urllib.parse import parse_qs
+import uuid
+from typing import Optional
+from dataclasses import field
+from urllib.parse import parse_qs, urlparse
+from attr import dataclass
 
-from includes.core.globals.entry import app_context
-from includes.src.request import RequestContext
-
-
+@dataclass(init=False)
 class Referer:
-    """
-    Convenience facade for accessing the current request's referer context.
-    Examples:
-        Referer.get()
-        Referer.path
-        Referer.resource
-        Referer.get_search("page")
-        Referer.get_search_int("page")
-    """
+    path: str = ""
+    query: str = ""
+    params: dict = field(default_factory=dict)
 
-    @classmethod
-    def _context(cls) -> Optional[RequestContext]:
-        """Return the current referer context, if available."""
-        try:
-            return app_context.request.referer
-        except AttributeError:
+    base_url: str = ""
+    base_uri: str = ""
+    full_path: str = ""
+    url_root: str = ""
+    host_url: str = ""
+    request_id: str = ""
+
+    depth: int = 0
+    raw_path: str = ""
+
+    section: Optional[str] = None
+    scope: Optional[str] = None
+    entity: Optional[str] = None
+    action: Optional[str] = None
+    core: Optional[str] = None
+    space: Optional[str] = None
+    end: Optional[str] = None
+
+    def __new__(cls, request):
+        if request.headers.get("Referer") is None:
             return None
 
-    @classmethod
-    def get(cls) -> Optional[RequestContext]:
-        """Return the complete referer RequestContext."""
-        return cls._context()
+        return super().__new__(cls)
 
-    @classmethod
-    def __getattr__(cls, name: str) -> Any:
-        """
-        Proxy unknown attributes to the current referer context.
+    def __init__(self, request):
+        referer_url = request.headers.get("Referer")
+        parsed = urlparse(referer_url)
 
-        Note:
-            Python does not normally use __getattr__ on a class itself
-            for `Referer.path`, so a metaclass/property approach would be
-            required for true class-level transparent proxying.
-        """
-        context = cls._context()
+        scheme = parsed.scheme or "http"
+        netloc = parsed.netloc
 
-        if context is None:
-            return None
+        self.path = parsed.path
+        self.query = parsed.query
 
-        return getattr(context, name, None)
+        raw_params = parse_qs(self.query)
+        self.params = {
+            key: values[0] if len(values) == 1 else values
+            for key, values in raw_params.items()
+        }
 
-    @classmethod
-    def get_search(cls, name: str, default: Any = None) -> Any:
-        """
-        Get a single query parameter from the referer's query string.
+        self.url_root = f"{scheme}://{netloc}"
+        self.base_url = f"{self.url_root}{self.path}"
+        self.base_uri = self.base_url
+        self.full_path = (
+            f"{self.base_url}?{self.query}" if self.query else self.base_url
+        )
+        self.host_url = f"{self.url_root}/"
+        self.request_id = str(uuid.uuid4())
 
-        Returns:
-            The first value when query params are strings.
-            A direct value when params behaves like a mapping.
-            `default` when the value does not exist.
-        """
-        context = cls._context()
+        self.raw_path = self.path.strip("/")
+        parts = self.raw_path.split("/") if self.raw_path else []
+        self.depth = len(parts)
 
-        if context is None or not name:
-            return default
-
-        params = getattr(context, "params", None)
-
-        if not params:
-            return default
-
-        try:
-            if isinstance(params, str):
-                values = parse_qs(
-                    params,
-                    keep_blank_values=True,
-                )
-                values = values.get(name)
-
-                return values[0] if values else default
-
-            if hasattr(params, "get"):
-                value = params.get(name, default)
-
-                # Mapping may return a list, similar to parse_qs().
-                if isinstance(value, (list, tuple)):
-                    return value[0] if value else default
-
-                return value
-
-        except (TypeError, ValueError, AttributeError):
-            return default
-
-        return default
-
-    @classmethod
-    def get_search_int(
-        cls,
-        name: str,
-        default: Optional[int] = None,
-    ) -> Optional[int]:
-        """Get a query parameter as an integer."""
-        value = cls.get_search(name)
-
-        if value is None or value == "":
-            return default
-
-        try:
-            return int(value)
-        except (TypeError, ValueError):
-            return default
-
-    @classmethod
-    def get_search_float(
-        cls,
-        name: str,
-        default: Optional[float] = None,
-    ) -> Optional[float]:
-        """Get a query parameter as a float."""
-        value = cls.get_search(name)
-
-        if value is None or value == "":
-            return default
-
-        try:
-            return float(value)
-        except (TypeError, ValueError):
-            return default
-
-    @classmethod
-    def has_search(cls, name: str) -> bool:
-        """Check whether a query parameter exists."""
-        return cls.get_search(name, default=None) is not None
+        fields = ("section", "scope", "entity", "action", "core", "space", "end")
+        for index, name in enumerate(fields):
+            setattr(self, name, parts[index] if index < len(parts) else None)

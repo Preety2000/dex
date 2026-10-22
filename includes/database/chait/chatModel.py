@@ -2,7 +2,7 @@ import uuid
 from sqlalchemy import Text, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from includes.database.models.utils import TimeStamp
-from includes.database.models.db_exam import JsonList
+from includes.database.models.exam import JsonList
 
 # Base defined globally for all tables
 chatBase = declarative_base()

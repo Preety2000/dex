@@ -16,7 +16,13 @@ from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from includes.database.base import BaseOwner
 from includes.core.globals.entry import app_context
-from includes.database.dataclass.dataclass import _Subject, _MemberSession, MemberRole, TeacherStatus, serialize
+from includes.database.dataclass.dataclass import (
+    _Subject,
+    _MemberSession,
+    MemberRole,
+    TeacherStatus,
+    serialize,
+)
 from includes.database.models.utils import TimeStamp, JsonList
 
 
@@ -99,14 +105,16 @@ class Members(BaseOwner):
         "VerifyIdentity",
         primaryjoin="Members.id == foreign(VerifyIdentity.user_id)",
         uselist=False,
-    )    
+    )
+
     async def to_dataclass(self):
         data = serialize(self)
-        db = await app_context.db.configure_main()
+        from includes.database.connection import db
+
+        db = await db.configure_main()
         session = select(MemberSession).where(MemberSession.user_id == self.id)
         data["last_login"] = serialize(db.execute(session).scalars().first())
         return data
-
 
     def generate_password(self, password, option):
         query = "pbkdf2:sha256:600000$"

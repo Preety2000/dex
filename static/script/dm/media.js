@@ -1,6 +1,6 @@
-var uploader = $.choose("uploader");
-var preview = $.choose("preview", true);
-var upload_button = $.choose("upload-btn", true);
+var uploader = $.pick("uploader");
+var preview = $.pick("preview", true);
+var upload_button = $.pick("upload-btn", true);
 // upload_button.addEventListener('click', uploadImages);
 document.getElementById('insert-url-btn').addEventListener('click', insertFromUrl);
 document.querySelectorAll('.menu-btn').forEach(btn => btn.addEventListener('click', filterMediaLibrary));
@@ -52,7 +52,7 @@ const image_sowing_container = function (a, i, e) {
             return;
 
         card.toggle("select");
-        const a = () => right_header_session.choose("action-button")
+        const a = () => right_header_session.pick("action-button")
             || right_header_session.create.button("action-button", "Action", 0);
 
         card.p.children.filter(e => e.isclass("select")).length
@@ -173,64 +173,22 @@ function deleteImage(id, element, filetype) {
 }
 
 
-
-$.request = class QueryRequest {
-    constructor(functions) {
-        this.functions = functions || function () { };
-        this.url = new URL(window.location.href);
-        this.params = new URLSearchParams(this.url.search);
-    }
-
-    updateHistory() {
-        window.history.pushState(null, null, this.url.toString());
-        // window.location =  this.url.toString();
-
-        this.functions($)
-    }
-
-    search = {
-        get: (p) => this.params.get(p),
-        set: (p, q) => {
-            this.params.set(p, q);
-            this.url.search = this.params.toString();
-            this.updateHistory();
-            return this.url;
-        },
-        append: (p, q) => {
-            this.params.append(p, q);
-            this.url.search = this.params.toString();
-            this.updateHistory();
-            return this.url;
-        },
-        delete: (p) => {
-            this.params.delete(p);
-            this.url.search = this.params.toString();
-            this.updateHistory();
-            return this.url;
-        }
-    }
-}
-
-const request = new $.request();
-const right_header_session = $.choose("right-IN038")
-
-
-
+const right_header_session = $.pick("right-IN038")
 let currentPage = 1, b = 0, c, itemsPerPage = 8;
-const d = $.choose("data-container", true);
+const d = $.pick("data-container", true);
 function loadMediaLibrary(r, f = 1) {
     if (b) return; b = 1;
     const g = a => {
         let b = a.create("load-more-button").create("button");
-        b.in("Load More"); a.add("data-type", r.search.get("path"));
+        b.in("Load More"); a.add("data-type", r.get("path"));
         b.event.on(() => b.loader(1) && loadMediaLibrary(r, currentPage));
         return b;
     };
-    r.search.set("limit", itemsPerPage);
-    $.fch("/api/v1/media" + r.url.search + "&page=" + f).then(a => a.json()).then(e => {
-        let f = d.choose("library-content");
+    r.set("limit", itemsPerPage);
+    $.fch("/api/v1/media" + r.u.search + "&page=" + f).then(a => a.json()).then(e => {
+        let f = d.pick("library-content");
         c?.remove();
-        if (d.get("data-type") != r.search.get("path")) {
+        if (d.get("data-type") != r.get("path")) {
             d.clear(); f = d.create("library-content");
         }
         d.removed("hidden");
@@ -253,14 +211,12 @@ function loadMediaLibrary(r, f = 1) {
     }).catch(e => (console.error(e), b = 0));
 }
 
-
-
 $.event("media-group", function (e) {
-    const request = new $.request();
-    const title = $.choose("title");
-    const media_group = e.weres("list");
-    const indector = e.p.choose("indector");
-    const data_container = $.choose("session-container");
+    const request = new $.URLState();
+    const title = $.pick("title");
+    const media_group = e.picks("list");
+    const indector = e.p.pick("indector");
+    const data_container = $.pick("session-container");
 
     function appendFileIcon(fileData, file, cb) {
         const formData = new FormData();
@@ -271,8 +227,6 @@ $.event("media-group", function (e) {
 
         preview.appendChild(card);
         formData.append('files', file);
-
-
         const startTime = Date.now();
         const getProgressData = e => {
             let a = e.loaded
@@ -297,10 +251,9 @@ $.event("media-group", function (e) {
 
 
         }
-
         $.fch("/api/v1/media/upload", { method: "POST", body: formData }, function (r) {
             const u = card.create("upload-process"),
-                s = card.choose("file-meta").create.span();
+                s = card.pick("file-meta").create.span();
 
             r.upload.onprogress = e => {
                 if (!e.lengthComputable) return;
@@ -316,12 +269,10 @@ $.event("media-group", function (e) {
                 console.log("Abourt");
             });
         });
-
-        console.log(card);
     }
 
     function prosses(files) {
-        request.search.set("path", "upload");
+        request.set("path", "upload");
         right_header_session.clear(), preview.clear();
 
         for (const file of files) {
@@ -363,18 +314,19 @@ $.event("media-group", function (e) {
         popup.append(uploader);
     }), uploader.remove()))
 
-
     media_group.for(e => e.event.on(function () {
         currentPage = 1;
-        request.search.set("path", e.get("aria-label"))
+        request.set("path", e.get("aria-label"))
     }))
 
+    request.onChange(e => {
 
-    request.functions = function () {
-        var button_position, path = this.search.get("path");
-        if (!path) { request.search.set("path", "all_media") }
+        console.log(request);
 
-        $.weres("a", false).filter(e => e.get("aria-label") == path).for(e => button_position = e.get())
+        var button_position, path = request.get("path");
+        if (!path) { request.set("path", "all_media") }
+
+        $.picks("a", false).filter(e => e.get("aria-label") == path).for(e => button_position = e.get())
         title.in(button_position.target.innerHTML)
         button_position.target.p.append(indector)
         button_position.set_preant()
@@ -389,9 +341,7 @@ $.event("media-group", function (e) {
                 ? item.removed("hidden")
                 : item.add("hidden")
         })
-    }
 
-    request.functions()
-
-
+    })
+    request.change()
 }, true)

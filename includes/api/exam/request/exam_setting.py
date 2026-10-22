@@ -1,3 +1,5 @@
+from includes.src.request import Request
+
 from includes.core.globals.entry import app_context
 from includes.core.security import AUTH_TOKEN
 
@@ -6,15 +8,15 @@ class CreateStore:
     KEY = "_cf_eSt"
 
     @staticmethod
-    def _read():
-        return AUTH_TOKEN.decode(app_context.cookie.get(CreateStore.KEY)) or {}
+    def _read(request: Request = None):
+        return AUTH_TOKEN.decode(request.state.cookie.get(CreateStore.KEY)) or {}
 
     @staticmethod
-    def set(key, value):
+    def set(key, value, request: Request = None):
         data = CreateStore._read()
         data[key] = value
 
-        app_context.cookie.insert(CreateStore.KEY, AUTH_TOKEN.encode(data))
+        request.state.cookie.insert(CreateStore.KEY, AUTH_TOKEN.encode(data))
 
         return data
 
@@ -24,13 +26,13 @@ class CreateStore:
         return data.get(key) if key else data
 
     @staticmethod
-    def res(key=None):
+    def res(key=None, request: Request = None):
         if key:
             data = CreateStore._read()
             data.pop(key, None)
 
-            app_context.cookie.insert(CreateStore.KEY, AUTH_TOKEN.encode(data))
+            request.state.cookie.insert(CreateStore.KEY, AUTH_TOKEN.encode(data))
             return data
 
-        app_context.cookie.delete(CreateStore.KEY)
+        request.state.cookie.delete(CreateStore.KEY)
         return {}

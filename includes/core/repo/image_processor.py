@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from PIL import Image
-
-from includes.utils.utils import get_query_value
+from includes.src.request import Request
 
 
 @dataclass
@@ -14,13 +13,13 @@ class ImageCropBounds:
     height: float = 0.0
 
     @classmethod
-    def from_request_query(cls):
+    def from_request_query(cls, request: Request = None):
         """Query parameters se safely parse karta hai."""
         return cls(
-            x=float(get_query_value("positionx") or 0),
-            y=float(get_query_value("positiony") or 0),
-            width=float(get_query_value("width") or 0),
-            height=float(get_query_value("height") or 0),
+            x=float(request.query_params.get("positionx") or 0),
+            y=float(request.query_params.get("positiony") or 0),
+            width=float(request.query_params.get("width") or 0),
+            height=float(request.query_params.get("height") or 0),
         )
 
 
@@ -29,9 +28,11 @@ class ImageProcessor:
 
     @staticmethod
     def apply_crop(
-        image: Image.Image, bounds: ImageCropBounds | None = None
+        image: Image.Image,
+        bounds: ImageCropBounds | None = None,
+        request: Request = None,
     ) -> tuple[bool, Image.Image]:
-        crop_bounds = bounds or ImageCropBounds.from_request_query()
+        crop_bounds = bounds or ImageCropBounds.from_request_query(request)
         img_width, img_height = image.size
 
         if crop_bounds.width <= 0 or crop_bounds.height <= 0:

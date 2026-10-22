@@ -1,7 +1,7 @@
 from includes.core.config import main_database
 from includes.core.security import _Security
-from includes.database.models.owner import Members
-from includes.database.connection import active_primary_db
+from includes.database.models.primary import Members
+from includes.database.connection import config_primary_db
 from includes.utils.meb import get_email_folder_info
 
 
@@ -33,7 +33,7 @@ class CHCUSER:
             return [self.jsons(item, callback) for item in allUser]
 
     async def getchatdata(self, Q1=None, Q2=None):
-        db = await active_primary_db()
+        db = await config_primary_db()
 
         allUser = db.query(Members).all()
         return [self.jsons(item) for item in allUser]

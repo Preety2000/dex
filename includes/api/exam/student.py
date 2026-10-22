@@ -1,3 +1,4 @@
+from includes.src.request import Request
 from sqlalchemy import desc, func, select
 from dataclasses import dataclass, field
 
@@ -5,8 +6,8 @@ from includes.core.pagination import Pagination
 from includes.core.request_filter import RequestFilter
 from includes.utils.exm import convert_int_values
 from includes.api.exam.results.results_conducted import IS_RESULTS
-from includes.database.connection import active_exam_db
-from includes.database.models.db_exam import (
+from includes.database.connection import config_exam_db
+from includes.database.models.exam import (
     _ExamRecord,
     ExamDetails,
     ExamRecord,
@@ -44,7 +45,7 @@ async def get_exam_details(record: _ExamRecord):
             "timing": info[3],
         }
 
-    db = await active_exam_db()
+    db = await config_exam_db()
 
     controller_query = db.execute(
         select(ExamDetails).where(ExamDetails.id == record.exam_id)
@@ -129,10 +130,7 @@ class Student:
         return STUDENT_CACHE, PracticeExamRecord
 
     @staticmethod
-    async def get(
-        student_id: int,
-        record_type=RecordType.STUDENT,
-    ):
+    async def get(student_id: int, record_type=RecordType.STUDENT):
         cache, model = Student._catchmodel(record_type)
 
         record = cache.ById.get(student_id)
@@ -140,7 +138,7 @@ class Student:
         if record:
             return record
 
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         result = db.execute(select(model).where(model.id == student_id))
 
@@ -155,10 +153,7 @@ class Student:
         )
 
     @staticmethod
-    async def get_by_exam_key(
-        record_key: str,
-        record_type=RecordType.STUDENT,
-    ):
+    async def get_by_exam_key(record_key: str, record_type=RecordType.STUDENT):
         cache, model = Student._catchmodel(record_type)
 
         record = cache.ByExamKey.get(record_key)
@@ -166,10 +161,8 @@ class Student:
         if record:
             return record
 
-        db = await active_exam_db()
-
+        db = await config_exam_db()
         result = db.execute(select(model).where(model.key == record_key))
-
         record = result.scalar_one_or_none()
 
         if not record:
@@ -193,7 +186,7 @@ class Student:
         if record:
             return record
 
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         result = db.execute(
             select(model).where(
@@ -225,7 +218,7 @@ class Student:
         if record:
             return record.key
 
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         result = db.execute(
             select(ExamRecord).where(
@@ -256,12 +249,13 @@ class Student:
 
     @staticmethod
     async def update(
+        request: Request,
         update_data: _ExamRecord,
         record_type=RecordType.STUDENT,
     ):
         cache, model = Student._catchmodel(record_type)
 
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         result = db.execute(
             select(model).where(
@@ -282,7 +276,8 @@ class Student:
         if update_data.is_submitted:
             record.submit_exam()
 
-            data = await IS_RESULTS.get_result(
+            is_result = IS_RESULTS(request)
+            data = await is_result.get_result(
                 update_data,
                 True,
             )
@@ -306,7 +301,7 @@ class Student:
         roll_no,
         record_type=RecordType.STUDENT,
     ):
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         cache, model = Student._catchmodel(record_type)
 
@@ -340,7 +335,7 @@ class Student:
         content,
         ts_info,
     ):
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         result = db.execute(
             select(PracticeExamRecord)
@@ -374,7 +369,7 @@ class Student:
     async def has_submission_limit_exceeded(
         roll_no: int,
     ):
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         start_ms, end_ms = TimeStamp._get_month_range()
         start_of_day, end_of_day = TimeStamp._get_day_range()
@@ -445,13 +440,14 @@ class Student:
     async def get_submission_counts(
         roll_no: int,
         record_type=RecordType.STUDENT,
+        request: Request = None,
         *,
         limit: int = 100,
         page: int = 0,
         list_getter: bool = False,
         **more,
     ):
-        db = await active_exam_db()
+        db = await config_exam_db()
 
         cache, model = Student._catchmodel(record_type)
 
@@ -459,6 +455,7 @@ class Student:
 
         base = await RequestFilter.apply_request_filters(
             model=model,
+            request=request,
             request_type="referer",
             query=base,
             columns={"roll_no": "rollno"},
@@ -477,7 +474,7 @@ class Student:
             select(func.count()).select_from(base.subquery())
         ).scalar_one()
 
-        pagination = Pagination("referer")
+        pagination = Pagination(request=request, request_type="referer")
 
         await pagination.load(limit=limit)
 

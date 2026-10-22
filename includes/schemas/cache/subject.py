@@ -1,11 +1,11 @@
 from sqlalchemy import func, select
 
 from includes.core.globals.entry import app_context
-from includes.database.models.owner import Subject
+from includes.database.models.primary import Subject
 from includes.database.dataclass.dataclass import _Subject
 from includes.database.models.secondary import QuizQuestion, QuizRelationships, Terms
 from includes.schemas.cache.dataclass import _SubjectCache
-from includes.database.connection import active_primary_db
+from includes.database.connection import config_primary_db
 
 SubjectCacheData = _SubjectCache()
 
@@ -26,7 +26,7 @@ class SubjectCache:
         if record:
             return record
 
-        db = await active_primary_db()
+        db = await config_primary_db()
         stmt = select(Subject).where(Subject.id == id)
         record = db.execute(stmt).scalar_one_or_none()
 
@@ -41,7 +41,7 @@ class SubjectCache:
             return await SubjectCache.get_by_id(SubjectCacheData.BySlug[slug])
 
         stmt = select(Subject).where(Subject.slug == slug)
-        db = await active_primary_db()
+        db = await config_primary_db()
         record = db.execute(stmt).scalar_one_or_none()
 
         if not record:
@@ -55,7 +55,7 @@ class SubjectCache:
             return await SubjectCache.get_by_id(SubjectCacheData.ByName[name])
 
         stmt = select(Subject).where(Subject.name == name)
-        db = await active_primary_db()
+        db = await config_primary_db()
         record = db.execute(stmt).scalar_one_or_none()
 
         if not record:
@@ -65,21 +65,18 @@ class SubjectCache:
 
     @staticmethod
     async def get_all():
-        db = await active_primary_db()
+        db = await config_primary_db()
         count = db.execute(select(func.count()).select_from(Subject)).scalar_one()
-        
+
         if len(SubjectCacheData.ById) == count:
             return list(SubjectCacheData.ById.values())
-            
+
         SubjectCacheData.ById.clear()
         SubjectCacheData.BySlug.clear()
         SubjectCacheData.ByName.clear()
 
         records = db.execute(select(Subject).order_by(Subject.name)).scalars().all()
-        return [
-            SubjectCache._cache(record.to_dataclass()) 
-            for record in records
-        ]
+        return [SubjectCache._cache(record.to_dataclass()) for record in records]
 
     @staticmethod
     async def get_mcqlist_count(category: str, subject=None):
@@ -129,7 +126,7 @@ class SubjectCache:
 
         if missing:
             stmt = select(Subject).where(Subject.id.in_(missing))
-            db = await active_primary_db()
+            db = await config_primary_db()
             db_records = db.execute(stmt).scalars().all()
 
             records.extend(

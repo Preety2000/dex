@@ -10,7 +10,7 @@ from pathlib import Path
 from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont
-from fastapi import HTTPException, Response
+from fastapi import HTTPException, Request, Response
 from fastapi.responses import (
     FileResponse,
     JSONResponse,
@@ -21,6 +21,7 @@ from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPM
 
 from includes.api.router import DynamicSokitURLRoute
+from includes.core.globals.route_context import Route
 from includes.core.security import _Security
 from includes.core.globals.entry import app_context
 from includes.core.globals.coreutils import process_image
@@ -35,7 +36,7 @@ from includes.schemas.cache.member import MemberCache
 
 from includes.utils.file import get_paginated_files
 from includes.utils.meb import get_email_folder_info
-from includes.utils.utils import get_query_value
+from includes.utils.utils import get_query_num
 
 # =========================================================
 # SVG TO PNG
@@ -59,7 +60,7 @@ def svg_to_png_bytesio(svg_path: str, width=None, height=None):
 # =========================================================
 
 
-def videos(folder_path, filename):
+def video(folder_path, filename):
     file_path = posixpath.join(folder_path, filename)
 
     if not os.path.isfile(file_path):
@@ -83,8 +84,8 @@ class Media:
         "images": folder.image_folder,
         "svg": folder.svg_folder,
         "pdf": folder.pdf_folder,
-        "videos": folder.video_folder,
-        "audios": folder.audio_folder,
+        "video": folder.video_folder,
+        "audio": folder.audio_folder,
     }
 
     def __init__(self, request):
@@ -231,54 +232,39 @@ class Media:
             return Response(content=svg_content, media_type="image/svg+xml")
 
     # GET
-    async def execute(self, root:str=None):
-        _root = DynamicSokitURLRoute.parse(root)
+    async def execute(self, request: Request = None, route: Route = None):
 
-        # print("/////////////", _root)
-        if _root.scope_type == "upload":
-            return await FileUpload.execute()
+        if route.section == "upload":
+            return await FileUpload.execute(request)
 
         # SVG
-        if _root.scope_type == "svg" and _root.scope_slug:
-            path = _root.scope_slug
-            if _root.resource_type:
-                path = posixpath.join(_root.scope_slug, _root.resource_type)
+        if route.section == "svg" and route.scope:
+            path = route.scope
+            if route.entity:
+                path = posixpath.join(route.scope, route.entity)
 
-            return self.get_svg(_root.scope_slug)
+            return self.get_svg(route.scope)
 
-        # ==============================
         # IMAGE
-        # ==============================
-        if _root.scope_type == "img":
-            if _root.scope_slug == "category":
-                _root.resource_type = (
-                    _root.resource_type or "empty.png"
-                )
-            if _root.resource_type:
-                _root.scope_slug = posixpath.join(
-                    _root.scope_slug, _root.resource_type
-                )
+        if route.section == "img":
+            if route.scope == "category":
+                route.entity = route.entity or "empty.png"
+            if route.entity:
+                route.scope = posixpath.join(route.scope, route.entity)
 
-            return await process_image(f"img/{_root.scope_slug}", "img")
+            return await process_image(f"img/{route.scope}", "img")
 
-        # ==============================
         # ICon
-        # ==============================
-        if _root.scope_type == "icon":
-            if _root.resource_type:
-                _root.scope_slug = posixpath.join(
-                    _root.scope_slug, _root.resource_type
-                )
+        if route.section == "icon":
+            if route.entity:
+                route.scope = posixpath.join(route.scope, route.entity)
 
-            return await process_image(f"icon/{_root.scope_slug}", "img")
+            return await process_image(f"icon/{route.scope}", "img")
 
-        # ==============================
         # THUMBNAIL
-        # ==============================
+        if route.section == "th":
 
-        if _root.scope_type == "th":
-
-            path = get_query_value("pt")
+            path = request.query_params.get("pt")
 
             file_path = _Security.short_decode(path)
 
@@ -291,15 +277,10 @@ class Media:
 
             return FileResponse(thumb_path, media_type="image/webp")
 
-        # ==============================
         # USER IMAGE
-        # ==============================
+        if route.section == "u" and route.scope:
 
-        if _root.scope_type == "u" and _root.scope_slug:
-
-            roll_no, folder_path = get_email_folder_info(
-                _root.scope_slug, False
-            )
+            roll_no, folder_path = get_email_folder_info(route.scope, False)
             file_path = posixpath.join(folder_path, "profile.webp")
 
             name = "*"
@@ -326,37 +307,30 @@ class Media:
 
             return StreamingResponse(img_io, media_type="image/webp")
 
-        # ==============================
         # FILES
-        # ==============================
-
-        if not _root.scope_type:
+        if not route.section:
             return ""
 
-        if (
-            _root.scope_type == "exnr"
-            and _root.scope_slug
-            and _root.resource_type
-        ):
+        if route.section == "exnr" and route.scope and route.entity:
             path = posixpath.join(
                 folder.exnr,
-                _root.scope_slug,
-                _root.resource_type,
+                route.scope,
+                route.entity,
             )
             if os.path.exists(path):
                 return self.file_sender(path)
             return self.file_sender("/")
 
-        upload_path = posixpath.join(folder.upload_folder, _root.scope_type)
-        static_path = posixpath.join(folder.static_folder, _root.scope_type)
+        upload_path = posixpath.join(folder.upload_folder, route.section)
+        static_path = posixpath.join(folder.static_folder, route.section)
 
-        if _root.scope_slug:
-            upload_path = posixpath.join(upload_path, _root.scope_slug)
-            static_path = posixpath.join(static_path, _root.scope_slug)
+        if route.scope:
+            upload_path = posixpath.join(upload_path, route.scope)
+            static_path = posixpath.join(static_path, route.scope)
 
-        if _root.resource_type:
-            upload_path = posixpath.join(upload_path, _root.resource_type)
-            static_path = posixpath.join(static_path, _root.resource_type)
+        if route.entity:
+            upload_path = posixpath.join(upload_path, route.entity)
+            static_path = posixpath.join(static_path, route.entity)
 
         if os.path.exists(upload_path):
             return self.file_sender(upload_path)
@@ -364,7 +338,7 @@ class Media:
         if os.path.exists(static_path):
             return self.file_sender(static_path)
 
-        raise HTTPException(404, f"File not found! {app_context.route}")
+        raise HTTPException(404, f"File not found! {route}")
 
     # USER DEFAULT IMAGE
     def create_avatar_from_letter(self, string):
@@ -494,21 +468,21 @@ class Media:
 
     # LIBRARY
 
-    async def library(self, root=None):
+    async def library(self, action=None, request: Request = None):
 
-        if app_context.route.scope_slug == "upload":
-            return await FileUpload.execute()
+        if action == "upload":
+            return await FileUpload.execute(request)
 
-        location = _FileAuthor.get("l")
-        limit = int(get_query_value("limit") or 20)
-        page = int(get_query_value("page") or 1)
+        location = _FileAuthor(request).get("l")
+        page = get_query_num(request.query_params, "page", 1)
+        limit = get_query_num(request.query_params, "limit", 20)
 
         start = (page - 1) * limit
         end = start + limit
 
-        path = get_query_value("path", app_context.route.scope_slug)
+        path = request.query_params.get("path", request.state.roote.action)
 
-        print("Library Path:", path)
+        print("Library Path: and location", path, location)
 
         if path and path == "root-file" and "category" == location:
             directory_path = folder.ensure_directory(folder.static_img, "category")
@@ -522,8 +496,8 @@ class Media:
         else:
             for filetype, folder_path in self.directories.items():
                 directory_path = folder_path
-                # files.extend(self.getfiles_with_path(folder_path, filetype))
 
+        print("directory_path", directory_path)
         paginated_files = get_paginated_files(directory_path, start=start, end=end)
         resolved_assets = await MediaManager.fetch_or_sync_assets(
             directory_path=directory_path,

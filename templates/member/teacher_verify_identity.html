@@ -319,7 +319,7 @@
         }
         $.event(a, i => {
             const v = i.get("value"), d = i.p.replace($.create("DIS01", i.p.cloneNode(true))), e = d.create("f036");
-            d.choose(a).event.change(async function () {
+            d.pick(a).event.change(async function () {
                 const f = this.files[0];
                 if (!b(f)) {
                     $.confirm({ t: $("[aria-selected=" + this.id + "]").innerText });

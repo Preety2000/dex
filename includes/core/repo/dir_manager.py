@@ -13,14 +13,16 @@ class Folders:
     def _get_path(self, *path_segments) -> Path:
         """Path ko join karta hai aur agar folder maujood nahi hai toh automatically bana deta hai."""
         full_path = self._root.joinpath(*path_segments)
-        full_path.mkdir(parents=True, exist_ok=True)  # Auto-create directory if not exists
+        full_path.mkdir(
+            parents=True, exist_ok=True
+        )  # Auto-create directory if not exists
         return full_path
-    
+
     def _get_file_path(self, *path_segments) -> Path:
         """Path ko join karta hai aur agar folder maujood nahi hai toh automatically bana deta hai."""
         full_path = self._root.joinpath(*path_segments)
         return full_path
-    
+
     # Root & Base Folders
     @property
     def root(self) -> Path:
@@ -63,7 +65,7 @@ class Folders:
     # Upload Sub-Folders
     @property
     def image_folder(self) -> Path:
-        return self._get_path("uploads", "images")
+        return self._get_path("uploads", "img")
 
     @property
     def svg_folder(self) -> Path:
@@ -75,11 +77,11 @@ class Folders:
 
     @property
     def video_folder(self) -> Path:
-        return self._get_path("uploads", "videos")
+        return self._get_path("uploads", "video")
 
     @property
     def audio_folder(self) -> Path:
-        return self._get_path("uploads", "audios")
+        return self._get_path("uploads", "audio")
 
     # Database Sub-Folders
     @property
@@ -107,9 +109,6 @@ class Folders:
     def language(self) -> Path:
         return self._get_path("static", "json", "lang")
 
-
-
-
     # Helper Methods
     def ensure_directories_exist(self) -> None:
         """App ke saare folders agar system par nahi hain, toh unhe create kar deta hai."""
@@ -123,7 +122,6 @@ class Folders:
         """Dynamic lookup ke liye (getattr fallback mechanism)."""
         path_obj = getattr(self, name, None)
         return str(path_obj) if path_obj else None
-
 
     def imports(self, name, joinName, folderName):
         # joinName और folderName को जोड़कर एक नया पथ बनाता है और उसे 'name' के नाम से एट्रीब्यूट के रूप में सेट करता है

@@ -5,18 +5,19 @@ import subprocess
 import time
 import cv2
 import platform
-from typing import List,  Any, Optional
+from typing import List, Any, Optional
 
 # pip install opencv-python
 from dataclasses import dataclass
 
 import exiftool
+from includes.src.request import Request
 from fastapi import UploadFile
 import numpy as np
 
 from includes.core.globals.entry import app_context
-from includes.database.chait.media_asset_model import MediaAsset
-from includes.utils.utils import get_query_value, json_null_response, json_response
+from includes.database.models.media_asset import MediaAsset
+from includes.utils.utils import json_null_response, json_response
 
 
 from io import BytesIO
@@ -106,9 +107,9 @@ colors = {
 }
 
 
-async def get_files(*, name=None, ALLOWED_EXTENSIONS=[]):
+async def get_files(request: Request = None, *, name=None, ALLOWED_EXTENSIONS=[]):
 
-    uploaded_files = await app_context.request.form()
+    uploaded_files = await request.form()
 
     def allowed_file(filename):
         return (
@@ -219,10 +220,10 @@ def get_file_extensions(mime_types):
 #     def from_query(cls):
 #         """Query parameters se safely data parse karne ke liye method"""
 #         return cls(
-#             x=float(get_query_value("positionx") or 0),
-#             y=float(get_query_value("positiony") or 0),
-#             width=float(get_query_value("width") or 0),
-#             height=float(get_query_value("height") or 0),
+#             x=float(request.query_params.get("positionx") or 0),
+#             y=float(request.query_params.get("positiony") or 0),
+#             width=float(request.query_params.get("width") or 0),
+#             height=float(request.query_params.get("height") or 0),
 #         )
 
 #     @classmethod
@@ -353,7 +354,7 @@ def build_file_upload_response(file, filename, path):
             },
             "path": path,
             "uploaded": True,
-            "url": f"{app_context.request.url_root}{path}?{int(time.time())}",
+            "url": f"{request.url_root}{path}?{int(time.time())}",
         }
     )
 
@@ -564,6 +565,7 @@ def serialize_media_asset(
         "width": getattr(record, "width", 0),
         "timestamp": getattr(record, "timestamp", 0),
         "extension": getattr(record, "extension", ""),
+        "file_type": getattr(record, "file_type", ""),
     }
 
     # Determine file type dynamically if not explicitly provided

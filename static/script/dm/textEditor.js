@@ -113,7 +113,7 @@ const bind = function (editor) {
 
         var selectedText = selectionText.toString();
         var linkContainer = $.create("link-container");
-        var container = (editor.container.p.choose("create-link") || editor.container.p.create("fixed create-link"));
+        var container = (editor.container.p.pick("create-link") || editor.container.p.create("fixed create-link"));
         var closeContainer = function () {
             actionGroup.export("link").removed("active");
             container.remove();
@@ -369,8 +369,8 @@ if (typeof $ != "undefined") {
         updateValue: true
     });
 
-    var weres = $.weres("button")
-    $.buttonAnimation(weres);
+    var picks = $.picks("button")
+    $.buttonAnimation(picks);
 
     console.log(ed_toolbar);
 

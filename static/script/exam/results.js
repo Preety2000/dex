@@ -101,15 +101,15 @@ $(function results(_, a, b, c, d, e, f, g, h, i, j, k, l, T, U) {
             [sname, roll_number, ragistration_number],
             [examinant, instructor]
         ] = query;
-        
+
         console.log(result_dg);
         if (result_dg == null) {
             $.loader(false);
             return;
         }
 
-        
-        const templateRow = result_dg.choose('list_on_paper');
+
+        const templateRow = result_dg.pick('list_on_paper');
         const template = templateRow.innerHTML;
 
         templateRow.innerHTML = list_in_paper.map(
@@ -152,9 +152,9 @@ $(function results(_, a, b, c, d, e, f, g, h, i, j, k, l, T, U) {
             (_, key) => placeholders[key.trim()] ?? (empty.push(key.trim()), '')
         );
         for (const i of empty) {
-            result_dg.choose(i)?.remove()
+            result_dg.pick(i)?.remove()
         }
-        const instructor_img = result_dg.choose("instructor_img");
+        const instructor_img = result_dg.pick("instructor_img");
         instructor_img && (instructor_img.src = instructor);
         result_dg.css({ display: "block" });
 

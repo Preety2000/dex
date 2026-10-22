@@ -5,8 +5,8 @@
             <div id="titlediv">
                 <div id="titlewrap">
                     <label class="screen-F0019" id="title-prompt-text" for="title">Add title</label>
-                    <input type="text" name="title" size="30" value="{{data_querys.title}}" id="title"
-                        spellcheck="true" autocomplete="off">
+                    <input type="text" name="title" size="30" value="{{data_querys.title}}" id="title" spellcheck="true"
+                        autocomplete="off">
                 </div>
                 <div class="inside">
                     <div id="edit-slug-box"></div>
@@ -18,9 +18,9 @@
                 <div id="content-wrap" class="core-ui editor-wrap tmce-active has-dfw">
                     <link rel="stylesheet" id="editor-buttons-css" href="/static/css/admin/editor.min.css" media="all">
                     <div id="content-editor-tools" class="editor-tools hide-if-no-js">
-                        <div id="content-media-buttons" class="media-buttons"><button type="button"
-                                id="insert-media-button" class="button insert-media add_media"
-                                data-editor="content"><span class="media-buttons-icon"></span> Add Media</button>
+                        <div id="content-media-buttons" class="media-buttons"><button type="button" id="insert-media"
+                                class="button insert-media add_media" data-editor="content"><span
+                                    class="media-buttons-icon"></span> Add Media</button>
                         </div>
                         <div class="editor-tabs">
                             <button type="button" id="content-tmce" class="switch-editor switch-tmce">Visual</button>
@@ -68,7 +68,9 @@
                                 <div class="grid insides border-bottom">
                                     {% for subject in subjects %}
                                     <label class="subject" for="subject-{{subject.id}}">
-                                        <input onclick="title_set(this)" type="radio" {{subject.checked}} title="{{subject.name}}" name="subject" id="subject-{{subject.id}}" value="{{subject.id}}">
+                                        <input onclick="title_set(this)" type="radio" {{subject.checked}}
+                                            title="{{subject.name}}" name="subject" id="subject-{{subject.id}}"
+                                            value="{{subject.id}}">
                                         {{subject.name}}
                                     </label>
                                     {%endfor%}
@@ -81,19 +83,24 @@
                         </div>
 
                         <div class="misc-pub-section misc-pub-university" id="visibility">
-                            University: <b><span id="university-display">{{data_querys.university_name or 'Select'}}</span></b>
+                            University: <b><span id="university-display">{{data_querys.university_name or
+                                    'Select'}}</span></b>
 
-                            <a href="javascript:void(0)" class="edit-university edit" aria-label="university-select" role="button">
+                            <a href="javascript:void(0)" class="edit-university edit" aria-label="university-select"
+                                role="button">
                                 <span class="span" aria-hidden="true">Edit</span>
                                 <span class="screen-F0019">Edit University </span>
                             </a>
                             <div id="university-select" class="university-select hidden hide-if-js">
                                 <div class="grid insides border-bottom">{% for university in universitys %}
                                     <label class="university" for="university-{{university.id}}">
-                                        <input title="{{university.name}}" onclick="title_set(this)" type="radio" {{university.checked}} name="university" id="university-{{university.id}}" value="{{university.id}}">
+                                        <input title="{{university.name}}" onclick="title_set(this)" type="radio"
+                                            {{university.checked}} name="university" id="university-{{university.id}}"
+                                            value="{{university.id}}">
                                         {{university.name}}
                                     </label>{%endfor%}
-                                    <a href="javascript:void(0)" jsname="addNewUniversity" class="add-new-university" role="button">
+                                    <a href="javascript:void(0)" jsname="addNewUniversity" class="add-new-university"
+                                        role="button">
                                         <span aria-hidden="true">Add New University</span>
                                         <span class="screen-F0019">Add New University List</span>
                                     </a>
@@ -133,8 +140,7 @@
                     </div>
                     <div class="inside">
                         <label class="screen-F0019" for="slug">Slug</label>
-                        <input name="slug" type="text" class="large-text width" id="slug"
-                            value="{{data_querys.slug}}">
+                        <input name="slug" type="text" class="large-text width" id="slug" value="{{data_querys.slug}}">
                     </div>
                 </div>
             </div>

@@ -72,7 +72,7 @@
 <script>
 
     var str = [];
-    var list = $("syllabus-container").weres("li", false).filter(e => e.p.previousElementSibling.nodeName == "H3")
+    var list = $("syllabus-container").picks("li", false).filter(e => e.p.previousElementSibling.nodeName == "H3")
     list.for(e => (str.push(e.innerText), e.add("loading")));
 
 

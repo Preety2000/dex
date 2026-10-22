@@ -4,8 +4,9 @@ from includes.utils.utils import get_post_value
 
 
 class ReqRoute:
-    def __init__(self, roots, exam_id):
+    def __init__(self, roots, exam_id, request):
         self.roots = roots
+        self.request = request
         self.exam_id = exam_id
 
     async def execute_authorized(self, payload, use_filter):
@@ -41,8 +42,8 @@ class ReqRoute:
 
     async def execute(self, has_access):
         print("has_access", has_access)
-        use_filter = await get_post_value("useFilter")
-        payload = await get_post_value("payload")
+        use_filter = await get_post_value(self.request, "useFilter")
+        payload = await get_post_value(self.request, "payload")
         if has_access:
             return await self.execute_authorized(payload, use_filter)
 

@@ -23,7 +23,7 @@
 
 
 {% set index_header %}
-<div class="flexCenter">
+<div class="DIS01">
 
     {# Status filters #}
     {% if total %}
@@ -71,11 +71,11 @@
         }
     </script>
     <div class="DIS02 app">
-        <header class="header flexCenter">
+        <header class="header DIS01">
             <!-- Navigation Header  -->
-            <div class="nv-header flexCenter">
+            <div class="nv-header DIS01">
                 <div class="icon menu-button"><i class="fa-classic fa-bars"></i></div>
-                <div class="logo flexCenter">
+                <div class="logo DIS01">
                     <div class="siteName">{{app_context.site_name | safe}}</div>
                 </div>
             </div>
@@ -85,7 +85,7 @@
                 <label for="search" class="icon"><i class="fa fa-search"></i></label>
             </form>
 
-            <div class="rightSide flexCenter">
+            <div class="rightSide DIS01">
                 <div class="IN088">
                     <input class="auto theme-button" type="checkbox" id="auto" {%if _andow.theme=="dark" %}checked
                         {%endif%}>
@@ -109,68 +109,68 @@
                 <div class="nv-body">
                     <ul class="IN0104">
                         <a href="" class="indector" style="top: {{(menu_position or 0 )* 36}}px;"></a>
-                        <a href="/admin/dashboard" class="list flexCenter">
+                        <a href="/admin/dashboard" class="list DIS01">
                             <div class="icon"><i class="fa-classic fa-list-tree"></i></div>
                             <div class="menu-title">Dashboard</div>
                         </a>
-                        <a href="/admin/analytics" class="list flexCenter">
+                        <a href="/admin/analytics" class="list DIS01">
                             <div class="icon"><i class="fa-classic fa-chart-line"></i></div>
                             <div class="menu-title">Analytics</div>
                         </a>
-                        <a href="/admin/syllabus" class="list flexCenter">
+                        <a href="/admin/syllabus" class="list DIS01">
                             <!-- <div class="icon"><i class="fa-classic fa-solid fa-books fa-fw"></i></div> -->
                             <div class="icon"><i class="fa-classic fa-books"></i></div>
                             <div class="menu-title">Syllabus</div>
                         </a>
-                        <a href="/admin/courses" class="list flexCenter">
+                        <a href="/admin/courses" class="list DIS01">
                             <div class="icon"><i class="fa-classic fa-notebook"></i></div>
                             <div class="menu-title">Courses</div>
                         </a>
-                        <a href="/admin/content" class="list flexCenter">
+                        <a href="/admin/content" class="list DIS01">
                             <div class="icon"><i class="fa-classic fa-newspaper"></i></div>
                             <div class="menu-title">Content</div>
                         </a>
-                        <a href="/admin/category" class="list flexCenter">
+                        <a href="/admin/category" class="list DIS01">
                             <div class="icon"><i class="fa-classic fa-layer-group"></i></div>
                             <div class="menu-title">Categories</div>
                         </a>
-                        <a href="/admin/books" class="list flexCenter">
+                        <a href="/admin/books" class="list DIS01">
                             <div class="icon"><i class="fa-classic fa-book"></i></div>
                             <div class="menu-title">StudyMaterial</div>
                         </a>
-                        <a href="/admin/practice" class="list flexCenter" title="Multiple Choice Question">
+                        <a href="/admin/practice" class="list DIS01" title="Multiple Choice Question">
                             <div class="icon"><i class="fa-classic fa-puzzle"></i></div>
                             <div class="menu-title">Questionnaire</div>
                         </a>
-                        <a href="/admin/comments" class="list flexCenter">
+                        <a href="/admin/comments" class="list DIS01">
                             <div class="icon"><i class="fa-classic fa-message-lines"></i></div>
                             <div class="menu-title">Comments</div>
                         </a>
-                        <a href="/admin/customisation" class="list flexCenter">
+                        <a href="/admin/customisation" class="list DIS01">
                             <div class="icon"><i class="fa-classic fa-screwdriver-wrench"></i></div>
                             <div class="menu-title">Customisation</div>
                         </a>
-                        <a href="/admin/media" class="list flexCenter">
+                        <a href="/admin/media" class="list DIS01">
                             <div class="icon"><i class="fa-duotone fa-photo-film"></i></div>
                             <div class="menu-title">Media</div>
                         </a>
-                        <a href="/admin/member" class="list flexCenter">
+                        <a href="/admin/member" class="list DIS01">
                             <div class="icon"><i class="fa-duotone fa-member"></i></div>
                             <div class="menu-title">Members</div>
                         </a>
-                        <a href="/admin/teacher-verify-indentity" class="list flexCenter">
+                        <a href="/admin/teacher-verify-indentity" class="list DIS01">
                             <div class="icon"><i class="fa-duotone fa-member"></i></div>
                             <div class="menu-title">Verify Indentity</div>
                         </a>
-                        <a href="" class="list flexCenter">
+                        <a href="" class="list DIS01">
                             <div class="icon"><i class="fa-classic fa-heart"></i></div>
                             <div class="menu-title">Favoritos</div>
                         </a>
-                        <a href="/admin/backup" class="list flexCenter">
+                        <a href="/admin/backup" class="list DIS01">
                             <div class="icon"><i class="fa-classic fa-trash-can-undo"></i></div>
                             <div class="menu-title">Beckup</div>
                         </a>
-                        <a href="/admin/logout" class="list flexCenter">
+                        <a href="/admin/logout" class="list DIS01">
                             <div class="icon"><i class="fa-duotone fa-right-from-bracket"></i></div>
                             <div class="menu-title">Logout</div>
                         </a>
@@ -180,11 +180,11 @@
                 <!-- Navigation Footer  -->
                 <div class="nv-footer">
                     <ul class="IN0104">
-                        <a href="#" class="list flexCenter" jsname="setting" jsname="setting">
+                        <a href="#" class="list DIS01" jsname="setting" jsname="setting">
                             <div class="icon"><i class="fa-classic fa-gear"></i></div>
                             <div class="menu-title">Settings</div>
                         </a>
-                        <a href="#" class="list flexCenter" jsname="false">
+                        <a href="#" class="list DIS01" jsname="false">
                             <div class="icon"><i class="fa-classic fa-circle-info"></i></div>
                             <div class="menu-title">Help</div>
                         </a>
@@ -208,20 +208,20 @@
                             <p>{{message | safe}}</p>
                         </div>
                     </div>{%endif%}
-                    <div class="main-header flexCenter">
+                    <div class="main-header DIS01">
                         <div class="leftSide DIS00">
-                            <h2 class="main-title flexCenter">{{container_title}}</h2>{% block leftSide %}{% endblock %}
+                            <h2 class="main-title DIS01">{{container_title}}</h2>{% block leftSide %}{% endblock %}
                         </div>
-                        <div class="rightSide flexCenter">
+                        <div class="rightSide DIS01">
 
                             {% block rightSide %}{% endblock %}
                             <span class="spinner spinner-main"></span>
                             {# Table actions and pagination #}
                             {% if bulk_actions %}
                             <div class="alignleft actions bulkactions">
-                                <label for="bulk-action-choose-top" class="screen-F0019">Select bulk
+                                <label for="bulk-action-pick-top" class="screen-F0019">Select bulk
                                     action</label>
-                                <select name="action" id="bulk-action-choose-top">
+                                <select name="action" id="bulk-action-pick-top">
                                     <option value="-1">Bulk actions</option>
                                     <option value="edit" class="hide-if-no-js">Edit</option>
                                     <option value="trash">Move to Bin</option>

@@ -23,7 +23,7 @@ $.define("worker", function Worker() {
     });
 
     m.add(function likes() {
-        let d = this.get("aria-label"), lc = this.choose("like-count"), l = +lc.get("inner");
+        let d = this.get("aria-label"), lc = this.pick("like-count"), l = +lc.get("inner");
         let opt = () => this.isclass(d) ? "like" : "removelike";
         let up = () => {
             opt() == "like" ? (this.removed(d), l++) : (this.add(d), l--);
@@ -95,7 +95,7 @@ $.define("worker", function Worker() {
 //     module.add(function likes(callback) {
 
 //         var details = this.get("aria-label");
-//         var like_count = this.choose("like-count");
+//         var like_count = this.pick("like-count");
 //         var like = Number(like_count.get("inner"));
 
 //         var get_option = (a, b) => {

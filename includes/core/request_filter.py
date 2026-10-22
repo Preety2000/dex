@@ -1,8 +1,9 @@
 import inspect
 from typing import Literal
 
+from includes.src.request import Request
 from sqlalchemy import String, Text, and_, or_
-from includes.database.models.db_exam import JsonList
+from includes.database.models.exam import JsonList
 from includes.utils.utils import _resolve_request_getter
 
 RequestType = Literal["query", "api", "referer"]
@@ -13,8 +14,8 @@ class RequestFilter:
 
     def __init__(
         self,
-        *,
-        model,
+        model=None,
+        request: Request = None,
         request_type: RequestType = "query",
         columns: dict[str, str] | None = None,
         search_columns: list[str] | None = None,
@@ -28,8 +29,9 @@ class RequestFilter:
             raise TypeError("search_columns must be a list, tuple or set")
 
         self.model = model
+        self.request = request
         self.columns = self._build_columns(columns)
-        self._get_value = _resolve_request_getter(request_type)
+        self._get_value = lambda k: _resolve_request_getter(request, request_type, k)
         self.search_columns = self._build_search_columns(search_columns)
 
     def _build_columns(self, columns: dict[str, str] | None) -> dict:
@@ -168,12 +170,14 @@ class RequestFilter:
         *,
         model,
         query,
+        request: Request = None,
         request_type: RequestType = "query",
         columns: dict[str, str] | None = None,
         search_columns: list[str] | None = None,
     ):
         filter_method = cls(
             model=model,
+            request=request,
             columns=columns,
             request_type=request_type,
             search_columns=search_columns,

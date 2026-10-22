@@ -1,8 +1,10 @@
+from includes.src.request import Request
+
 from includes.api.exam.student import RecordType, Student
 from includes.api.exam.session.es import ES
 from includes.api.exam.teacher import Teachers
-from includes.core.metadata import MetaData
-from includes.database.connection import active_exam_db
+
+from includes.database.connection import config_exam_db
 from includes.utils.exm import (
     block_exam_message,
     completed_exam_message,
@@ -21,7 +23,7 @@ from includes.api.exam.socket.student_req import StudentRequestSession
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
 from includes.database.dataclass.dataclass import ExamRqStatus
-from includes.database.models.db_exam import _ExamDetails, StudentTeacherAssociation
+from includes.database.models.exam import _ExamDetails, StudentTeacherAssociation
 from includes.function import get_unique_id
 from includes.utils.utils import json_response
 
@@ -33,7 +35,7 @@ async def check_access(
     if exam_query.join_mode == 2:
         return True, None
 
-    db = await active_exam_db()
+    db = await config_exam_db()
     link = (
         db.query(StudentTeacherAssociation)
         .filter_by(st_roll_no=st_roll_no, teacher_id=exam_query.teacher_id)
@@ -54,10 +56,13 @@ async def check_access(
 
 
 class ExamtProcessor:
-    def __init__(self, isuser=None):
+    def __init__(self, isuser=None, request=None):
         self.isuser = isuser
+        self.request = request
 
-    async def handle_exam_request(self, path: str, params: dict):
+    async def handle_exam_request(
+        self, path: str, params: dict, request: Request = None
+    ):
 
         join = params.get("join")
         has_keys = params.get("hx")
@@ -68,10 +73,10 @@ class ExamtProcessor:
         if not join and not has_keys:
             return response
 
-        member = await app_context.setting.member()
+        member = await self.request.state.setting.member()
 
         if member is None:
-            MetaData.redirect_url = "/exam"
+            self.request.state.metadata.redirect_url = "/exam"
             return response
 
         stu_rec = await StudentRequestSession.get(
@@ -107,7 +112,7 @@ class ExamtProcessor:
         return await self.process_exam(stu_rec, response)
 
     async def inject_exam_session(self, response, has_keys):
-        self_exam_manager = SELF_EXAM_MANAGER()
+        self_exam_manager = SELF_EXAM_MANAGER(request=self.request)
         await self_exam_manager.session_inject(response, has_keys)
 
         response["stu_img"] = self.isuser.get("img")
@@ -115,7 +120,7 @@ class ExamtProcessor:
         response["stu_name"] = self.isuser.get("name")
         response["roll_no"] = self.isuser.get("roll_no")
 
-    async def process_join_exam(self, exam_id: int, student):
+    async def process_join_exam(self, exam_id: int, student, request: Request = None):
         response = {"status": None}
 
         # Fetch exam details
@@ -226,7 +231,7 @@ class ExamtProcessor:
             ):
 
                 record = await init_exam_session(connect_session, exam_query)
-                origin = app_context.request.headers.get("origin")
+                origin = self.request.headers.get("origin")
                 return {
                     "status": "open",
                     "infoMessage": "Request accepted",

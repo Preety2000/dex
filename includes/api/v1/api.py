@@ -3,6 +3,7 @@ import json
 import random
 import string
 from attr import dataclass
+from includes.src.request import Request
 from fastapi.responses import StreamingResponse
 from includes.api.chat.index import CHAIT
 from includes.core.cache import AppCache
@@ -10,6 +11,7 @@ from includes.core.globals.initialize import initialize_database
 from includes.core.globals.entry import app_context
 from includes.api.exam.manager.manager import API_EXAM_MANAGER
 from includes.api.exam.results.results_manager import API_RESULTS_MANAGER
+from includes.core.globals.route_context import Route
 from includes.schemas.cache.likes import Likes
 from includes.schemas.cache.terms import TermsCache
 from includes.schemas.objective import ClassObjective
@@ -21,6 +23,7 @@ from includes.database.models.secondary import Article
 from PIL import Image, ImageDraw, ImageFont
 
 from includes.utils.utils import get_post_value, json_null_response, json_response
+from includes.database.connection import db
 
 
 @dataclass
@@ -104,41 +107,40 @@ class API:
         return text, error
         return json_response(text)
 
-    async def index(self):
-        # scope_type/scope_slug/resource_type/resource_slug/sub_action/child_entity/modifier
+    async def index(self, request: Request = None, roots: Route = None):
+        member = ClassUser(self.request)
+        await initialize_database(request)
 
-        member = ClassUser()
-        await initialize_database()
+        entity = request.state.roote.entity
+        action = request.state.roote.action
 
-        resource_type = app_context.route.resource_type
-        resource_slug = app_context.route.resource_slug
-
-        if resource_type == "auth" and resource_slug == "t":
-            examManager = API_EXAM_MANAGER()
+        if entity == "auth" and action == "t":
+            examManager = API_EXAM_MANAGER(request=request)
             return await examManager.test_manager()
 
-        if resource_type == "auth" and resource_slug == "r":
-            manager = API_RESULTS_MANAGER()
+        if entity == "auth" and action == "r":
+            manager = API_RESULTS_MANAGER(request=request)
             return await manager.result_manager()
 
-        if resource_type == "conversations":
-            message = await Conversation.index()
+        if entity == "conversations":
+            message = await Conversation(request=request).index()
             return StreamingResponse(message, media_type="text/event-stream")
 
-        if resource_type == "search":
+        if entity == "search":
             search = Search(self.request)
             searchs = await search.list()
             return json_response([{"searchs": searchs, "fatching_key": None}, 200])
 
-        if resource_type == "profile":
-            resource_type = await member.apimapp(resource_slug)
-            return resource_type
+        if entity == "profile":
+            entity = await member.apimapp(action)
+            return entity
 
-        if resource_type == "feedback":
-            member = await app_context.setting.member()
+        if entity == "feedback":
+            member = await request.state.setting.member()
             if not member:
                 return json_null_response(
-                    code="Xe022524", details="You must be loogged in to like this Artical."
+                    code="Xe022524",
+                    details="You must be loogged in to like this Artical.",
                 )
 
             # Get the referer URL
@@ -148,11 +150,11 @@ class API:
             res_ = referer["resource_slug"]
             sub_ = referer["sub_action"]
 
-            log_ = await get_post_value("log_")
-            opg_ = await get_post_value("opg_")
+            log_ = await get_post_value(request, "log_")
+            opg_ = await get_post_value(request, "opg_")
 
             category = await TermsCache.get_by_slug(det_)
-            article = app_context.db.query(Article).filter(Article.slug == res_).first()
+            article = db.query(Article).filter(Article.slug == res_).first()
             if category and article and article.parameter == category.id:
                 return await Likes.handle_like(
                     article_id=article.id,
@@ -160,11 +162,11 @@ class API:
                     option=("removelike" if len(opg_) == 20 else "like"),
                 )
 
-        if "practice" == resource_type and resource_slug:
-            id = await get_post_value("id")
+        if "practice" == entity and action:
+            id = await get_post_value(request, "id")
             id = id.replace("F", "")
 
-            query = await ClassObjective.get(id=int(id))
+            query = await ClassObjective.get(id=int(id), request=request)
             if query:
                 return json_response(
                     [
@@ -176,27 +178,27 @@ class API:
                     ]
                 )
 
-        if resource_type == "setting" and resource_slug == "accept-cookie":
+        if entity == "setting" and action == "accept-cookie":
 
-            app_context.cookie.insert(
+            request.state.cookie.insert(
                 "_cf_bQ", "wgYeZFCqhmoLPRNXsSoFllKWYmUBrT", 3600 * 24 * 360
             )
             return json_response([{"accept": True}, 200])
 
-        if resource_type == "logout":
+        if entity == "logout":
             response = await member.logout()
             return json_response(response)
 
-        if resource_type == "translate":
-            text = await get_post_value("q")
+        if entity == "translate":
+            text = await get_post_value(request, "q")
             translatedText, error = self.translate(text)
             translatedText = translatedText.replace(" ", "-").lower()
 
             return json_response(translatedText)
 
-        if resource_type == "media":
+        if entity == "media":
             media = Media(self.request)
-            return await media.library(resource_slug, resource_type)
+            return await media.library(action, request)
 
         def detect_input_type(user_input):
             email_pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
@@ -219,10 +221,10 @@ class API:
             else:
                 return f"No account found with the username: {user_input}."
 
-        if resource_type == "account":
-            requests_path = app_context.request.referer.path
+        if entity == "account":
+            requests_path = request.state.referer.path
             if requests_path == "/ut/accounts/password/reset":
-                request_ip = getattr(app_context.request, "ip", None)
+                request_ip = getattr(request, "ip", None)
 
                 if not request_ip:
                     return json_response(
@@ -232,7 +234,7 @@ class API:
                         success=False,
                     )
 
-                identifier = await get_post_value("identifier")
+                identifier = await get_post_value(request, "identifier")
                 if not identifier:
                     return json_response(
                         {"message": "Please enter email, username, or phone number"},
@@ -267,11 +269,10 @@ class API:
                 return json_response(
                     {"message": not_found_message(identifier)}, success=False
                 )
-        if resource_type == "chat":
+        if entity == "chat":
             return await CHAIT.index()
 
         return [
-            resource_type,
-            resource_slug,
-            app_context.route.sub_action,
+            entity,
+            action,
         ]

@@ -1,4 +1,4 @@
-(function (choose) {
+(function (pick) {
     "use strict";
 
     const ads_query = {
@@ -64,19 +64,19 @@
         return typeof value === "string";
     }
 
-    function ads(choose, context) {
-        // If no choose is provided, return the current instance
-        if (!choose) {
+    function ads(pick, context) {
+        // If no pick is provided, return the current instance
+        if (!pick) {
             return this;
         }
-        // Return the result of the choose function with the provided context
-        return choose(context);
+        // Return the result of the pick function with the provided context
+        return pick(context);
     }
 
     // Define a local copy of ads
-    ads = function (choose, context) {
-        // Use ads.contect to handle the choose and context
-        return ads.contect(choose, context);
+    ads = function (pick, context) {
+        // Use ads.contect to handle the pick and context
+        return ads.contect(pick, context);
     };
 
     const extend = function (name, opretar) {
@@ -325,6 +325,7 @@
     });
 
     extend(function getFrameDocument(frame) {
+        
         // Get the document object of the iframe for further manipulation
         const document = frame.contentDocument || frame.contentWindow.document;
 
@@ -424,7 +425,7 @@
     });
 
     var run = function () {
-        var ins = choose.weres("ins", false);
+        var ins = pick.picks("ins", false);
         ins.for(item => new ads(item))
     }
 

@@ -4,8 +4,15 @@ import re
 from typing import Any
 from dataclasses import dataclass, field
 from includes.function import Functions
-from includes.schemas.router_schema import DynamicURLRoute
 from includes.core.repo.dir_manager import Folders
+
+
+class FetchTime:
+    start: Any = None
+    end: Any = None
+
+    def resate(self, time):
+        setattr(self, "start", time)
 
 
 @dataclass
@@ -18,7 +25,8 @@ class GlobleCatchs:
 class AppContext:
     request: Any = None
     setting: Any = None
-    route: "DynamicURLRoute" = field(init=False)
+    
+    host_url:str = "/"
 
     exam_session = Any = None
     main_session = Any = None
@@ -59,25 +67,25 @@ class AppContext:
     def get(self, name: str | int, default: Any = None):
         return getattr(self, str(name), default)
 
-    def set_languages(self, lang: dict):
+    def set_languages(self, lang: dict, request):
 
         lang_code = ["en", "hi", "sa", "ta", "te"][
-            int(self.setting.setting_session.get("languageCode", 0))
+            int(request.state.setting.setting_session.get("languageCode", 0))
         ]
 
         fallback_language = self.languages.get("en")
         active_language = self.languages.get(lang_code)
 
-        self.request.state.menuname = {
+        request.state.menuname = {
             re.sub(r"\s+", "", fallback_language[key].lower()): active_language.get(key)
             for key in fallback_language.keys()
             if key in active_language
         }
 
-        self.request.state.language_data = active_language
-        return self.request.state.menuname
+        request.state.language_data = active_language
+        return request.state.menuname
 
-    async def active_exam_db(self):
+    async def config_exam_db(self):
         """Active exam database"""
 
         if self.db.exam_session is None:
@@ -85,7 +93,7 @@ class AppContext:
 
         return self.db.exam_session
 
-    async def active_primary_db(self):
+    async def config_primary_db(self):
         """Active primary database"""
 
         if self.db.main_session is None:

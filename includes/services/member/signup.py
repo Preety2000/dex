@@ -4,22 +4,20 @@ from datetime import datetime
 
 from sqlalchemy import func, select
 
+from includes.src.request import Request
 from database.username_list import USERNAME
 from includes.schemas.captcha import captcha_verification
 from includes.utils._sub import configure_page
 from includes.core.config import main_database
 from includes.core.dataclass.member import Gender
-from includes.core.globals.fun import random_string
 from includes.core.globals.entry import app_context
-from includes.core.metadata import MetaData
 from includes.core.security import _Security
-from includes.database.models.owner import Members
+from includes.database.models.primary import Members
 from includes.services.member.login_service import complete_login
 from includes.utils.utils import get_post_value
 
 
 class SineUp:
-
     input_fields = [
         "name",
         "email",
@@ -56,11 +54,12 @@ class SineUp:
 
     # Signup / Authentication
     @staticmethod
-    async def authenticate():
+    async def authenticate(request: Request = None):
 
         error = False
 
         configure_page(
+            request.state.metadata,
             template="member/signup_animation",
             title="Sign Up",
             suffix=True,
@@ -68,32 +67,33 @@ class SineUp:
 
         template = "member/signup_animation"
         # If not POST request
-        if not app_context.function.is_post():
+        if not request.is_post:
             return template
 
         # Collect & validate input
         for field in SineUp.input_fields:
             value = await get_post_value(
+                request,
                 field,
                 "",
             )
 
-            app_context.response[field] = value
+            request.state.response[field] = value
             if not value:
-                app_context.response[f"{field}_error"] = "error"
+                request.state.response[f"{field}_error"] = "error"
                 error = True
 
         if error:
             return template
 
         # Password match check
-        if app_context.response["password"] != app_context.response["cpassword"]:
-            app_context.response["message"] = "Passwords do not match"
+        if request.state.response["password"] != request.state.response["cpassword"]:
+            request.state.response["message"] = "Passwords do not match"
             return template
 
         # Captcha verification
-        if not await captcha_verification():
-            app_context.response["message"] = app_context.function.utc(
+        if not await captcha_verification(request=request):
+            request.state.response["message"] = app_context.function.utc(
                 "Captcha not verified!"
             )
 
@@ -103,36 +103,38 @@ class SineUp:
 
             # Duplicate email check
             email_exists = db.execute(
-                select(Members.id).where(Members.email == app_context.response["email"])
+                select(Members.id).where(
+                    Members.email == request.state.response["email"]
+                )
             ).scalar_one_or_none()
 
             if email_exists is not None:
-                app_context.response["message"] = "Email already exists"
+                request.state.response["message"] = "Email already exists"
                 return template
 
             # Duplicate mobile check
             mobile_exists = db.execute(
                 select(Members.id).where(
-                    Members.phone == app_context.response["mobile"]
+                    Members.phone == request.state.response["mobile"]
                 )
             ).scalar_one_or_none()
 
             if mobile_exists is not None:
-                app_context.response["message"] = "Mobile number already exists"
+                request.state.response["message"] = "Mobile number already exists"
 
                 return template
 
             # Token generation
             token_xeper = _Security.short_encode(
-                f"{app_context.response['name']}@"
-                f"{app_context.response['email']}@"
-                f"{app_context.response['mobile']}/"
-                f"{app_context.request.ip}"
+                f"{request.state.response['name']}@"
+                f"{request.state.response['email']}@"
+                f"{request.state.response['mobile']}/"
+                f"{request.ip}"
             )
 
             # Username generation
             username = SineUp.get_new_username(
-                app_context.response["name"],
+                request.state.response["name"],
                 db,
                 Members,
             )
@@ -162,11 +164,11 @@ class SineUp:
             # Create new member
             new_member = Members(
                 username=username,
-                name=app_context.response["name"],
-                email=app_context.response["email"],
-                phone=app_context.response["mobile"],
+                name=request.state.response["name"],
+                email=request.state.response["email"],
+                phone=request.state.response["mobile"],
                 gender=Gender.unspecified,
-                ipinfo=app_context.request.ip,
+                ipinfo=request.ip,
                 reg_no=reg_count + 1,
                 secret=token_xeper[::-1],
                 image_src="",
@@ -175,17 +177,13 @@ class SineUp:
             )
 
             # Password hashing
-            new_member.set_password(app_context.response["password"])
+            new_member.set_password(request.state.response["password"])
 
             db.add(new_member)
             db.commit()
             db.refresh(new_member)
 
-            MetaData.redirect_url = f"/success?token={token_xeper}"
-
-            return await complete_login(
-                new_member,
-                db,
-            )
+            request.state.metadata.redirect_url = f"/success?token={token_xeper}"
+            return await complete_login(new_member, db, request)
 
         return template

@@ -1,21 +1,24 @@
 from includes.core.cache import AppCache
 from includes.core.config import main_database
-from includes.core.metadata import MetaData
-from includes.database.models.owner import Subject
+
+from includes.database.models.primary import Subject
 from includes.metrics import MetricsManager
 from includes.schemas.trending import ArticleTrendingService
 
 
 def configure_page(
-    template: str | None = None, title: str | None = None, suffix: bool | str = False
+    metadata: MetaData = None,
+    template: str | None = None,
+    title: str | None = None,
+    suffix: bool | str = False,
 ) -> None:
     """Sets page template and updates metadata title with optional suffix."""
     if template:
-        MetaData.template = template
+        metadata.template = template
 
     if title:
-        suffix_text = MetaData.site_name if suffix is True else suffix
-        MetaData.title = f"{title} • {suffix_text}" if suffix_text else title
+        suffix_text = metadata.site_name if suffix is True else suffix
+        metadata.title = f"{title} • {suffix_text}" if suffix_text else title
 
 
 def get_nested_value(data, key):
@@ -63,7 +66,7 @@ async def get_code_to_subject():
     return record
 
 
-async def apply_session_updates(data):
+async def apply_session_updates(data, request):
     update_key = "update_session_returns"
 
     if not isinstance(data, dict):
@@ -87,7 +90,8 @@ async def apply_session_updates(data):
                 updated_data = await metric_method(
                     item_id,
                     update_option,
-                    servic= ArticleTrendingService
+                    request=request,
+                    servic=ArticleTrendingService,
                 )
 
                 if isinstance(updated_data, dict):
@@ -99,6 +103,6 @@ async def apply_session_updates(data):
     for key, value in data.items():
         if isinstance(value, (dict, list)):
             if get_nested_value(value, update_key):
-                data[key] = await apply_session_updates(value)
+                data[key] = await apply_session_updates(value, request=request)
 
     return data

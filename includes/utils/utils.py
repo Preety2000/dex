@@ -2,35 +2,35 @@ import re
 import unicodedata
 from typing import Any, Callable
 from datetime import datetime, timezone
+from sqlalchemy import text
 
-from sqlalchemy import MetaData, text
-from includes.core.globals.entry import app_context
-
-
-def set_response(name, value):
-    app_context.response[name] = value
-    return app_context.response
+from includes.src.request import Request
 
 
-def redirect_back(default: str = "/"):
-    MetaData.template = "redirect"
-    MetaData.redirect_url = (
-        app_context.request.referer.full_path
-        if app_context.request.path != app_context.request.referer.path
+def set_response(request, name, value):
+    request.state.response[name] = value
+    return request.state.response
+
+
+def redirect_back(request, default: str = "/"):
+    request.state.metadata.template = "redirect"
+    request.state.metadata.redirect_url = (
+        request.state.referer.full_path
+        if request.path != request.state.referer.path
         else default
     )
 
 
-def get_referer():
+def get_referer(request: Request = None):
     try:
-        return app_context.request.referer
+        return request.state.referer
     except AttributeError:
         return None
 
 
-def get_referer_value(value, default=None):
+def get_referer_value(request, value, default=None):
 
-    referer = get_referer()
+    referer = get_referer(request)
     if referer is None:
         return None
 
@@ -38,16 +38,21 @@ def get_referer_value(value, default=None):
     return params.get(value, default)
 
 
-def get_query_value(value, default=None):
-    return app_context.request.query_params.get(value, default)
-
-
-async def get_post_value(name, value=None):
+def get_query_num(query_params, key, default=None):
+    value = query_params.get(key)
     try:
-        form = await app_context.request.json()
+        num = float(value)
+        return int(num) if num.is_integer() else num
+    except (TypeError, ValueError):
+        return default
+
+
+async def get_post_value(request: Request, name, value=None):
+    try:
+        form = await request.json()
     except:
         try:
-            form = await app_context.request.form()
+            form = await request.form()
         except:
             form = {}
     if isinstance(form, list):
@@ -75,17 +80,15 @@ async def get_post_value(name, value=None):
     )
 
 
-def _resolve_request_getter(
-    source: str | None = None, key: str | None = None
-) -> Callable | Any:
+def _resolve_request_getter( request: Request, source: str | None = None, key: str | None = None) -> Callable | Any:
     if source in (None, "query"):
-        getter = get_query_value
+        getter = request.query_params.get
 
     elif source == "api":
-        getter = get_post_value
+        getter = lambda k: get_post_value(request, k)
 
     elif source == "referer":
-        getter = get_referer_value
+        getter = lambda k: get_referer_value(request, k)
 
     else:
         raise ValueError(
@@ -165,6 +168,3 @@ def json_response(
     return responce1
 
     return [{"status": "ok", "RESTFUL": query}, None]
-
-
-

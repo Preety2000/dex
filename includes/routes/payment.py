@@ -1,6 +1,7 @@
 from typing import Optional
-from fastapi import Request
+from includes.src.request import Request
 
+from includes.core.globals.route_context import Route
 from includes.utils._sub import configure_page
 from includes.core.globals.entry import app_context
 from includes.core.globals.initialize import initialize_database
@@ -182,36 +183,46 @@ async def payment_redirect(
     }
 
 
-async def process_payment():
-    # scope_type/scope_slug/resource_type/resource_slug/sub_action/child_entity/modifier
-    await initialize_database()
+async def process_payment(request: None):
+    # /scope_slug/resource_type/resource_slug/sub_action/child_entity/modifier
+    await initialize_database(request)
 
     """Active exam database"""
     await app_context.db.configure_exam()
 
-    if app_context.route.scope_slug and app_context.route.scope_slug in (
+    if request.state.roote.scope and request.state.roote.scope in (
         "teacher-basic",
         "teacher-standard",
     ):
-        configure_page(template="payment/amount", title="Payment", suffix=True)
+        configure_page(
+            request.state.metadata,
+            template="payment/amount",
+            title="Payment",
+            suffix=True,
+        )
         return
 
-    if app_context.route.scope_type == "plan":
-        # await Payment.plan(app_context.route.scope_slug, detail)
-        configure_page(template="payment/plans", title="Payment", suffix=True)
+    if request.state.roote.section == "plan":
+        # await Payment.plan(request.state.roote.scope, detail)
+        configure_page(
+            request.state.metadata,
+            template="payment/plans",
+            title="Payment",
+            suffix=True,
+        )
 
         return
 
-    # if app_context.route.scope_type == "subscription":
-    #     return await Payment.subscription(app_context.route.scope_slug, detail)
+    # if request.state.roote.section == "subscription":
+    #     return await Payment.subscription(request.state.roote.scope, detail)
 
-    # if app_context.route.scope_type == "payment":
-    #     return await Payment.payment(app_context.route.scope_slug, detail)
+    # if request.state.roote.section == "payment":
+    #     return await Payment.payment(request.state.roote.scope, detail)
 
-    # if app_context.route.scope_type == "status":
-    #     return await Payment.status(app_context.route.scope_slug, detail)
+    # if request.state.roote.section == "status":
+    #     return await Payment.status(request.state.roote.scope, detail)
 
-    # if app_context.route.scope_type == "renew":
-    #     return await Payment.renew(app_context.route.scope_slug, detail)
+    # if request.state.roote.section == "renew":
+    #     return await Payment.renew(request.state.roote.scope, detail)
 
-    return {"error": "app_context.route.scope_type not found"}
+    return {"error": "request.state.roote.section not found"}

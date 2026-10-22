@@ -12,22 +12,24 @@
 # Request handler
 
 import os
+from includes.src.request import Request
 from sqlalchemy import asc, desc
 from includes.api.exam.student import RecordType, Student
 from includes.core.globals.entry import app_context
 from includes.core.security import _Security
 from includes.database.dataclass.dataclass import ExamRqStatus
-from includes.database.models.db_exam import _ExamRequestSession, ExamRequestSession
+from includes.database.models.exam import _ExamRequestSession, ExamRequestSession
 from includes.api.exam.session.ev import ExamEventManager
 from includes.api.exam.socket.student_req import StudentRequestSession
 from includes.schemas.cache.member import MemberCache
 from includes.utils.utils import json_response
+from includes.database.connection import db
 
 
-async def get_exam_setting() -> dict[str, int]:
+async def get_exam_setting(request: Request) -> dict[str, int]:
 
     keys = ("id", "exam_view", "request_view")
-    parts = (app_context.cookie.get("_cf_est") or "").split("/")
+    parts = (request.state.cookie.get("_cf_est") or "").split("/")
 
     return {
         k: max(len(parts[i]) - 6, 0) if i < len(parts) else 0
@@ -129,7 +131,7 @@ class ExamController:
             }
 
         row = (
-            app_context.db.query(ExamRequestSession)
+            db.query(ExamRequestSession)
             .filter_by(
                 roll_no=int(roll_no),
                 exam_id=int(exam_id),
@@ -153,7 +155,7 @@ class ExamController:
                 joined_status=ExamRqStatus.STUDENT_PENDING_EXAM,
             )
 
-            app_context.db.add(row)
+            db.add(row)
 
         else:
             if row.joined_status in [
@@ -172,8 +174,8 @@ class ExamController:
             row.total_request += 1
 
         # Save changes
-        app_context.db.commit()
-        app_context.db.refresh(row)
+        db.commit()
+        db.refresh(row)
 
         summary = await ExamController.get_exam_summary(
             exam_id, {}, record=row, only_count=True
@@ -300,8 +302,8 @@ class ExamController:
         exam_id: int, returns: dict, *, record=None, only_count=None
     ):
         returns["students"] = {}
-        setting = await get_exam_setting()
-        query = app_context.db.query(ExamRequestSession).filter(
+        # setting = await get_exam_setting()
+        query = db.query(ExamRequestSession).filter(
             ExamRequestSession.exam_id == exam_id
         )
 

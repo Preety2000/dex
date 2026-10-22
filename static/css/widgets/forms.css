@@ -116,8 +116,8 @@ form .F0006 {
 }
 
 .IN031 .hrg button:hover {
-    background: var(--bg-secondary);
-    border-color: #8080805e;
+    background: var(--bg-active);
+    border-color: var(--border-light);
     border: 1px solid #8787875e;
 }
 
@@ -212,7 +212,7 @@ form .F0006 {
 
 .F0007 .F0009,
 .F0008 .F0009 {
-        flex: auto;
+    flex: auto;
     overflow: hidden;
     /* https://www.myapplication .com:8000/exam/create */
 }
@@ -521,7 +521,8 @@ input[disabled]+.button:hover::after {
     /* padding: 20px; */
 }
 
-.F0025, .reader-meta-desc {
+.F0025,
+.reader-meta-desc {
     text-wrap-mode: wrap;
     background: transparent;
 }

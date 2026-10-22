@@ -5,7 +5,7 @@ from sqlalchemy import func, select
 from includes.core.globals.fun import random_string
 from includes.utils.utils import json_response
 from includes.core.security import _Security
-from includes.database.connection import active_secondary_db
+from includes.database.connection import config_secondary_db
 from includes.database.models.secondary import UserRelationships
 
 LikesCached: set[tuple[int, int]] = set()
@@ -25,7 +25,7 @@ class Likes:
         if key in LikesCached:
             return True
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         stmt = select(UserRelationships).where(
             UserRelationships.users_id == users_id,
@@ -44,7 +44,7 @@ class Likes:
         if await cls.get(article_id, users_id):
             return False
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         record = UserRelationships(
             article_id=article_id,
@@ -59,7 +59,7 @@ class Likes:
 
     @classmethod
     async def delete(cls, article_id: int, users_id: int) -> bool:
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         stmt = select(UserRelationships).where(
             UserRelationships.article_id == article_id,
@@ -82,7 +82,7 @@ class Likes:
         if key in LikesCached:
             return True
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         stmt = select(UserRelationships).where(
             UserRelationships.users_id == users_id,
@@ -125,7 +125,7 @@ class Likes:
             "article-like" if await cls.exists(article_id, users_id) else "feedback"
         )
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
 
         stmt = (
             select(func.count())

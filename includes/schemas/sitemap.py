@@ -4,9 +4,10 @@ import datetime as dt
 import xml.etree.ElementTree as ET
 
 from includes.core.globals.entry import app_context
-from includes.core.metadata import MetaData
+
 from includes.database.models.secondary import Article, QuizQuestion, Terms
 from includes.utils.arti import get_artical_url
+from includes.database.connection import db
 
 
 class Sitemap:
@@ -55,10 +56,10 @@ class Sitemap:
         root.set("xmlns:moz", "http://www.mozilla.org/2006/browser/search/")
 
         ShortName = ET.SubElement(root, "ShortName")
-        ShortName.text = MetaData.site_name
+        ShortName.text = request.state.metadata.site_name
 
         Description = ET.SubElement(root, "Description")
-        Description.text = MetaData.excerpt
+        Description.text = request.state.metadata.excerpt
 
         InputEncoding = ET.SubElement(root, "InputEncoding")
         InputEncoding.text = "UTF-8"
@@ -67,14 +68,13 @@ class Sitemap:
         Image.set("width", "16")
         Image.set("height", "16")
         Image.set("type", "image/x-icon")
-        Image.text = app_context.request.host_url + "favicon.ico"
+        Image.text = app_context.host_url + "favicon.ico"
 
         Url = ET.SubElement(root, "Url")
         Url.set("method", "get")
         Url.set(
             "template",
-            app_context.request.host_url
-            + "search?q={searchTerms}&tag={searchTermsForTag}",
+            app_context.host_url + "search?q={searchTerms}&tag={searchTermsForTag}",
         )
         Url.set("type", "text/html")
 
@@ -94,11 +94,11 @@ class Sitemap:
     @staticmethod
     async def index():
         sitemap_url = []
-        host_url = app_context.request.host_url
-        sitemap_url.append(app_context.request.host_url[:-1])
+        host_url = app_context.host_url
+        sitemap_url.append(app_context.host_url[:-1])
         other = ["trending", "search", "courses", "topic", "exam"]
 
-        category_all = app_context.db.query(Terms).all()
+        category_all = db.query(Terms).all()
         sitemap_url.extend([host_url + item for item in other])
 
         # ARTICLE QUESTIONS
@@ -109,7 +109,7 @@ class Sitemap:
         ]
 
         articals = []
-        artical_all = app_context.db.query(Article).all()
+        artical_all = db.query(Article).all()
         for artical in artical_all:
             if artical.status == "Publish":
                 await get_artical_url(artical)
@@ -121,7 +121,7 @@ class Sitemap:
             url = f"{host_url}practice/tagged/{category.slug}"
             mcq_map.append(url)
 
-        quiz_questions = app_context.db.query(QuizQuestion).all()
+        quiz_questions = db.query(QuizQuestion).all()
         mcq_questions = [
             f"{host_url}practice/{quiz_question.id}"
             for quiz_question in quiz_questions

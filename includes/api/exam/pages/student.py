@@ -1,5 +1,7 @@
 import asyncio
 
+from includes.src.request import Request
+
 from includes.api.exam.student import RecordType, Student
 from includes.core.globals.entry import app_context
 from includes.utils.utils import json_response
@@ -8,16 +10,18 @@ from includes.utils.utils import json_response
 class StudentExamPanel:
 
     @staticmethod
-    async def dashboard(params):
-        page = int(params.get("page", 0))
-        list_session = params.get("ls", "practice")
+    async def dashboard(request: Request = None):
 
-        student = await app_context.setting.member()
+        page = int(request.state.referer.params.get("page", 0))
+        list_session = request.state.referer.params.get("ls", "practice")
+
+        student = await request.state.setting.member()
         roll_no = student["roll_no"]
 
         student_task = Student.get_submission_counts(
             roll_no,
             RecordType.STUDENT,
+            request=request,
             page=page,
             limit=10,
             list_getter=(list_session == "practice"),
@@ -26,6 +30,7 @@ class StudentExamPanel:
         invigilator_task = Student.get_submission_counts(
             roll_no,
             RecordType.INVIGILATOR,
+            request=request,
             page=page,
             limit=10,
             list_getter=(list_session == "examiner_conducted"),
@@ -59,6 +64,7 @@ class StudentExamPanel:
         }
 
     @staticmethod
-    async def account(path, params):
-        data = await StudentExamPanel.dashboard(params)
+    async def account(request: Request = None):
+        # path.replace("/exam/dashboard", "")
+        data = await StudentExamPanel.dashboard(request)
         return json_response(data)

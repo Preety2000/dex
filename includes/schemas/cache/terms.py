@@ -1,11 +1,10 @@
 from sqlalchemy import select
 
 from includes.core.globals.entry import app_context
-from includes.database.connection import active_secondary_db
+from includes.database.connection import config_secondary_db
 from includes.database.models.secondary import Terms
 from includes.database.dataclass.dataclass import _Terms, serialize
 from includes.schemas.cache.dataclass import _TermsCache
-
 
 TermsCacheData = _TermsCache()
 CACHE_BY_SUBJECT = {}
@@ -37,21 +36,15 @@ class TermsCache:
 
         if record:
             return record
-        
-        db = await active_secondary_db()
 
-        record = db.execute(
-            select(Terms).where(
-                Terms.id == id
-            )
-        ).scalar_one_or_none()
+        db = await config_secondary_db()
+
+        record = db.execute(select(Terms).where(Terms.id == id)).scalar_one_or_none()
 
         if not record:
             return None
 
-        return TermsCache._cache(
-            _Terms(**serialize(record))
-        )
+        return TermsCache._cache(_Terms(**serialize(record)))
 
     @staticmethod
     async def get_by_slug(slug: str) -> _Terms:
@@ -59,20 +52,16 @@ class TermsCache:
 
         if cached_id:
             return await TermsCache.get_by_id(cached_id)
-        
-        db = await active_secondary_db()
+
+        db = await config_secondary_db()
         record = db.execute(
-            select(Terms).where(
-                Terms.slug == slug
-            )
+            select(Terms).where(Terms.slug == slug)
         ).scalar_one_or_none()
 
         if not record:
             return None
 
-        return TermsCache._cache(
-            _Terms(**serialize(record))
-        )
+        return TermsCache._cache(_Terms(**serialize(record)))
 
     @staticmethod
     async def get_by_name(name: str) -> _Terms:
@@ -81,19 +70,15 @@ class TermsCache:
         if cached_id:
             return await TermsCache.get_by_id(cached_id)
 
-        db = await active_secondary_db()
+        db = await config_secondary_db()
         record = db.execute(
-            select(Terms).where(
-                Terms.name == name
-            )
+            select(Terms).where(Terms.name == name)
         ).scalar_one_or_none()
 
         if not record:
             return None
 
-        return TermsCache._cache(
-            _Terms(**serialize(record))
-        )
+        return TermsCache._cache(_Terms(**serialize(record)))
 
     @staticmethod
     async def get_by_subject(subject_id: int) -> list[_Terms]:
@@ -102,18 +87,15 @@ class TermsCache:
         data = CACHE_BY_SUBJECT.get(subject_id)
 
         if data is None:
-            db = await active_secondary_db()
-            records = db.execute(
-                select(Terms).where(
-                    Terms.subject_id == subject_id
-                )
-            ).scalars().all()
+            db = await config_secondary_db()
+            records = (
+                db.execute(select(Terms).where(Terms.subject_id == subject_id))
+                .scalars()
+                .all()
+            )
 
             data = [
-                TermsCache._cache(
-                    _Terms(**serialize(record))
-                )
-                for record in records
+                TermsCache._cache(_Terms(**serialize(record))) for record in records
             ]
 
             CACHE_BY_SUBJECT[subject_id] = data
@@ -125,18 +107,11 @@ class TermsCache:
         if TermsCacheData.allList:
             return TermsCacheData.allList
 
-        db = await active_secondary_db()
-        records = db.execute(
-            select(Terms).order_by(
-                Terms.name
-            )
-        ).scalars().all()
+        db = await config_secondary_db()
+        records = db.execute(select(Terms).order_by(Terms.name)).scalars().all()
 
         TermsCacheData.allList = [
-            TermsCache._cache(
-                _Terms(**serialize(record))
-            )
-            for record in records
+            TermsCache._cache(_Terms(**serialize(record))) for record in records
         ]
 
         return TermsCacheData.allList
@@ -155,18 +130,13 @@ class TermsCache:
                 missing.append(qid)
 
         if missing:
-            db = await active_secondary_db()
-            db_records = db.execute(
-                select(Terms).where(
-                    Terms.id.in_(missing)
-                )
-            ).scalars().all()
+            db = await config_secondary_db()
+            db_records = (
+                db.execute(select(Terms).where(Terms.id.in_(missing))).scalars().all()
+            )
 
             records.extend(
-                TermsCache._cache(
-                    _Terms(**serialize(record))
-                )
-                for record in db_records
+                TermsCache._cache(_Terms(**serialize(record))) for record in db_records
             )
 
         return records

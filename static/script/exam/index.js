@@ -31,7 +31,7 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
         }
         , rsc = (p, v) => {
             v && v.loader(false);
-            $.weres(`[id$="${AUTH_TOKEN.encode([p.request_id, RV.REQUEST_VIEW], true)}"]`).forEach(e => {
+            $.picks(`[id$="${AUTH_TOKEN.encode([p.request_id, RV.REQUEST_VIEW], true)}"]`).forEach(e => {
                 let i = +e.get("callback_id"), c = ES.get(i);
                 if (typeof c == "function") {
 
@@ -630,8 +630,16 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
             const studentInStudent = r.create.div(c, "Students In Exam").create.strong(null, String(ES.exViewRes.STUDENT_JOINED_EXAM_COUNT));
             const studentsCompliteExam = r.create.div(c, "Students Complite Exam").create.strong(null, String(ES.exViewRes.STUDENT_COMPLETED_EXAM_COUNT));
 
-            if (ES.exViewRes.isPublish === true || ES.exViewRes.start_timestamp == null)
+
+            if (ES.exViewRes.isPublish === true || ES.exViewRes.start_timestamp == null || (ES.exViewRes.endTime < Date.now()))
                 return;
+
+            const timel = r.create("T059").addIcon("ice_time").create("T060", ES.formatTm(0));
+            setInterval(() => {
+                const t = ES.exViewRes.endTime - Date.now();
+                if (t <= 0) { location.reload(); return; }
+                timel.in(ES.formatTm(t), true);
+            }, 1000);
 
             r.create.span("corm").addIcon("an_live");
             const ws = doSession();
@@ -646,6 +654,7 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
 
                 if (c !== 5060 || !e || typeof e !== "object" || Array.isArray(e))
                     return console.log("Event=>", e, q);
+
                 e.students && Object.assign(ES.students, e.students);
                 e.STUDENT_REQUEST_SEND_COUNT != null && set(studentRequestSend, ES.sr, e.STUDENT_REQUEST_SEND_COUNT);
                 e.STUDENT_JOINED_EXAM_COUNT != null && set(studentInStudent, ES.si, e.STUDENT_JOINED_EXAM_COUNT);
@@ -917,7 +926,7 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
         const containerId = "T001";
         const container = $(containerId);
 
-        ES.homeIndex ??= container.choose("index", true);
+        ES.homeIndex ??= container.pick("index", true);
         !option && container.clear();
         container.removed("class");
         container.add([containerId, widgetClass]);
@@ -1355,6 +1364,11 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
         );
 
     })
+    listen("formatTm", (ms) => {
+        if (ms <= 0) return "00:00:00";
+        let s = Math.floor(ms / 1000), h = s / 3600 | 0, m = s % 3600 / 60 | 0;
+        return [h, m, s % 60].map(v => String(v).padStart(2, '0')).join(':');
+    })
     listen("setRsyt", function (a, b, c, d) {
         const dialog = editSetting.call(ES.exViewRes, a, (e, form) => {
             const value = form.getValue();
@@ -1469,10 +1483,14 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
             v.status == 2 && e.css(css)
         }
         const option = [
-            { icon: 'ice_edit', name: 'Edite Class', event: (e, c, { v }) => (addRequestStudentsInExam({ ec: a.exam_category, std: v, ch: v.exam_category }, 113), c()) },
-            { icon: 'ice_circle-block', name: 'UnBlock', event: (i, c, { e, v }) => req([[300, [203, [525, [null, v.rollno], 115]]]], r => su(r, v, e)) },
-            { icon: 'ice_circle-block', name: 'Block', event: (i, c, { e, v }) => req([[300, [203, [525, [null, v.rollno], 114]]]], r => su(r, v, e)) },
-            { icon: 'ice_trash-delete', name: 'Delete', event: (i, c, { e, v }) => req([[300, [203, [525, [null, v.rollno], 116]]]], r => r.status === true && e.remove()) }
+            // { icon: 'ice_edit', name: 'Edite Class', event: (e, c, { v }) => (addRequestStudentsInExam({ ec: a.exam_category, std: v, ch: v.exam_category }, 113), c()) },
+            // { icon: 'ice_circle-block', name: 'UnBlock', event: (i, c, { e, v }) => req([[300, [203, [525, [null, v.rollno], 115]]]], r => su(r, v, e)) },
+            // { icon: 'ice_circle-block', name: 'Block', event: (i, c, { e, v }) => req([[300, [203, [525, [null, v.rollno], 114]]]], r => su(r, v, e)) },
+            // { icon: 'ice_trash-delete', name: 'Delete', event: (i, c, { e, v }) => req([[300, [203, [525, [null, v.rollno], 116]]]], r => r.status === true && e.remove()) }
+            { icon: 'ice_edit', name: 'Edite Class', event: (e, { c, g: { v } }) => (addRequestStudentsInExam({ ec: a.exam_category, std: v, ch: v.exam_category }, 113), c()) },
+            { icon: 'ice_circle-block', name: 'UnBlock', event: (i, { c, g: { e, v } }) => req([[300, [203, [525, [null, v.rollno], 115]]]], r => su(r, v, e)) },
+            { icon: 'ice_circle-block', name: 'Block', event: (i, { c, g: { e, v } }) => req([[300, [203, [525, [null, v.rollno], 114]]]], r => su(r, v, e)) },
+            { icon: 'ice_trash-delete', name: 'Delete', event: (i, { c, g: { e, v } }) => req([[300, [203, [525, [null, v.rollno], 116]]]], r => r.status === true && e.remove()) }
         ]
         const tableElement = createJsonTable({
             css, header, body: [], callBack: (a, e, v) =>
@@ -2537,8 +2555,8 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
                     : [{ icon: 'ic_result', name: 'Get Result', event: e => openWindow(`/exam/result/${rus_link}`) }, { icon: 'ic_list', name: 'Get Ans Seet', event: e => openWindow(`/exam/answer_sheet/${rus_link}`) }]
 
                 !examinant && option.push({
-                    icon: 'ice_trash-delete', name: 'Delete', event: function (e, v) {
-                        return this.loader(true) && dc((c) => sendReq({ reqRoute: "practiceDelete", payload: [item.key, a.student.roll_no] }, e => e.status === true && (te.choose(item.rus_no, true)?.remove(), v(), c())) && !c)
+                    icon: 'ice_trash-delete', name: 'Delete', event: function (e, { c: v }) {
+                        return this.loader(true) && dc((c) => sendReq({ reqRoute: "practiceDelete", payload: [item.key, a.student.roll_no] }, e => e.status === true && (te.pick(item.rus_no, true)?.remove(), v(), c())) && !c)
                     }
                 })
                 te.addRow({ ...item, exam_name, timing, subject: subject.join(",<br>"), category: category.join(",<br>"), timestamp: formatTimestamp(item.timestamp), option }).add("submitted", item.is_submitted).add("id", item.rus_no);

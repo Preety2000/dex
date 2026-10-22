@@ -1,10 +1,10 @@
+from includes.src.request import Request
+
 from includes.database.connection import db
 from includes.core.globals.entry import app_context
-from includes.database.models.owner import bindOwnerModelsToSession
-from includes.database.models.secondary import bindBaseSecondaryModelsToSession
 
 
-async def initialize_database():
+async def initialize_database(request: Request = None):
     # Initialize database connections
     await db.configure()
 
@@ -18,5 +18,5 @@ async def initialize_database():
     app_context.secondary_session = db.secondary_session
 
     # Set language for Application
-    app_context.preferences = await app_context.setting.preferences()
-    app_context.set_languages(app_context.language)
+    app_context.preferences = await request.state.setting.preferences()
+    app_context.set_languages(app_context.language, request)

@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy import func, select
 
 from includes.core.config import app_context
-from includes.database.connection import active_secondary_db
+from includes.database.connection import config_secondary_db
 from includes.database.dataclass.dataclass import _Article, _Terms
 from includes.database.models.secondary import Article, ArticleMetadata, Trending
 from includes.metrics import MetricsManager
@@ -37,7 +37,7 @@ async def get_artical_url(article: _Article) -> str:
     if isinstance(article.parameter, int):
         article.parameter = await TermsCache.get_by_id(article.parameter)
 
-    article.url = f"{app_context.request.host_url}{(
+    article.url = f"{app_context.host_url}{(
         f"{article.parameter.slug}/{article.slug}" 
         if isinstance(article.parameter, _Terms) and article.parameter.slug
         else article.slug
@@ -45,11 +45,13 @@ async def get_artical_url(article: _Article) -> str:
     return article.url
 
 
-async def enrich_article(article: _Article, *, suggestion=False, excerpt=False) -> _Article:
-    db = await active_secondary_db()
+async def enrich_article(
+    article: _Article, *, suggestion=False, excerpt=False
+) -> _Article:
+    db = await config_secondary_db()
     metadata_stmt = select(ArticleMetadata).where(ArticleMetadata.id == article.id)
     mdata = db.execute(metadata_stmt).scalars().first()
-    
+
     if mdata is None:
         mdata = {
             "secret_key": None,
@@ -58,9 +60,9 @@ async def enrich_article(article: _Article, *, suggestion=False, excerpt=False) 
             "excerpt": None,
         }
     else:
-        mdata = {field: getattr(mdata, field) for field in mdata.__table__.columns.keys()}
-        
-        
+        mdata = {
+            field: getattr(mdata, field) for field in mdata.__table__.columns.keys()
+        }
 
     article.secret_key = mdata["secret_key"]
     article.subject = await SubjectCache.get_by_id(mdata["subject_id"])
@@ -96,7 +98,7 @@ async def get_mini_article_json(
             category=category,
             like=like,
         )
-        
+
     if article is None:
         return {}
 
@@ -133,4 +135,3 @@ async def get_mini_article_json(
         )
 
     return response
-

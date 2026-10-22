@@ -1,69 +1,85 @@
-from includes.api.exam.stlinks import StLinksHendlar
-from includes.core.globals.entry import app_context
-from includes.database.models.db_exam import _TeacherProfile
+from includes.src.request import Request
+from includes.src.referer import Referer
+from includes.utils.exm import get_exam_id
 from includes.schemas.subject import ClassSubject
-from includes.src.request import RequestContext
+from includes.api.exam.stlinks import StLinksHendlar
+from includes.database.models.exam import _TeacherProfile
+
 from includes.api.exam.index import Exam
 from includes.api.exam.router import ReqRoute
-from includes.utils.exm import get_exam_id
+from includes.api.exam.processor import ExamtProcessor
+from includes.api.exam.controller import ExamController
 from includes.api.exam.pages.index import ExamIndexPage
 from includes.api.exam.pages.create import ExamCreatePage
+from includes.api.exam.pages.dashboard import ExamDashboard
+from includes.api.exam.pages.student import StudentExamPanel
 from includes.api.exam.manager.practice import SELF_EXAM_MANAGER
 from includes.api.exam.request.execute import handle_exam_requests
-from includes.api.exam.controller import ExamController
-from includes.api.exam.processor import ExamtProcessor
-
-from includes.api.exam.teacher import Teachers, check_teacher_authorization
-from includes.api.exam.pages.student import StudentExamPanel
-from includes.api.exam.pages.dashboard import ExamDashboard
+from includes.api.exam.teacher import (
+    Teachers,
+    check_teacher_authorization,
+)
 from includes.api.exam.metadata import (
     exam_setting_setter,
     build_settings_page,
     get_selected_classes,
 )
-from includes.utils.utils import get_post_value, json_response
+from includes.utils.utils import (
+    get_post_value,
+    json_response,
+)
+from includes.database.connection import db
 
 
 class API_EXAM_MANAGER:
-    def __init__(self):
+    def __init__(self, request: Request):
+        self.request = request
         self.ex_keys_ids = None
         self.examController = None
 
     async def test_manager(self):
 
         # Safely extract referer, path, and params
-        referer = getattr(app_context.request, "referer")
-        if not isinstance(referer, RequestContext):
+        referer = self.request.state.referer
+
+        # print(vars(self.request))
+        # # print(dir(self.request))
+
+        if not isinstance(referer, Referer):
             print("Invalid referer format:", referer)
             return None
 
         """Active exam database"""
-        await app_context.db.configure_exam()
+        await db.configure_exam()
 
-        is_authorized = referer.subresource == "r"
-        teacher_profile = await check_teacher_authorization(is_authorized)
-
-        # _TeacherProfile
+        is_authorized = referer.scope == "r"
+        teacher_profile = await check_teacher_authorization(
+            is_authorized, request=self.request
+        )
 
         # If verification route → return immediately
         if is_authorized and isinstance(teacher_profile, (dict, str, list, int)):
-            update = await get_post_value("update")
+            update = await get_post_value(self.request, "update")
             if update and all(update):
                 return update
 
             return teacher_profile
 
         exam_id = get_exam_id(referer.params.get("id"))
-        req_route = await get_post_value("reqRoute")
+        req_route = await get_post_value(self.request, "reqRoute")
 
         if req_route:
             return json_response(
-                await ReqRoute(roots=req_route, exam_id=exam_id).execute(is_authorized)
+                await ReqRoute(
+                    roots=req_route, exam_id=exam_id, request=self.request
+                ).execute(is_authorized)
             )
 
         if is_authorized:
             # Handle exam-based requests
-            if result := await handle_exam_requests(exam_id, teacher_profile):
+            if result := await handle_exam_requests(
+                exam_id, teacher_profile, request=self.request
+            ):
                 return result
 
             return json_response(
@@ -77,36 +93,41 @@ class API_EXAM_MANAGER:
 
     async def dashboard_roots(self, path, params, teacher):
         response = {}
-        language = await app_context.setting.get("language")
+        language = await self.request.state.setting.get("language")
 
         if path == "/exam/r/setting":
-            teacher_id = await app_context.setting.member("id")
+            teacher_id = await self.request.state.setting.member("id")
             teacher_session = await Teachers.get(teacher_id)
-
-            update, teacher_session = await exam_setting_setter(teacher_session)
+            update, teacher_session = await exam_setting_setter(
+                teacher_session, request=self.request
+            )
             for name in ["biography", "img", "signature", "name", "exam_category"]:
-                value = await get_post_value(name)
+                value = await get_post_value(self.request, name)
                 if value and str(value).strip():
                     update = True
                     setattr(teacher_session, name, value)
 
             if update is True:
                 teacher_session = await Teachers.update(teacher_session)
-                return await build_settings_page(language, teacher_session, True)
+                return await build_settings_page(
+                    language, teacher_session, True, request=self.request
+                )
 
-            return await build_settings_page(language, teacher_session)
+            return await build_settings_page(
+                language, teacher_session, request=self.request
+            )
 
         elif path == "/exam/r/dashboard":
-            return await ExamDashboard.get_dashboard_data()
+            return await ExamDashboard.get_dashboard_data(self.request)
 
         elif path == "/exam/r/student":
             return await self.students(teacher, params)
 
         elif path == "/exam/r/create":
-            return await ExamCreatePage.create(params)
+            return await ExamCreatePage.create(params, request=self.request)
 
         elif path == "/exam/r/index":
-            return await ExamIndexPage.index(path, params)
+            return await ExamIndexPage.index(path, self.request)
 
         if not response.get("__ac"):
             response["__ac"] = 103
@@ -116,17 +137,18 @@ class API_EXAM_MANAGER:
     async def roots(self, path, params):
         response = {}
         if path == "/exam":
-            ep = ExamtProcessor(await app_context.setting.member())
+            ep = ExamtProcessor(
+                request=self.request,
+                isuser=await self.request.state.setting.member(),
+            )
             return await ep.handle_exam_request(path, params)
 
         elif path == "/exam/create":
-            self_exam_manager = SELF_EXAM_MANAGER()
+            self_exam_manager = SELF_EXAM_MANAGER(request=self.request)
             return await self_exam_manager.index(response)
 
         elif path.startswith("/exam/dashboard"):
-            return await StudentExamPanel.account(
-                path.replace("/exam/dashboard", ""), params
-            )
+            return await StudentExamPanel.account(self.request)
 
         return json_response(response)
 
@@ -174,7 +196,9 @@ class API_EXAM_MANAGER:
         return category
 
     async def students(self, teacher: _TeacherProfile, params):
-        lists, pagination, total = await StLinksHendlar.get_list(teacher)
+        lists, pagination, total = await StLinksHendlar.get_list(
+            teacher, request=self.request
+        )
         return {
             "__ac": 104,
             "list": lists,

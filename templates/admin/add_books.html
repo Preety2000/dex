@@ -79,7 +79,7 @@
                                         <span class="screen-F0019">Add a new Writer List</span>
                                     </a>
                                 </div>
-                                <script>function title_set(e) { $.choose("writer-display", true).in(e) }</script>
+                                <script>function title_set(e) { $.pick("writer-display", true).in(e) }</script>
                             </div>
                         </div>
 
@@ -110,7 +110,7 @@
                                         <span class="screen-F0019">Add a new Subject List</span>
                                     </a>
                                 </div>
-                                <script>function title_set(e) { $.choose("subject-display", true).in(e) }</script>
+                                <script>function title_set(e) { $.pick("subject-display", true).in(e) }</script>
                             </div>
                         </div>
 
@@ -162,7 +162,7 @@
     $.isfor("display-input", function () {
         let insideDisplay = this.parentFilter(filter => filter.isclass("inside-desplay"));
         let aria_details = this.get("aria-label");
-        let display = insideDisplay.choose("display");
+        let display = insideDisplay.pick("display");
         display.in(aria_details, !0);
     })
 </script>

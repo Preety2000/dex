@@ -3,12 +3,15 @@ import re
 import uuid
 import base64
 import unicodedata
-from io import BytesIO
 from PIL import Image
+from io import BytesIO
+from pathlib import Path
 from datetime import datetime
 from typing import Any, List, Union, Optional
-
+from typing import Any, Optional, Union
 from fastapi.responses import StreamingResponse
+
+
 from includes.core.repo.dir_manager import folder
 
 
@@ -93,15 +96,28 @@ def format_view_count(num: Union[int, float, str]) -> str:
     return f"{formatted}{suffixes[magnitude]}"
 
 
-import base64
-import os
-from io import BytesIO
-from pathlib import Path
-from typing import Any, Optional, Union
 
-from fastapi.responses import StreamingResponse
-from PIL import Image
 
+def get_safe_path(base_folder_path, relative_path):
+    """Validates if relative_path is inside base_folder_path to prevent path traversal."""
+    base_root = Path(base_folder_path).resolve()
+    resolved_path = (base_root / relative_path).resolve()
+    
+    # Path Traversal Check (Ensures resolved path stays within base_root)
+    try:
+        resolved_path.relative_to(base_root)
+    except ValueError:
+        return None  # Invalid path (directory traversal attack attempt)
+    
+    # Check if the file exists and is a regular file
+    if resolved_path.is_file():
+        return resolved_path
+    
+    # Fallback logic if file is missing and a fallback directory is provided
+    if base_folder_path != folder.static_folder:
+        return get_safe_path(folder.static_folder, relative_path)
+    
+    return None
 
 async def process_image(
     image_relative_path: str,
@@ -116,6 +132,7 @@ async def process_image(
     Prevents path traversal / arbitrary file access by ensuring that
     the resolved image path remains inside the static directory.
     """
+
 
     try:
         # Basic input validation
@@ -133,17 +150,9 @@ async def process_image(
         if height is not None and (not isinstance(height, int) or height <= 0):
             return "Invalid height."
 
-        # Resolve the static root
-        static_root = Path(folder.static_folder).resolve()
-
-        # Resolve the requested path
-        requested_path = (static_root / image_relative_path).resolve()
-
-        # IMPORTANT:
-        # Ensure requested_path is actually inside static_root.
-        try:
-            requested_path.relative_to(static_root)
-        except ValueError:
+        # Resolve the static rootcategory
+        requested_path = get_safe_path(folder.upload_folder, image_relative_path)
+        if requested_path is None:
             return "Invalid image path."
 
         # File must exist and must be a regular file
@@ -154,7 +163,7 @@ async def process_image(
         # resolve() normally catches this, but this makes the intention explicit.
         if requested_path.is_symlink():
             return "Invalid image path."
-        
+
         print("requested_path====", requested_path)
         # Process image
         with Image.open(requested_path) as base_image:
@@ -183,11 +192,7 @@ async def process_image(
 
         # Streaming response
         if output_type in {"img", "ico"}:
-            media_type = (
-                "image/x-icon"
-                if output_type == "ico"
-                else "image/webp"
-            )
+            media_type = "image/x-icon" if output_type == "ico" else "image/webp"
 
             return StreamingResponse(
                 BytesIO(image_bytes),
@@ -207,7 +212,6 @@ async def process_image(
     except Exception as e:
         # Production mein actual exception expose na karein
         return "Error processing image."
-
 
 
 def get_active_class(current_state: str, target_state: str) -> str:

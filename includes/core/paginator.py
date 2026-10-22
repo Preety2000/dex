@@ -1,6 +1,7 @@
 import inspect
 from dataclasses import dataclass
 from typing import Any, Callable, Optional
+from includes.src.request import Request
 from sqlalchemy import asc, desc
 from includes.core.pagination import Pagination
 from includes.core.request_filter import RequestFilter
@@ -17,10 +18,12 @@ class PaginatorRecord:
 class NewQueryPaginator:
 
     @classmethod
-    async def _global_filter(cls, type: Optional[str] = None, model: Any = None):
+    async def _global_filter(
+        cls, type: Optional[str] = None, model: Any = None, request: Request = None
+    ):
         conditions = []
 
-        global_search = _resolve_request_getter(type, "where")
+        global_search = _resolve_request_getter(request, type, "where")
         if inspect.isawaitable(global_search):
             global_search = await global_search
 
@@ -73,6 +76,7 @@ class NewQueryPaginator:
         limit: int = 10,
         model: Any = None,
         query: Any = None,
+        request: Request = None,
         types: Optional[str] = "query",
         columns: Optional[dict] = None,
         transform: Optional[Callable] = None,
@@ -84,7 +88,9 @@ class NewQueryPaginator:
         otherinfo = otherinfo.copy() if otherinfo else {}
 
         # 2. Apply Global Search Filter
-        global_conditions = await cls._global_filter(type=types, model=model)
+        global_conditions = await cls._global_filter(
+            type=types, model=model, request=request
+        )
         if global_conditions and hasattr(query, "where"):
             query = query.where(*global_conditions)
 
@@ -93,6 +99,7 @@ class NewQueryPaginator:
             query = await RequestFilter.apply_request_filters(
                 model=model,
                 query=query,
+                request=request,
                 columns=columns,
                 request_type=types or "query",
                 search_columns=search_columns,
@@ -109,6 +116,7 @@ class NewQueryPaginator:
         records, pagination, total_count = await Pagination.get_paginate(
             limit=limit,
             query=query,
+            request=request,
             order_by=order_by,
             request_type=types,
             transform=transform,
@@ -116,8 +124,8 @@ class NewQueryPaginator:
         )
 
         # Context updates
-        set_response("results", total_count)
-        set_response("paginator", pagination)
+        set_response(request, "results", total_count)
+        set_response(request, "paginator", pagination)
 
         return PaginatorRecord(
             records=records, pagination=pagination, total_count=total_count

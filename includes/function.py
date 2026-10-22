@@ -21,6 +21,8 @@ from sqlalchemy import asc, desc
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 from includes.core.security import _Security
+from includes.core.repo.dir_manager import folder
+from includes.utils.utils import get_post_value
 
 # Example of using a global variable (not recommended for FastAPI)
 # This is a global configuration object or variable
@@ -58,12 +60,12 @@ def set_global(key, value):
     session_creator_manager[key] = value
 
 
-async def load_svg_files(self):
+async def load_svg_files():
     svg_files = {}
 
-    for file in os.listdir(self.folder.static_svg):
+    for file in os.listdir(folder.static_svg):
         if file.endswith(".svg"):
-            path = os.path.join(self.folder.static_svg, file)
+            path = os.path.join(folder.static_svg, file)
 
             with open(path, "r", encoding="utf-8") as f:
                 svg_files[file.replace(".svg", "")] = f.read()
@@ -76,64 +78,8 @@ class Functions:
         self.state = state
         pass
 
-    def is_post(self):
-        return self.state.request.method == "POST"
-
-    def is_api(self):
-        return self.state.request.method == "POST" and self.get_request_value("key")
-
-    def get_next_id(self, table):
-        query = (
-            getattr(self.state.session, table.__tablename__).order_by(table.id).all()
-        )
-        for index, item in enumerate(query, start=0):
-            if item.id != index:
-                return index
-
-        return len(query) + 1
-
-    def get_request_value(self, value, default=None):
-        return self.state.request.query_params.get(value, default)
-
-    def getRequestInt(self, value, default=None):
-        value = self.get_request_value(value, default)
-        try:
-            value = int(value)
-        except:
-            pass
-        return value if isinstance(value, (int, float)) else default
-
     def utc(self, string):
         return string
 
     def active_class(self, type, action):
         return "active" if type == action else "deactive"
-
-    def resize_and_compress_image(self, image, target_size=10):
-        buffer = BytesIO()
-        best_buffer = None
-        best_size = float("inf")
-        target_bytes = self.getRequestInt("st", (target_size * 1024))
-
-        if format in ("JPEG", "JPG") and image.mode != "RGB":
-            image = image.convert("RGB")
-
-        if dimensions := self.getRequestInt("si"):
-            max_dimensions = (dimensions, dimensions)
-            image.thumbnail(max_dimensions, Image.Resampling.LANCZOS)
-
-        for quality in range(100, 1, -5):
-            buffer.seek(0)
-            buffer.truncate()
-            image.save(buffer, format="JPEG", quality=quality, optimize=True)
-            size = buffer.tell()
-
-            if size <= target_bytes:
-                buffer.seek(0)
-                return buffer
-
-            if size < best_size:
-                best_size = size
-                best_buffer = BytesIO(buffer.getvalue())
-
-        return best_buffer if best_buffer else None

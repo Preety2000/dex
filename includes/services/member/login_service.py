@@ -1,22 +1,22 @@
+from includes.schemas.cache.member import MemberCache
+from includes.src.request import Request
 from sqlalchemy import inspect
 
-from includes.core.metadata import MetaData
+
 from includes.database.models.utils import TimeStamp
-from includes.core.globals.entry import app_context
 from includes.core.security import _Security
-from includes.database.models.owner import Members, MemberSession
-from includes.schemas.cache.member import MemberCache
-from includes.utils.utils import get_query_value
+from includes.database.models.primary import Members, MemberSession
 
 
-async def complete_login(member: Members, db) -> str | None:
-    device_id = app_context.client_info.get("device_id")
+async def complete_login(member: Members, db, request: Request = None) -> str | None:
+
+    device_id = request.state.client_info.get("device_id")
 
     user_sessions = MemberSession(
         is_active=True,
         user_id=member.id,
         device_id=device_id,
-        ip_address=app_context.request.ip,
+        ip_address=request.ip,
     )
 
     db.add(user_sessions)
@@ -26,10 +26,10 @@ async def complete_login(member: Members, db) -> str | None:
     user_login_info_id = _Security.short_encode(user_sessions.id)
 
     # Session
-    app_context.setting.setting_session["MASTER_KEY"] = (
+    request.state.setting.setting_session["MASTER_KEY"] = (
         f"{member.secret}///{user_login_info_id}"
     )
-    app_context.setting.setting_session["id"] = _Security.short_encode(member.id)
+    request.state.setting.setting_session["id"] = _Security.short_encode(member.id)
 
     timestamp = TimeStamp.now_timestamp()
 
@@ -56,14 +56,16 @@ async def complete_login(member: Members, db) -> str | None:
 
     # Cache
     await MemberCache._cache(member)
-    app_context.setting.update_cookie()
+    request.state.setting.update_cookie()
 
     try:
-        del app_context.response["email"]
-        del app_context.response["password"]
+        del request.state.response["email"]
+        del request.state.response["password"]
     except:
         pass
 
-    MetaData.redirect_url = get_query_value("redirect", "/?refresh=true")
+    request.state.metadata.redirect_url = request.query_params.get(
+        "redirect", "/?refresh=true"
+    )
     return
     # return "redirect"
