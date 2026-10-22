@@ -354,7 +354,7 @@ def build_file_upload_response(file, filename, path):
             },
             "path": path,
             "uploaded": True,
-            "url": f"{request.url_root}{path}?{int(time.time())}",
+            "url": f"/{path}?{int(time.time())}",
         }
     )
 

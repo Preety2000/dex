@@ -189,7 +189,7 @@ class JobsResponse(JobsBase):
 class TermsBase(BaseModel):
     slug: str = Field(..., max_length=255)
     name: str = Field(..., max_length=255)
-    image_src: str = "empty.png"
+    image_src: str = "empty.webp"
     resource: int
     topic: int
     subject_id: Optional[int] = None

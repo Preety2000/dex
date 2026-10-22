@@ -278,12 +278,12 @@
         };
         const appendFileIcon = (a, b, c, j) => {
             const d = new FormData, e = image_sowing_container(a, $.create.div().addIcon("ic_close"), () => typeof c == "function" && c())
-                , q = ["location", "name"].filter(i => this[i]).map(i => `${i}=${encodeURIComponent(this[i])}`).join("&")
+                , q = ["location", "name"].filter(i => !(M.OrN.checked && i === "name") && this[i]).map(i => `${i}=${encodeURIComponent(this[i])}`).join("&")
                 , k = () => sc(M.Cn, "M022");
+
 
             M.abortFiles ??= {};
             !M.Cn.pick("M009") && M.Cn.clear();
-
             for (const [i, v] of Object.entries(M.abortFiles)) {
                 if (v.name == b.name) {
                     j = k().pick(i, !0);
@@ -372,6 +372,13 @@
             ));
         }
         const upf = () => {
+            const d = ed.getid();
+            sc(f.l, "OrN", e => {
+                M.OrN = e.create.input({ type: "checkbox", id: d, checked: true });
+                e.create.label({ for: d, inner: "Original name" });
+                return e.add("DIS01");
+            })
+
             const n = M.gC("M008")
             const i = n.create.input({
                 type: "file",

@@ -96,28 +96,27 @@ def format_view_count(num: Union[int, float, str]) -> str:
     return f"{formatted}{suffixes[magnitude]}"
 
 
-
-
 def get_safe_path(base_folder_path, relative_path):
     """Validates if relative_path is inside base_folder_path to prevent path traversal."""
     base_root = Path(base_folder_path).resolve()
     resolved_path = (base_root / relative_path).resolve()
-    
+
     # Path Traversal Check (Ensures resolved path stays within base_root)
     try:
         resolved_path.relative_to(base_root)
     except ValueError:
         return None  # Invalid path (directory traversal attack attempt)
-    
+
     # Check if the file exists and is a regular file
     if resolved_path.is_file():
         return resolved_path
-    
+
     # Fallback logic if file is missing and a fallback directory is provided
     if base_folder_path != folder.static_folder:
         return get_safe_path(folder.static_folder, relative_path)
-    
+
     return None
+
 
 async def process_image(
     image_relative_path: str,
@@ -133,8 +132,8 @@ async def process_image(
     the resolved image path remains inside the static directory.
     """
 
-
     try:
+        print(image_relative_path)
         # Basic input validation
         if not image_relative_path or not isinstance(image_relative_path, str):
             return "Invalid image path."

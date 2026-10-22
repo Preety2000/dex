@@ -124,7 +124,7 @@ class ADMIN_API:
                     self.request, "request.state.roote.entity"
                 ),
                 "image_src": await get_post_value(
-                    self.request, "image_src", "empty.png"
+                    self.request, "image_src", "empty.webp"
                 ),
                 "description": await get_post_value(self.request, "description", ""),
             }

@@ -282,7 +282,7 @@ class ClassBooks:
             "",
             0,
             0,
-            "empty.png",
+            "empty.webp",
         ]
 
         if is_post:

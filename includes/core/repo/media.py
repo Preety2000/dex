@@ -248,7 +248,7 @@ class Media:
         # IMAGE
         if route.section == "img":
             if route.scope == "category":
-                route.entity = route.entity or "empty.png"
+                route.entity = route.entity or "empty.webp"
             if route.entity:
                 route.scope = posixpath.join(route.scope, route.entity)
 

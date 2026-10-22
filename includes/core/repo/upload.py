@@ -201,7 +201,7 @@ class FileUpload:
 
         os.makedirs(upload_dir, exist_ok=True)
 
-        file = await extract_uploaded_files("image")
+        file = await extract_uploaded_files("image", request)
         if not file:
             return file_not_found("image")
 
@@ -248,7 +248,7 @@ class FileUpload:
                 # image = remove(image, session=session)
                 return image
 
-        file = await extract_uploaded_files("image")
+        file = await extract_uploaded_files("image", request)
         if not file:
             return file_not_found("image")
 
@@ -282,7 +282,7 @@ class FileUpload:
         bind = None
         opexte = ".webp"
 
-        file = await extract_uploaded_files("files")
+        file = await extract_uploaded_files("files", request)
         if not file:
             return file_not_found("files")
 
@@ -297,13 +297,16 @@ class FileUpload:
             call_back=bind,
         )
 
-        try:
-            if data.get("success", None) is True:
-                return build_file_upload_response(
-                    file, data.get("filename"), f"/media/img/category/{name}{opexte}"
-                )
-        except:
-            return data
+        # try:
+        if data.get("success", None) is True:
+            return build_file_upload_response(
+                file,
+                data.get("filename"),
+                f"/media/img/category/{data.get("filename")}",
+            )
+        # except:
+        #     print("error upload_category_image ", data)
+        #     return data
 
     @staticmethod
     async def upload_verify_indentity_document(request):
@@ -332,7 +335,7 @@ class FileUpload:
                 and re.search(r"\.(pdf|jpe?g|png)$", f.filename, re.I)
             )
 
-        file = await extract_uploaded_files("file")
+        file = await extract_uploaded_files("file", request)
         return json_response(await Identity.save_verification_document(file))
 
         if not file:
@@ -508,7 +511,7 @@ class FileUpload:
         if callable(callback):
             return await callback(request)
 
-        uploaded_files = await extract_uploaded_files()
+        uploaded_files = await extract_uploaded_files(request=request)
 
         return json_response(await FileUpload.upload(uploaded_files))
         # uploaded_files = await self.request.form()

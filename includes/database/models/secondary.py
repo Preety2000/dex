@@ -351,7 +351,7 @@ class Terms(BaseSecondary):
     id = Column(Integer, primary_key=True)
     slug = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
-    image_src = Column(Text, default="empty.png")
+    image_src = Column(Text, default="empty.webp")
     resource = Column(Integer, nullable=False)
     topic = Column(Integer, nullable=False)
     subject_id = Column(Integer, nullable=True)
@@ -360,8 +360,8 @@ class Terms(BaseSecondary):
 
     @property
     def img(self):
-        path = folder._get_file_path("static", "img", "category", f"{self.slug}.png")
-        src = f"{self.slug}.png" if os.path.isfile(path) else self.image_src
+        path = folder._get_file_path("static", "img", "category", f"{self.slug}.webp")
+        src = f"{self.slug}.webp" if os.path.isfile(path) else self.image_src
         return src if "/" in src else f"/media/img/category/{src}"
 
     @property
