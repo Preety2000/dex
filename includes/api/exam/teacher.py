@@ -109,7 +109,7 @@ async def check_teacher_authorization(verification_status, request: Request = No
             )
 
         # Nothing submitted yet
-        return json_response(await build_settings_page(language))
+        return json_response(await build_settings_page(language, request=request))
     # 4. Teacher profile exists but join_mode is not configured
     if teacher_meta.join_mode is None:
 
@@ -149,7 +149,7 @@ async def check_teacher_authorization(verification_status, request: Request = No
             )
 
         # Nothing submitted
-        return json_response(await build_settings_page(language))
+        return json_response(await build_settings_page(language, request=request))
 
     # 5. Everything is already configured
     return teacher_meta

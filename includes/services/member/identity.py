@@ -29,10 +29,10 @@ class VerifyIdentityRequest:
     document_file: str = None
 
 
-async def get_verify_identity_request(error):
+async def get_verify_identity_request(request, error):
 
     # ---------------- BUILD REQUEST ----------------
-    request = VerifyIdentityRequest(
+    identity_request = VerifyIdentityRequest(
         **{
             f.name: await get_post_value(request, f.name)
             for f in fields(VerifyIdentityRequest)
@@ -40,13 +40,15 @@ async def get_verify_identity_request(error):
         }
     )
 
-    request.document_file = await get_files(
-        name="document_file", ALLOWED_EXTENSIONS={"jpg", "jpeg", "png", "pdf"}
+    identity_request.document_file = await get_files(
+        request=request,
+        name="document_file",
+        ALLOWED_EXTENSIONS={"jpg", "jpeg", "png", "pdf"},
     )
     # ---------------- VALIDATION ----------------
 
     # Captcha empty check
-    if not request.captcha:
+    if not identity_request.captcha:
         error["error_captcha"] = "Enter Captcha"
 
     # Captcha verify check
@@ -54,21 +56,21 @@ async def get_verify_identity_request(error):
         error["error_captcha"] = app_context.function.utc("Captcha not verified!")
 
     # Subject
-    if not request.subject:
+    if not identity_request.subject:
         error["error_subject"] = "Enter your Subject Name"
 
     # Experience
-    if not request.experience:
+    if not identity_request.experience:
         error["error_experience"] = "Enter your experience"
 
     # Document name
-    if not request.document_name:
+    if not identity_request.document_name:
         error["error_document_name"] = "Enter document name"
 
     # ---------------- FILE VALIDATION ----------------
     ALLOWED_TYPES = {"image/jpeg", "image/png", "application/pdf"}
 
-    return request, error
+    return identity_request, error
 
 
 def pdf_to_icon(path, output):
@@ -86,6 +88,9 @@ def pdf_to_icon(path, output):
 
 class Identity:
 
+    def __init__(self, request: Request = None):
+        self.request = request
+
     @staticmethod
     def is_valid_document(f):
         return bool(
@@ -94,14 +99,13 @@ class Identity:
             and re.search(r"\.(pdf|jpe?g|png)$", f.filename, re.I)
         )
 
-    @classmethod
-    async def save_verification_document(cls, file, request: Request = None):
+    async def save_verification_document(self, file):
         global folder
 
-        if not file or not cls.is_valid_document(file):
+        if not file or not self.is_valid_document(file):
             return {"error": "Please upload a valid PDF, JPG, or PNG document."}
 
-        user_id = await request.state.setting.member("id")
+        user_id = await self.request.state.setting.member("id")
         if not user_id:
             return {"error": "Session not Active.. Error code Ex0025GH"}
 
@@ -136,24 +140,23 @@ class Identity:
             "uri": f"/media/exnr/{uid}/{filename}",
         }
 
-    @classmethod
-    async def teacher_verify_identity(cls, request: Request = None):
+    async def teacher_verify_identity(self):
         global folder
 
         error = {}
-        try_ = get_post_value(request, "try")
-        request.state.response["error"] = error
-        request.state.response["formView"] = True
+        try_ = get_post_value(self.request, "try")
+        self.request.state.response["error"] = error
+        self.request.state.response["formView"] = True
 
-        email = await request.state.setting.member("email")
-        user_id = await request.state.setting.member("id")
-        identity = await request.state.setting.member("identity")
+        email = await self.request.state.setting.member("email")
+        user_id = await self.request.state.setting.member("id")
+        identity = await self.request.state.setting.member("identity")
 
-        request.state.response["verify"] = identity
+        self.request.state.response["verify"] = identity
 
         # ---------------- helper ----------------
         async def set_verification_status(identity_data=None):
-            request.state.response["formView"] = False
+            self.request.state.response["formView"] = False
 
             if identity_data is None:
                 q = await MemberCache.get_with_id(user_id)
@@ -163,26 +166,26 @@ class Identity:
             identity_data["request_id"] = identity_data["id"] + 5265
 
             if identity_data["try_number"] == try_ and identity_data["status"] != 0:
-                request.state.response["formView"] = True
+                self.request.state.response["formView"] = True
 
-            request.state.response["reasons"] = identity_data["reasons"]
+            self.request.state.response["reasons"] = identity_data["reasons"]
             if identity_data["document"]:
                 uid = get_folder_key(int(identity_data["user_id"]))
-                request.state.response["document_url"] = (
+                self.request.state.response["document_url"] = (
                     f"/media/exnr/{uid}/b95f30192536.png?t={int(time.time())}"
                 )
 
         # ---------------- POST ----------------
-        if request.is_post:
-            vi_request, error = await get_verify_identity_request(error)
+        if self.request.is_post:
+            vi_request, error = await get_verify_identity_request(self.request, error)
 
             if not error:
-                uid = get_folder_key(int(await request.state.setting.member("id")))
+                uid = get_folder_key(int(await self.request.state.setting.member("id")))
                 user_dir = folder.ensure_directory(folder.exnr, uid)
                 icon_path = os.path.join(user_dir, "b95f30192536.png")
 
                 if not os.path.exists(icon_path):
-                    data = await cls.save_verification_document(
+                    data = await self.save_verification_document(
                         vi_request.document_file
                     )
                     if data.get("error"):
@@ -191,7 +194,7 @@ class Identity:
 
                 ext = os.path.splitext(vi_request.document_file.filename)[1].lower()
                 filename = secure_filename("ve_verification" + ext)
-                info = json.dumps(request.state.client_info)
+                info = json.dumps(self.request.state.client_info)
 
                 # ---------------- DB ----------------
                 db_session = await config_primary_db()
@@ -216,8 +219,8 @@ class Identity:
 
                 await MemberCache.delete_cache(user_id)
                 await set_verification_status()
-                request.state.metadata.template = "redirect"
-                request.state.metadata.redirect_url = (
+                self.request.state.metadata.template = "redirect"
+                self.request.state.metadata.redirect_url = (
                     "/ut/accounts/teacher/verify-indentity"
                 )
                 return

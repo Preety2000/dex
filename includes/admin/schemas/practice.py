@@ -132,7 +132,7 @@ class AdminClassObjective:
             return data_querys
 
         # Validate through AdminApiMCQ schema check
-        data = await AdminApiMCQ.insert()
+        data = await AdminApiMCQ(request=self.request).insert()
 
         error = data.get("error") if isinstance(data, dict) else None
 
@@ -355,10 +355,11 @@ class AdminClassObjective:
         if action_type == "delete":
 
             # Backup before deleting
-            backup_status = await ClassBeckup.insert(
-                question_record.to_dict(),
-                "QuizQuestion",
-            )
+            backup_status = None
+            if not self.request.state.response["error"]:
+                backup_status = await ClassBeckup.insert(
+                    question_record.to_dict(), "QuizQuestion"
+                )
 
             if backup_status:
 

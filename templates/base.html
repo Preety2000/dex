@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="hi">
-{% if svg %}
-
+<html lang="hi">{% if svg %}
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,8 +9,7 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
     <link rel="image_src" href="/img/{{response.hasTitle if response.hasTitle else security.short_encode(title)}}">
-    <link rel="search" type="application/opensearchdescription+xml" title="{{site_name  | safe}}"
-        href="/opensearch.xml">
+    <link rel="search" type="application/opensearchdescription+xml" title="{{site_name | safe}}" href="/opensearch.xml">
     <link rel="canonical" href="{{request.url}}">
     <!-- Meta data session  -->
     <meta name="title" property="title" itemprop="name" content="{{title}}">
@@ -22,16 +19,13 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{request.url}}">
     <meta property="og:site_name " content="{{site_name  | safe}}">
-    <meta property="og:image" itemprop="image primaryImageOfPage" content="/static/apple-touch-icon@2.png">{% for item
-    in tags %}
+    <meta property="og:image" itemprop="image primaryImageOfPage" content="/static/apple-touch-icon@2.png">{% for item in tags %}
     <meta property="og:tag" content="{{item}}">{% endfor %}
-
     <!-- Twitter meta session  -->
     <meta name="twitter:card" content="summary">
     <meta name="twitter:domain" content="{{response.site_domain}}">
     <meta name="twitter:title" property="og:title" itemprop="name" content="{{title}}">
-    <meta name="twitter:description" property="og:description" itemprop="description"
-        content='{{ response.excerpt |safe }}'>
+    <meta name="twitter:description" property="og:description" itemprop="description" content='{{ response.excerpt |safe }}'>
     <meta content='#1e1e1e' name='theme-color' />{%if parameter %}
     <script type="application/ld+json">{
         "@context": "https://schema.org",
@@ -71,7 +65,7 @@
 
         .IN010 {
             position: fixed;
-            width: -webkit-fill-available;
+            width: 100%;
             height: 100%;
             margin: 0;
             left: 0;
@@ -85,19 +79,13 @@
             flex-direction: column;
             min-height: 100vh;
             height: max-content;
-            width: -webkit-fill-available;
+            width: 100%;
         }
     </style>
-    <link rel="stylesheet" id="main_style" href="/static/css/index.css?m={{device_info.device_type}}">{% block head %}{%
-    endblock %}{%if device_info.device_type == "mobile"%}
+    <link rel="stylesheet" id="main_style" href="/static/css/index.css?m={{device_info.device_type}}">{% block head %}{%endblock %}{%if device_info.device_type == "mobile"%}
     <link rel="stylesheet" id="main_style" href="/static/css/mobile.css?m={{device_info.device_type}}">{%endif%}
-    <script type="application/json" data-sjs data-content-len="4">
-        {"require":["bess", null, null, ["7512725961844105", "splash_load"]]}
-    </script>
-    <script type="application/json" data-sjs data-content-len="4">
-        {"require":["option", null, null, ["7512725961844105", "splash_load"]]}
-    </script>
-
+    <script type="application/json" data-sjs data-content-len="4">{"require":["bess", null, null, ["7512725961844105", "splash_load"]]}</script>
+    <script type="application/json" data-sjs data-content-len="4">{"require":["option", null, null, ["7512725961844105", "splash_load"]]}</script>
     <script type="text/javascript">
         function ExtentJs(a, b, c, d, f, m = e => typeof e === "function") {
             const g = a[b], h = m(g) ? g.call(a, d) : c;

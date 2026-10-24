@@ -330,7 +330,7 @@ $.define(function MCQ(container, opretar, ES) {
 
         // User Modal 
         mcqe.T056.create({ tagName: "img", class: "T057", src: opretar.stu_img })
-        var table = mcqe.T056.create.div().css({ width: '-webkit-fill-available' });
+        var table = mcqe.T056.create.div().css({ width: '100%' });
         function sm(a, b) {
             let tr = table.create('T040');
             tr.create.span('msq1', a);

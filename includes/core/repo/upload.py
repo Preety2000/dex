@@ -336,7 +336,7 @@ class FileUpload:
             )
 
         file = await extract_uploaded_files("file", request)
-        return json_response(await Identity.save_verification_document(file))
+        return json_response(await Identity(request).save_verification_document(file))
 
         if not file:
             return {"error": "Please upload a valid PDF, JPG, or PNG document."}

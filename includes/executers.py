@@ -12,7 +12,7 @@ from includes.database.dataclass.dataclass import serialize, to_dict
 
 from includes.core.cache import AppCache
 from includes.core.security import _Security
-from includes.core.metadata import set_article_context
+from includes.core.metadata import MetaData, set_article_context
 from includes.core.globals.entry import app_context, fetchTime
 from includes.core.globals.initialize import initialize_database
 
@@ -348,16 +348,19 @@ async def execute_request(request: Request = None):
             slug=request.state.roote.scope,
             parameter=resource_query.id,
         )
+        MetaData
         if response:
             response.pop("mdata", None)
             types = response.get("type")
             response["reseant_parameter"] = await ArticleService.get_filtered_articles(
-                request=request, parameter=resource_query.id, limit=10
+                request=request, parameter=resource_query.id, limit=10, desc="id",
             )
             if isinstance(types, dict) and types.get("Id"):
                 response["reseant_type"] = await ArticleService.get_filtered_articles(
-                    request=request, type=types["Id"], limit=10
+                    request=request, type=types["Id"], limit=10, desc="id",
                 )
+
+            await request.state.metadata.update(response)
             configure_page(
                 request.state.metadata,
                 template="query/second_parameter",
@@ -371,7 +374,9 @@ async def execute_request(request: Request = None):
         slug=request.state.roote.section, parameter=0
     )
     if data:
-        page_list = await ArticleService.get_page_lists(desc="id", limit=6)
+        page_list = await ArticleService.get_page_lists(
+            desc="id", limit=6, request=request
+        )
         configure_page(
             request.state.metadata, template="query/page", title=data.get("title")
         )

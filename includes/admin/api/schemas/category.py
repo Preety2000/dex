@@ -7,12 +7,14 @@ from includes.utils.utils import create_slug, get_next_id, get_post_value
 
 
 class AdminApiCategory:
+    
+    def __init__(self, request):
+        self.request = request
 
-    @classmethod
-    async def insert(cls):
-        replace = await get_post_value(request, "replace")
+    async def insert(self):
+        replace = await get_post_value(self.request, "replace")
         fields = ["description", "name", "resource", "slug", "subject", "topic"]
-        data = {i: await get_post_value(request, i) for i in fields}
+        data = {i: await get_post_value(self.request, i) for i in fields}
 
         if not data["name"] or not data["subject"] or not data["description"]:
             return {"error": "Category name, description and subject are required."}
@@ -99,10 +101,9 @@ class AdminApiCategory:
             db.rollback()
             raise
 
-    @classmethod
-    async def execute(cls, root_name: str = None):
+    async def execute(self, root_name: str = None):
 
         if root_name == "insert":
-            return await cls.insert()
+            return await self.insert()
 
         return []

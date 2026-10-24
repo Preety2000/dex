@@ -21,7 +21,19 @@ class TermsCache:
         TermsCacheData.BySlug[record.slug] = record.id
         TermsCacheData.ByName[record.name] = record.id
 
+        print("TermsCache update with id =>", record)
+
         return record
+
+    @staticmethod
+    def _delete(record: _Terms) -> _Terms:
+        if isinstance(record, _Terms):
+            del TermsCacheData.ById[record.id]
+            del TermsCacheData.BySlug[record.slug]
+            del TermsCacheData.ByName[record.name]
+            return
+
+        return TermsCache._cache_remove()
 
     @staticmethod
     def _cache_remove():
@@ -38,7 +50,6 @@ class TermsCache:
             return record
 
         db = await config_secondary_db()
-
         record = db.execute(select(Terms).where(Terms.id == id)).scalar_one_or_none()
 
         if not record:
@@ -105,16 +116,15 @@ class TermsCache:
     @staticmethod
     async def get_all() -> list[_Terms]:
         if TermsCacheData.allList:
-            return TermsCacheData.allList
+            return TermsCacheData.ById.values()
 
         db = await config_secondary_db()
         records = db.execute(select(Terms).order_by(Terms.name)).scalars().all()
+        data = [TermsCache._cache(_Terms(**serialize(record))) for record in records]
 
-        TermsCacheData.allList = [
-            TermsCache._cache(_Terms(**serialize(record))) for record in records
-        ]
+        TermsCacheData.allList = True
 
-        return TermsCacheData.allList
+        return data
 
     @staticmethod
     async def get_many(id_list: list[int]):

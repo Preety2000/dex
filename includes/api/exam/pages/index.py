@@ -58,7 +58,7 @@ class ExamIndexPage:
                         return {"jump": f"{path}?id={id}"}
 
                 exam_query.teacher_record = await Teachers.get(exam_query.teacher_id)
-                return await build_settings_page(language, exam_query)
+                return await build_settings_page(language, exam_query, request=request)
 
             response = {"__ac": 113, "query": await ExamIndexPage.get_exam(exam_id)}
 

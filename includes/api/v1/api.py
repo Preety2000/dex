@@ -22,7 +22,12 @@ from includes.schemas.search import Search
 from includes.database.models.secondary import Article
 from PIL import Image, ImageDraw, ImageFont
 
-from includes.utils.utils import get_post_value, json_null_response, json_response
+from includes.utils.utils import (
+    create_slug,
+    get_post_value,
+    json_null_response,
+    json_response,
+)
 from includes.database.connection import db
 
 
@@ -88,8 +93,10 @@ def create_captcha_image(captcha_text):
     return image
 
 
-from deep_translator import GoogleTranslator
 from langdetect import detect
+from deep_translator import GoogleTranslator
+
+translator = GoogleTranslator(source="auto", target="en")
 
 
 class API:
@@ -99,13 +106,11 @@ class API:
     def translate(self, text):
         error = False
         try:
-            text = GoogleTranslator(source="auto", target="es").translate(text)
-
+            text = translator.translate(text)
         except:
             error = True
 
         return text, error
-        return json_response(text)
 
     async def index(self, request: Request = None, roots: Route = None):
         member = ClassUser(self.request)
@@ -192,7 +197,7 @@ class API:
         if entity == "translate":
             text = await get_post_value(request, "q")
             translatedText, error = self.translate(text)
-            translatedText = translatedText.replace(" ", "-").lower()
+            translatedText = create_slug(translatedText)
 
             return json_response(translatedText)
 

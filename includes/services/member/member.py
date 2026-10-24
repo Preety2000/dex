@@ -274,7 +274,7 @@ class ClassUser:
         member = await self.request.state.setting.member()
 
         if reso == "teacher" and self.request.state.roote.action == "verify-indentity":
-            return await Identity.teacher_verify_identity()
+            return await Identity(self.request).teacher_verify_identity()
 
         if self.request.is_post:
             return await getattr(self, reso)(member) or "error"

@@ -1,12 +1,12 @@
-
 .IN038 {
     box-shadow: 0px 4px 9px 0 #00000026;
 }
 
 
-.quiz-container{
+.quiz-container {
     margin: 0 auto;
-    width: -webkit-fill-available;;
+    width: 100%;
+    ;
     min-height: 350px;
     max-width: 780px;
     padding: 10px;
@@ -15,7 +15,7 @@
     border-radius: 5px;
 }
 
-.options-container{
+.options-container {
     max-width: 728px;
     min-height: 350px;
     margin: 5px auto;
@@ -49,14 +49,16 @@
     padding: 6px 12px;
     border: solid 1px #00000022;
     min-width: 160px;
-    width: -webkit-fill-available;;
+    width: 100%;
+    ;
     cursor: pointer;
     transition: all 0.5s;
     border-radius: 6px;
     overflow: hidden;
     box-shadow: 2px 2px 4px #00000022;
 }
-.options-container .options .button:hover{
+
+.options-container .options .button:hover {
     background: var(--btn-outline-hover);
 }
 
@@ -77,7 +79,7 @@
     margin-right: 10px;
 }
 
-.button-container{
+.button-container {
     margin-top: 50px;
     display: flex;
     overflow: hidden;
@@ -93,7 +95,7 @@
 
 
 /* View Ans */
-.head-container{
+.head-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 5px;
@@ -112,16 +114,18 @@
 .head-container .m-title {
     flex: 1;
 }
-.head-container .numbers{
+
+.head-container .numbers {
     font-weight: bold;
     min-width: 120px;
 }
-.head-container .numbers::before{
+
+.head-container .numbers::before {
     content: ":";
     margin: auto 10px;
 }
 
-.quiz-container .show_ans_sheet  {
+.quiz-container .show_ans_sheet {
     /* font-size: 18px; */
     margin-bottom: 20px;
     text-align: center;
@@ -136,7 +140,8 @@
     height: 0;
     overflow: hidden;
 }
-.oprn_ans_sheet  .IN0104 {
+
+.oprn_ans_sheet .IN0104 {
     height: auto;
 }
 
@@ -188,8 +193,11 @@
 
 
 @media screen and (max-width:880px) {
-    .options-container{background: transparent !important;}
-    .quiz-container{
+    .options-container {
+        background: transparent !important;
+    }
+
+    .quiz-container {
         margin: 10px auto;
         background: transparent !important;
         box-shadow: none;
@@ -203,6 +211,7 @@
     .quiz-container .options {
         grid-template-columns: repeat(1, 1fr);
     }
+
     .head-container,
     .quiz-container .IN0104 {
         grid-template-columns: repeat(1, 1fr);

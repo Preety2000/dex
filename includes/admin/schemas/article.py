@@ -154,6 +154,7 @@ class AdminArticleService:
             model=Article,
             query=select(Article),
             transform=lambda item: json(item),
+            desc="id",
         )
 
         return data.records
@@ -550,7 +551,11 @@ class AdminArticleService:
 
         if article and action_type == "delete":
             data_querys = await AdminArticleService.getCollection(article)
-            if await ClassBeckup.insert(data_querys, "article"):
+            backup_status = None
+            if not self.request.state.response["error"]:
+                backup_status = await ClassBeckup.insert(data_querys, "article")
+
+            if backup_status:
                 db.execute(
                     delete(ArticleMetadata).where(ArticleMetadata.id == article.id)
                 )

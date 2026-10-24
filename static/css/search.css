@@ -11,7 +11,7 @@ aside {
 
 img {
     height: 100%;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
 }
 
@@ -37,7 +37,7 @@ body .boc {
 .search-IN018 {
     position: fixed;
     animation: fadein 500ms;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     height: 100%;
     margin: 0;
@@ -75,7 +75,7 @@ body .boc {
 
 
 .input-box {
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     height: 45px;
     position: relative;
@@ -85,7 +85,7 @@ body .boc {
     position: absolute;
     left: 0;
     top: 0;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     height: 35px;
     border: none;
@@ -202,7 +202,7 @@ body .boc {
 .search-result-container {
     position: relative;
     grid-area: content;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     display: block;
     overflow: hidden;
@@ -220,7 +220,7 @@ body .boc {
     display: block;
     overflow: hidden;
     min-width: 320px;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     grid-area: side;
 }
@@ -231,7 +231,7 @@ body .boc {
 }
 
 .b_tween {
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     padding: 10px;
 }
@@ -365,7 +365,7 @@ body .boc {
 }
 
 .IN079 .question_list {
-    width: -webkit-fill-available;
+    width: 100%;
     ;
 }
 
@@ -405,7 +405,7 @@ body .boc {
     }
 
     .IN003 .b_context {
-        max-width: -webkit-fill-available;
+        max-width: 100%;
         ;
         padding: 0;
     }

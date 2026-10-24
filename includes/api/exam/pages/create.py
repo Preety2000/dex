@@ -29,7 +29,7 @@ class CreateExam:
     oictionary: list | None = None
     question_submit: str | None = None
 
-    async def load(self):
+    async def load(self, request: Request):
 
         for item in CREATE_FIELDS:
             setattr(self, item, await get_post_value(request, item))
@@ -227,7 +227,10 @@ class ExamCreatePage:
         if paper:
 
             url = await ExamCreatePage.insurt_exam_preferences_on_database(
-                exam_context.exam_name, exam_context.exam_meta, exam_context.exam_qsto
+                exam_context.exam_name,
+                exam_context.exam_meta,
+                exam_context.exam_qsto,
+                request=request,
             )
 
             ExamCacheMemory.remove(entry)
@@ -275,7 +278,7 @@ class ExamCreatePage:
             exam_name = None
 
         create_exam = CreateExam()
-        await create_exam.load()
+        await create_exam.load(request=request)
 
         exam_context = await ExamCacheMemory.get(entry)
         print("//////////", exam_context)

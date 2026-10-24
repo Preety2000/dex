@@ -180,11 +180,11 @@ async def process_image(
             image_io = BytesIO()
 
             # Convert modes that WebP may not handle correctly
-            if base_image.mode not in ("RGB", "RGBA"):
-                if "A" in base_image.getbands():
-                    base_image = base_image.convert("RGBA")
-                else:
-                    base_image = base_image.convert("RGB")
+            # if base_image.mode not in ("RGB", "RGBA"):
+            #     if "A" in base_image.getbands():
+            #         base_image = base_image.convert("RGBA")
+            #     else:
+            #         base_image = base_image.convert("RGB")
 
             base_image.save(image_io, format="WEBP")
             image_bytes = image_io.getvalue()

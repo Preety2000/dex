@@ -1,6 +1,7 @@
 from collections import defaultdict
 from typing import Any, List, Optional
 
+from includes.schemas.cache.terms import TermsCache
 from includes.src.request import Request
 from sqlalchemy import asc, delete, select
 
@@ -12,9 +13,14 @@ from includes.core.globals.coreutils import is_empty, slugify
 from includes.core.globals.route_context import Route
 from includes.core.paginator import NewQueryPaginator
 from includes.database.connection import config_primary_db, config_secondary_db
-from includes.database.dataclass.dataclass import serialize
+from includes.database.dataclass.dataclass import _Terms, serialize
 from includes.database.models.primary import Subject
-from includes.database.models.secondary import Terms
+from includes.database.models.secondary import (
+    BooksRelationship,
+    QuizRelationships,
+    Terms,
+    TermsRelationship,
+)
 from includes.schemas.cache.subject import SubjectCache
 from includes.utils.utils import get_next_id, get_post_value
 
@@ -166,6 +172,7 @@ class AdminClassTerms:
 
         db.add(term)
         db.commit()
+        TermsCache._cache(term)
 
         return {"redirect": True}
 
@@ -228,6 +235,8 @@ class AdminClassTerms:
 
         db.commit()
 
+        TermsCache._cache(terms_query)
+
         self.request.state.response["message"] = (
             "Updated " "<a href='/admin/category'>Back</a>"
         )
@@ -241,26 +250,43 @@ class AdminClassTerms:
         db = await config_secondary_db()
         if id:
             stmt = select(Terms).where(Terms.id == id)
-
             result = db.execute(stmt)
-
             terms_query = result.scalars().first()
 
         if terms_query:
 
-            if await ClassBeckup.insert(
-                serialize(terms_query),
-                "terms",
-            ):
+            backup_status = None
+            if not self.request.state.response["error"]:
+                old_data = serialize(terms_query)
+                ods_query = _Terms(**old_data)
+
+                backup_status = await ClassBeckup.insert(old_data, "terms")
+
+            if backup_status:
 
                 # Delete main Terms record
                 db.execute(delete(Terms).where(Terms.id == terms_query.id))
 
                 # Delete related records
-                db.execute(delete(Terms).where(Terms.terms_id == terms_query.id))
+                db.execute(
+                    delete(TermsRelationship).where(
+                        TermsRelationship.terms_id == terms_query.id
+                    )
+                )
+                db.execute(
+                    delete(QuizRelationships).where(
+                        QuizRelationships.terms_id == terms_query.id
+                    )
+                )
+                db.execute(
+                    delete(BooksRelationship).where(
+                        BooksRelationship.terms_id == terms_query.id
+                    )
+                )
 
                 db.commit()
 
+                TermsCache._delete(ods_query)
                 GlobleCatch.get_with_terms = None
 
                 return True

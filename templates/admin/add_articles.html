@@ -1,13 +1,9 @@
 {% extends "admin/base.html" %}
 
 {% block head %}
-
 {% endblock %}
-
 {% block body %}
-
 {% if data_querys %}
-
 {% if data_querys.article_matching %}
 <div class="messages-box postbox">
     <h2 class="titles">Error :)</h2>
@@ -226,18 +222,29 @@
         </div>
         <div id="postbox-container-2" class="postbox-container">
             <div id="normal-sortables" class="meta-box-sortables">
-                <div id="postimagediv" class="postbox ">
+
+                <div id="slugdiv" class="postbox  hide-if-js">
                     <div class="F0006">
-                        <h2 class="hndle">Featured image</h2>
+                        <h2 class="hndle">Slug</h2>
                         <div class="handle-actions"></div>
                     </div>
-                    <div class="inside">
-                        <p><a href="#SelectFeaturedImage" class="thickbox" jsname="SelectFeaturedImage">Select featured
-                                image</a>
-                        </p>
-                        <input type="text" class="width" name="thumbnail" value="{{data_querys.thumbnail}}"
-                            placeholder="Enter Image URL">
+
+                    <div class="inside {{data_querys.null_slug}}">
+                        <span>Type :</span>
+                        <input type="radio" name="parameter" checked value="0"> None
+                        {% for resource in resources %}
+                        <input type="radio" name="parameter" {{resource.checked}} id="id_{{resource.slug}}"
+                            value="{{resource.id}}"> {{resource.name}},
+                        {%endfor%}
+                        <a href="javascript:void(0)" class="add-parameter"> Add</a> or
+                        <a href="javascript:void(0)" class="select-parameter" aria-data="{{parameters}}">Select</a>
+                        <p></p>
+                        <br>
+                        <label class="screen-F0019" for="slug">Slug</label>
+                        <input name="slug" type="text" class="large-text width" aria-label="{{data_querys.parameter}}"
+                            id="slug" value="{{data_querys.slug}}">
                     </div>
+
                 </div>
                 <div id="categorydiv" class="postbox ">
                     <div class="F0006">
@@ -288,28 +295,21 @@
                         </div>
                     </div>
                 </div>
-                <div id="slugdiv" class="postbox  hide-if-js">
+
+                <div id="postimagediv" class="postbox ">
                     <div class="F0006">
-                        <h2 class="hndle">Slug</h2>
+                        <h2 class="hndle">Featured image</h2>
                         <div class="handle-actions"></div>
                     </div>
-
-                    <div class="inside {{data_querys.null_slug}}">
-                        <span>Type :</span>
-                        <input type="radio" name="parameter" checked value="0"> None
-                        {% for resource in resources %}
-                        <input type="radio" name="parameter" {{resource.checked}} id="id_{{resource.slug}}"
-                            value="{{resource.id}}"> {{resource.name}},
-                        {%endfor%}
-                        <a href="javascript:void(0)" class="add-parameter"> Add</a> or
-                        <a href="javascript:void(0)" class="select-parameter" aria-data="{{parameters}}">Select</a>
-                        <p></p>
-                        <br>
-                        <label class="screen-F0019" for="slug">Slug</label>
-                        <input name="slug" type="text" class="large-text width" aria-label="{{data_querys.parameter}}"
-                            id="slug" value="{{data_querys.slug}}">
+                    <div class="inside">
+                        <p>
+                            <a href="#SelectFeaturedImage" class="thickbox" jsname="SelectFeaturedImage">
+                                Select featured image
+                            </a>
+                        </p>
+                        <input type="text" class="width" name="thumbnail" value="{{data_querys.thumbnail}}"
+                            placeholder="Enter Image URL">
                     </div>
-
                 </div>
                 <div id="postcustom" class="postbox  hide-if-js">
                     <div class="F0006">

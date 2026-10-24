@@ -14,15 +14,17 @@ from includes.utils.utils import get_post_value, json_response
 
 class ActionForm:
 
-    @staticmethod
-    async def verify_teacher_identity(request):
-        email = await get_post_value(request, "email")
-        verification_id = await get_post_value(request, "id")
-        approve = await get_post_value(request, "verify", False)
-        block_private = await get_post_value(request, "block_private")
-        block_teacher = await get_post_value(request, "block_teacher")
-        rejection_message = await get_post_value(request, "rejection_message")
-        reasons = await get_post_value(request, "reasons")
+    def __init__(self, request: Request = None):
+        self.request = request
+
+    async def verify_teacher_identity(self):
+        email = await get_post_value(self.request, "email")
+        verification_id = await get_post_value(self.request, "id")
+        approve = await get_post_value(self.request, "verify", False)
+        block_private = await get_post_value(self.request, "block_private")
+        block_teacher = await get_post_value(self.request, "block_teacher")
+        rejection_message = await get_post_value(self.request, "rejection_message")
+        reasons = await get_post_value(self.request, "reasons")
 
         if not verification_id or not email:
             return {"status": False, "message": "Missing required fields"}
@@ -102,13 +104,12 @@ class ActionForm:
             "jsname": "teacherVerifyUnVerify",
         }
 
-    @staticmethod
-    async def index(detail, request: Request = None):
+    async def index(self, detail):
         if (
-            request.state.referer
-            and request.state.referer.path == "/admin/teacher-verify-indentity"
+            self.request.state.referer
+            and self.request.state.referer.path == "/admin/teacher-verify-indentity"
         ):
-            query = await ActionForm.verify_teacher_identity(request)
+            query = await self.verify_teacher_identity()
             return json_response(query)
 
         return {}

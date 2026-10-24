@@ -1,16 +1,17 @@
 from includes.utils._sub import configure_page
-from includes.core.globals.entry import app_context
+from includes.src.request import Request
 
 
 class ClassDownload:
 
-    @staticmethod
-    def index():
+    def __init__(self, request: Request):
+        self.request = request
+
+    def index(self):
         configure_page(
-            request.state.metadata,
+            self.request.state.metadata,
             template="widget/app_download",
             title="Download App",
             suffix=True,
         )
         return "widget/app_download"
-        return []

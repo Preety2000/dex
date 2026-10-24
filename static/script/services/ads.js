@@ -278,7 +278,7 @@
         this.session.setValue("style", style);
 
         // Insert CSS rules to style the ad containerand its elements
-        style.in("html,body{height:100%;width: -webkit-fill-available;overflow:hidden;margin: 0;background:#fff;font-family: roboto;}button {border: none;outline: none;}.action{position: absolute;right: 0;top: 0;background: #fff;border-radius: 0 0 0 5px; overflow: hidden;z-index:9}");
+        style.in("html,body{height:100%;width: 100%;overflow:hidden;margin: 0;background:#fff;font-family: roboto;}button {border: none;outline: none;}.action{position: absolute;right: 0;top: 0;background: #fff;border-radius: 0 0 0 5px; overflow: hidden;z-index:9}");
 
         return this.insurts(style); // Insert the style into the document
     });
@@ -325,13 +325,13 @@
     });
 
     extend(function getFrameDocument(frame) {
-        
+
         // Get the document object of the iframe for further manipulation
         const document = frame.contentDocument || frame.contentWindow.document;
 
         // Open, write, and close the document to initialize it
         document.open();
-        document.write(`<!DOCTYPE html><html lang='en-in' dir='ltr' style="height: 100%;width: -webkit-fill-available;"></html>`);
+        document.write(`<!DOCTYPE html><html lang='en-in' dir='ltr' style="height: 100%;width: 100%;"></html>`);
         document.close();
 
         return document;

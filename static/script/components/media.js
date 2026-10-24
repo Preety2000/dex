@@ -159,7 +159,7 @@ const dataContainer = new $(function dataContainer(e) {
 
         image_container.create.button("option-button", icon).event.on(dataContainer.optionThumble);
         image_container.create.p("image-name").in(image_data.name);
-        image_containers.set_thumbnail(image_data.thumbnail || "/media/img/empty.png")
+        image_containers.set_thumbnail(image_data.thumbnail || "/media/img/empty.webp")
         image_containers.data = image_data;
         image.dataset.type = image_data.type;
 

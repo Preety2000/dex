@@ -24,35 +24,32 @@ class ADMIN_API:
 
         await initialize_database(request)
 
-        if await Admin.user_verifaction(request.state.roote.entity):
+        if await self.admin.user_verifaction(request.state.roote.entity):
             return json_response("Session End! 😒")
 
         if "insert" == request.state.roote.entity:
-            return await AdminInsurt.exiute()
+            return await AdminInsurt.exiute(request)
 
-        if "category" == request.state.roote.entity:
+        if "category" == request.state.roote.entity and request.state.roote.action:
             if request.state.roote.action:
-                return await AdminApiCategory.execute(request.state.roote.action)
+                return await AdminApiCategory(request=self.request).execute(request.state.roote.action)
 
             return []
 
-        if "tags" == request.state.roote.entity:
-            if request.state.roote.action:
-                return await self.tags()
+        if "tags" == request.state.roote.entity and request.state.roote.action:
+            return await self.tags()
 
-        if "subject" == request.state.roote.entity:
-            if request.state.roote.action:
-                return json_response(
-                    await AdminApiSubject.execute(request.state.roote.action)
-                )
+        if "subject" == request.state.roote.entity and request.state.roote.action:
+            return json_response(
+                await AdminApiSubject.execute(request.state.roote.action)
+            )
 
-        if "content" == request.state.roote.entity:
-            if request.state.roote.action:
-                return await self.content()
+        if "content" == request.state.roote.entity and request.state.roote.action:
+            return await self.content()
 
         # Action Form Js Request
         if request.state.roote.entity == "auth" and request.state.roote.action == "t":
-            return await ActionForm.index(request.state.roote.entity)
+            return await ActionForm(request=request).index(request.state.roote.entity)
 
         return [
             request.state.roote.entity,
@@ -89,7 +86,7 @@ class ADMIN_API:
         if "search" == self.request.state.roote.action:
             search = Search(self.request)
             search_term = await get_post_value(self.request, "q")
-            suggestion_query = search.suggestion(search_term, 20)
+            suggestion_query = await search.suggestion(search_term, 20)
 
             return json_response(
                 [{"query": suggestion_query, "fatching_key": "g.params.key"}, 200]

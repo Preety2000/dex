@@ -77,17 +77,23 @@ $.define("dm/action", function Action(ED) {
         , za = (t, b) => zd(t, (f, m) => typeof b === "function" && b(f(m), m))
         , gm = (t, b, i, c) => {
             const gh = (f, e, a, w, s, g, t) => {
-                const h = "hidden", v = () => f.getValue("tag") || [], r = () => { t.reStore(); s.in(b, null); g.add(h) };
-                for (const i of a) if (!v().includes(i)) {
+                const h = "hidden", v = () => f.getValue("tag") || [], r = () => { t.reStore(); s.in(b, null); g.add(h) }, y = $("tax-input-post_tag", true), o = y.value.split(",");
+                console.log(a, e, o, v());
+
+                for (const i of [...new Set([...o, ...a])]) if (!v().includes(i)) {
                     const c = cr(g, "tag-list-container"), b = f.input({ class: h, type: "checkbox", name: "tag", value: i, title: i, checked: true }, c);
-                    sp(c, null).event.on(() => (rm(b), rm(c), !v().length && r())).addIcon("ic_close"); g.removed(h)
+                    o.includes(i) && c.add("active"), sp(c, null).event.on(() => (rm(b), rm(c), !v().length && r())).addIcon("ic_close"); g.removed(h)
                 }
+
                 a.length && (rm(t), s.in("Insuet Json", null));
                 if (e.tag) { const a = e.tag.filter(x => x !== null).join(","); $("tax-input-post_tag", true).in(a); w.close() }
             }
             return za(t, (f, w) => {
                 const g = cr(f.getContainer(), "hidden", 0), t = i(f), s = f.submitButton(b);
-                g.css({ maxWidth: 700, minHeight: 180, display: "flex", flexWrap: "wrap", alignContent: "flex-start" });
+                g.css({
+                    //  maxWidth: 700, 
+                    minHeight: 180, display: "flex", flexWrap: "wrap", alignContent: "flex-start"
+                });
                 f.submit = e => c(e, a => gh(f, e, a, w, s, g, t), s)
             })
         }
@@ -407,7 +413,10 @@ $.define("dm/action", function Action(ED) {
             return gm("Search Tag for DataBace", "Search", e => e.input({ name: "q", value: "", placeholder: "Tag Keywords" }), (e, b, bt) => $.apirequest("/api/admin/tags/search", true).send(e, r => b([...r.res.is("query")].map(e => e.name))));
         })
         ep(function ACAGT(a, b) {
-            return gm(a.innerText, "Apply", e => e.textarea({ class: "description", name: "description", placeholder: "Enter json $." }), (e, b) => { const f = s => s.replace(/<\/?b>/g, ""); b([...new Set((JSON.parse(e.description?.slice(6) || "[]")?.[0] || []).map(x => f(x[0])))]) });
+            return gm(a.innerText, "Apply", e => e.textarea({ class: "description", name: "description", placeholder: "Enter json $." }), (e, b) => {
+                const f = s => s.replace(/<\/?b>/g, "");
+                b([...new Set((JSON.parse(e.description?.slice(7) || "[]")?.[0] || []).map(x => f(x[0])))])
+            });
         })
         ep(function ACAJQ(a, b) {
             return zd("Add Questions", (f, m) => {

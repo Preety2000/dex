@@ -7,8 +7,10 @@ body {
     gap: 15px;
     margin: 0 auto;
     flex-direction: row-reverse;
-    width: -webkit-fill-available;;
+    width: 100%;
+    ;
 }
+
 .sidebar {
     flex: none;
     display: block;
@@ -16,6 +18,3 @@ body {
     width: 280px;
     margin-bottom: 10px;
 }
-
-
-

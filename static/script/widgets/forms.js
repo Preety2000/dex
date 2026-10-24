@@ -817,15 +817,15 @@
                 q = typeof q === "function" ? q() : q;
                 return Array.isArray(q) ? Object.fromEntries(q.map(i => Array.isArray(i) && i.length == 2 ? i : [i, i])) : q;
             };
-            var radio = function (name, values, clss) {
+            var radio = function (name, values, clss, checked) {
                 let scroll = $.create("scroll-ys"), group = scroll.create("F0007");
                 scroll.textBigLanght = 0;
 
                 for (const [title, value] of Object.entries(values)) {
-                    let selet = group.create("label");
+                    let selet = group.create("label"), ched = checked == title || checked == value;
                     selet.add("button");
                     selet.create.span("titld", getString(title));
-                    selet.create({ name, value, type: "radio", tagName: "input", class: clss || "F0023" }).event.on(function (e) {
+                    selet.create({ name, value, checked: ched, type: "radio", tagName: "input", class: clss || "F0023" }).event.on(function (e) {
                         typeof scroll.change == "function"
                             ? function (q) {
                                 typeof q == "undefined" || q === true
@@ -858,7 +858,7 @@
 
             const getGroup = function () {
                 let v = valueVe(value);
-                let group = radio(name, v);
+                let group = radio(name, v, undefined, checked);
                 if (checked)
                     checked = getChecked(v, checked);
 

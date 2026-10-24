@@ -203,7 +203,8 @@ form .F0006 {
     align-items: start;
     border: none;
     align-items: stretch;
-    overflow: hidden;
+    /* overflow: hidden; */
+    /* chack scroll select */
 }
 
 .F0007 {
@@ -304,7 +305,7 @@ form .F0006 {
 .F0007[type="button"] .button,
 .F0008[type="button"] .button {
     display: flex;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     justify-content: center;
 }
@@ -314,7 +315,7 @@ form .F0006 {
 .F0016 {
     display: block;
     height: 1px;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     background: var(--border);
 }
@@ -326,7 +327,7 @@ form .F0006 {
 }
 
 .F0018 {
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     display: flex;
     justify-content: space-between;
@@ -350,7 +351,7 @@ form .F0006 {
 
 .F0021 input:not([type="file"]):not([type=checkbox]):not([type=radio]),
 .F0021 textarea {
-    width: -webkit-fill-available;
+    width: 100%;
     min-height: 40px;
     /* padding: 10px; */
     /* https://www.myapplication .com:8000/admin/content/insert */
@@ -375,7 +376,7 @@ form .F0006 {
     transition: 0.2s;
     color: var(--btn-dark-hover);
     background: var(--bg-muted);
-    width: -webkit-fill-available;
+    width: 100%;
     border: solid 1px var(--border) !important;
 }
 
@@ -434,7 +435,7 @@ form .F0006 {
 }
 
 .F0007 .titld {
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     flex: auto;
     text-align: left;
@@ -507,7 +508,7 @@ input[disabled]+.button:hover::after {
     content: "Not Available";
     background: #ff3131;
     color: #ffffff;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     height: 100%;
     display: flex;
@@ -659,7 +660,7 @@ input[disabled]+.button:hover::after {
     justify-content: space-between;
     font-size: 16px;
     line-height: 100%;
-    width: -webkit-fill-available;
+    width: 100%;
     margin: 16px 10px;
     border-radius: 6px;
     min-height: 40px;
@@ -680,7 +681,7 @@ input[disabled]+.button:hover::after {
     margin: 0;
     padding: 4px;
     cursor: pointer;
-    member-select: none;
+    user-select: none;
     position: relative;
     border-radius: 20px;
     background: var(--bg-muted);

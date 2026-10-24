@@ -21,7 +21,7 @@ table {
     border-spacing: 0;
     border-radius: 10px;
     overflow: hidden;
-    width: -webkit-fill-available;
+    width: 100%;
     border: solid 1px var(--border);
     margin-bottom: 20px;
 }
@@ -82,7 +82,7 @@ td {
 .container .IN097,
 .IN077 {
     overflow: hidden;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
 }
 
@@ -114,7 +114,7 @@ td {
 .article-content img {
     max-width: 437px;
     margin: 15px auto;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     display: block;
 }
@@ -216,7 +216,7 @@ td {
     position: absolute;
     left: 0;
     top: 0;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     height: 100%;
     display: flex;

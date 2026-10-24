@@ -216,7 +216,7 @@ class RequestDispatcher:
     async def handle_download(request):
         configure_page(
             request.state.metadata,
-            template=ClassDownload.index(),
+            template=ClassDownload(request).index(),
             title="Download App",
             suffix=True,
         )

@@ -86,12 +86,11 @@
             <div class='list boc button' onclick="$.onlink(this,'learning-link')">
                 <div class='IN0105'>
                     <div class='logo'>
-                        <img width="60" height="60" alt='{{insex.name}}' src='{{insex.img}}' loading="lazy" />
+                        <img width="60" height="60" title='{{insex.name}}' alt='{{insex.name}}' src='{{insex.img}}' loading="lazy" />
                     </div>
                     <div class='meta'>
                         <div class='title'>{{insex.name}}</div>
-                        <a class='learning-link' href='{{insex.url}}'>{{function.utc('Start
-                            Learning')}}!</a>
+                        <a class='learning-link' href='{{insex.url}}'>{{function.utc('Start Learning')}}!</a>
                     </div>
                 </div>
             </div>{% endfor %}

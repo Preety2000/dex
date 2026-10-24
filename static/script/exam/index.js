@@ -2055,7 +2055,7 @@ $(function onlineTestSeries(_, a, b, c, d, e, f, g, h, i, j, k, l, S, T, U, R) {
             mn.create.span().addIcon("ice_chevron_right")
 
             var fos = form($.create.div())
-            fos.select({ name: "cg", container: mn, value: [[cog, "default"], ...item.co_list], checked: r.get("Cg") || cog })
+            fos.select({ name: "cg", container: mn, checked: r.get("Cg"), value: [[cog, "default"], ...item.co_list], checked: r.get("Cg") || cog })
             fos.change(e => { r.o = false; r.set("Cg", e.target.value); r.o = true; r.set("page", 1); });
 
             var co, on = function () {

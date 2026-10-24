@@ -59,7 +59,7 @@ input[type=radio]:checked::before {
 .T001 {
     user-select: none;
     display: block;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
 }
 
@@ -86,7 +86,7 @@ input[type=radio]:checked::before {
 }
 
 .T001 .container {
-    width: -webkit-fill-available;
+    width: 100%;
     display: flex;
     gap: 15px;
     margin: 0 auto;
@@ -97,14 +97,14 @@ input[type=radio]:checked::before {
     display: block;
     position: relative;
     overflow: hidden;
-    width: -webkit-fill-available;
+    width: 100%;
     margin: 5px auto;
 }
 
 .T001 .T052 {
     min-height: 300px;
     max-height: 400px;
-    width: -webkit-fill-available;
+    width: 100%;
     ;
     overflow: auto;
     padding: 15px;
@@ -147,7 +147,7 @@ input[type=radio]:checked::before {
 } */
 .T001 aside {
     max-width: 314px;
-    width: -webkit-fill-available;
+    width: 100%;
     padding-left: 20px;
     border-left: solid 1px #0001;
 }
@@ -322,7 +322,7 @@ input[type=radio]:checked::before {
     padding: 0;
     margin: auto;
     border: none;
-    max-width: -webkit-fill-available;
+    max-width: 100%;
     contain: layout
 }
 
@@ -411,7 +411,7 @@ input[type=radio]:checked::before {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     gap: 20px;
-    width: -webkit-fill-available;
+    width: 100%;
 }
 
 .T005 .card {
@@ -557,7 +557,7 @@ input[type=radio]:checked::before {
     border-color: var(--br-color);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     overflow: hidden;
-    width: -webkit-fill-available;
+    width: 100%;
 }
 
 .T002 .T011 {
@@ -725,7 +725,7 @@ input[type=radio]:checked::before {
 }
 
 table {
-    width: -webkit-fill-available;
+    width: 100%;
     border-collapse: collapse;
     overflow: hidden;
     background: var(--bg-muted);
@@ -796,7 +796,7 @@ td {
 
 .IN016 {
     margin: 10px auto;
-    /* width: -webkit-fill-available; */
+    /* width: 100%; */
 }
 
 .IN094.DIS01 {
@@ -864,7 +864,7 @@ icon.icon_loader_2 {
 }
 
 .border {
-    width: -webkit-fill-available;
+    width: 100%;
     height: 1px;
     background: var(--border);
 }
@@ -898,7 +898,7 @@ icon.icon_loader_2 {
     height: 100%;
     min-height: 100%;
     overflow-y: auto;
-    width: -webkit-fill-available;
+    width: 100%;
     animation: .5s ease-in fadeIn 0s forwards;
     opacity: 0;
 }
@@ -909,7 +909,7 @@ icon.icon_loader_2 {
     height: 100%;
     justify-content: space-evenly;
     min-height: 100%;
-    width: -webkit-fill-available;
+    width: 100%;
 }
 
 .T023 {
@@ -972,7 +972,7 @@ icon.icon_loader_2 {
 .T027 {
     height: 100%;
     max-width: 52rem;
-    width: -webkit-fill-available;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -987,13 +987,13 @@ icon.icon_loader_2 {
 
 body {
     /* position: fixed; */
-    width: -webkit-fill-available;
+    width: 100%;
     height: 100%;
 }
 
 .test .popup_window {
     max-width: 920px;
-    member-select: none;
+    user-select: none;
 }
 
 .F0017 {
@@ -1011,7 +1011,7 @@ body {
 }
 
 .popup_window .button.select {
-    width: -webkit-fill-available;
+    width: 100%;
     text-align: center;
     display: flex;
     justify-content: center;
@@ -1023,7 +1023,7 @@ body {
 }
 
 .berTr .IN078 {
-    width: -webkit-fill-available;
+    width: 100%;
     text-align: center;
 }
 
@@ -1105,7 +1105,7 @@ body {
     display: flex;
     overflow: hidden;
     height: 100%;
-    width: -webkit-fill-available;
+    width: 100%;
     gap: 16px;
     padding: 40px;
 }
@@ -1137,7 +1137,7 @@ body {
     top: 0;
     width: 50px;
     border-radius: 6px;
-    height: -webkit-fill-available;
+    height: 100%;
     border: solid 1px var(--br-color);
     background: var(--bg-muted);
 }
@@ -1172,7 +1172,7 @@ body {
     background: transparent;
     border: none;
     color: var(--text-secondary);
-    width: -webkit-fill-available;
+    width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
@@ -1203,7 +1203,7 @@ body {
 .T034 {
     position: relative;
     height: 100%;
-    width: -webkit-fill-available;
+    width: 100%;
     min-height: 85vh;
 }
 
@@ -1326,7 +1326,7 @@ body {
 .T043 {
     position: relative;
     display: flex;
-    width: -webkit-fill-available;
+    width: 100%;
 }
 
 .F0021 .T043 {

@@ -1,7 +1,8 @@
 .IN017 {
     display: block;
     overflow: hidden;
-    width: -webkit-fill-available;;
+    width: 100%;
+    ;
     padding: 0 5px;
 }
 
@@ -13,7 +14,8 @@
 .navebar-session {
     display: block;
     overflow: hidden;
-    width: -webkit-fill-available;;
+    width: 100%;
+    ;
     height: auto;
 }
 
@@ -27,7 +29,8 @@
 }
 
 .navbar .button {
-    width: -webkit-fill-available;;
+    width: 100%;
+    ;
     text-align: center;
     justify-content: center;
     padding: 0;
@@ -41,17 +44,19 @@
     overflow: hidden;
 }
 
-.jobs-container{
+.jobs-container {
     display: block;
     overflow: hidden;
-    width: -webkit-fill-available;;
+    width: 100%;
+    ;
     padding: 0 5px;
     margin-top: 40px;
 }
 
 .jobs-container .gropu-number {
     padding: 0;
-    width: -webkit-fill-available;;
+    width: 100%;
+    ;
 }
 
 .jobs-container .title-session {

@@ -6,9 +6,10 @@ from includes.utils.utils import create_slug, get_post_value
 
 
 class AdminApiMCQ:
+    def __init__(self, request):
+        self.request = request
 
-    @classmethod
-    async def _get_data(cls):
+    async def _get_data(self):
         fields = [
             "title",
             "category",
@@ -19,7 +20,7 @@ class AdminApiMCQ:
             "subject",
         ]
 
-        data = {field: await get_post_value(request, field) for field in fields}
+        data = {field: await get_post_value(self.request, field) for field in fields}
 
         string_fields = [
             "title",
@@ -45,7 +46,7 @@ class AdminApiMCQ:
         return data, None
 
     @classmethod
-    def _update_relationships(cls, db, question_id, category):
+    def _update_relationships(self, db, question_id, category):
         GlobleCatch.get_with_terms = None
 
         db.query(QuizRelationships).filter(
@@ -64,7 +65,7 @@ class AdminApiMCQ:
             db.add_all(relationships)
 
     @classmethod
-    def _update_question(cls, question, data, subject):
+    def _update_question(self, question, data, subject):
         question.question = data["title"]
         question.excerpt = data["excerpt"]
         question.correct_answer = data["correct_answer"]
@@ -73,7 +74,7 @@ class AdminApiMCQ:
         question.status = data["s-status"]
 
     @classmethod
-    def _create_question(cls, db, data, subject):
+    def _create_question(self, db, data, subject):
         question = QuizQuestion(
             question=data["title"],
             excerpt=data["excerpt"],
@@ -84,7 +85,7 @@ class AdminApiMCQ:
         )
         db.add(question)
         db.flush()
-        cls._update_relationships(
+        self._update_relationships(
             db,
             question.id,
             data["category"],
@@ -100,11 +101,10 @@ class AdminApiMCQ:
             },
         }
 
-    @classmethod
-    async def insert(cls):
-        replace = await get_post_value(request, "replace")
+    async def insert(self):
+        replace = await get_post_value(self.request, "replace")
 
-        data, error = await cls._get_data()
+        data, error = await self._get_data()
 
         if error:
             return {"error": error}
@@ -144,15 +144,15 @@ class AdminApiMCQ:
 
                 if existing_question != data["title"]:
                     # Create new question
-                    return cls._create_question(db, data, subject)
+                    return self._create_question(db, data, subject)
 
-                cls._update_question(
+                self._update_question(
                     existing_question,
                     data,
                     subject,
                 )
 
-                cls._update_relationships(
+                self._update_relationships(
                     db,
                     existing_question.id,
                     data["category"],
@@ -172,7 +172,7 @@ class AdminApiMCQ:
             # --------------------------------
             # Create new question
             # --------------------------------
-            return cls._create_question(db, data, subject)
+            return self._create_question(db, data, subject)
 
         except Exception:
             db.rollback()

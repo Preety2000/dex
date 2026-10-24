@@ -6,7 +6,7 @@ from includes.utils.utils import get_post_value
 class AdminInsurt:
 
     @classmethod
-    async def exiute(cls):
+    async def exiute(cls, request):
         root = await get_post_value(request, "root", None)
         datatype = await get_post_value(request, "datatype", None)
 
@@ -14,12 +14,12 @@ class AdminInsurt:
             return {"error": "6a8473f9-73d4-83ea-ba81-6a76a0d9fd82"}
 
         if root == "cot":
-            responce = await AdminApiCategory.insert()
+            responce = await AdminApiCategory(request).insert()
             responce["datatype"] = datatype
             return responce
 
         if root == "practice":
-            responce = await AdminApiMCQ.insert()
+            responce = await AdminApiMCQ(request=request).insert()
             responce["datatype"] = datatype
             return responce
 

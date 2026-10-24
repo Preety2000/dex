@@ -12,7 +12,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         grid-gap: 10px;
-        width: -webkit-fill-available;
+        width: 100%;
         padding: 10px;
     }
 
@@ -23,7 +23,7 @@
 
     .syllabus .button {
         background: var(--bg-muted);
-        width: -webkit-fill-available;
+        width: 100%;
         height: 100%;
         color: var(--text-primary);
         padding: 8px 16px;
@@ -33,7 +33,7 @@
     }
 
     * {
-        member-select: none;
+        user-select: none;
     }
 </style>
 {% endblock %}
