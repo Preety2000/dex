@@ -57,7 +57,7 @@ async def execute_home_page(request: Request = None) -> dict[str, Any]:
         request.state.metadata, template="index", title="Welcome", suffix=True
     )
 
-    terms_task = ClassTerms.get_all_record(limit=48, topic=1, bind=term_filter)
+    terms_task = ClassTerms.get_all_record(limit=20, topic=1, bind=term_filter)
     articles_task = ArticleService.get_filtered_articles(
         limit=12, desc="id", request=request
     )

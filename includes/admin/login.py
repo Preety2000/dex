@@ -48,7 +48,7 @@ class AdminLogin:
     async def user_verification(self, state):
         cookie_value = self.request.state.cookie.get(COOKIE_NAME)
 
-        return None
+        # return None
 
         # Check the existing server-side session.
         session = self.get_valid_session()
