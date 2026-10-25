@@ -1,14 +1,17 @@
 from sqlalchemy import asc
 
-from includes.core.globals.entry import app_context
-
-from includes.core.globals.coreutils import slugify
-from includes.core.globals.route_context import Route
 from includes.database.connection import db
+from includes.core.globals.coreutils import slugify
+from includes.core.globals.entry import app_context
+from includes.core.globals.route_context import Route
 from includes.database.models.secondary import Courses
+from includes.utils.utils import get_post_value
 
 
 class ClassCourses:
+
+    def __init__(self, request):
+        self.request = request
 
     # JSON
 
@@ -25,17 +28,14 @@ class ClassCourses:
             "university": query.university,
         }
 
-    # GET
-
-    @classmethod
-    def get(cls, query=None, raw=False):
+    def get(self, query=None, raw=False):
         courses = db.query(Courses)
 
         # Get all courses
         if query is True:
             items = courses.order_by(asc(Courses.title)).all()
 
-            return [cls.json(item) for item in items]
+            return [self.json(item) for item in items]
 
         if query is None:
             return None
@@ -48,13 +48,12 @@ class ClassCourses:
         if raw:
             return course
 
-        return cls.json(course)
+        return self.json(course)
 
     # INSERT
 
-    @classmethod
-    def insert(cls, data):
-        if request.state.response["error"]:
+    def insert(self, data):
+        if self.request.state.response["error"]:
             return data
 
         title = data.get("title")
@@ -68,8 +67,8 @@ class ClassCourses:
         slug = slugify(slug)
 
         # Check duplicate slug
-        if cls.get(slug, raw=True):
-            result = cls.get(slug)
+        if self.get(slug, raw=True):
+            result = self.get(slug)
 
             if result:
                 result["mcq_ex"] = True
@@ -77,8 +76,8 @@ class ClassCourses:
             return result
 
         # Check duplicate title
-        if cls.get(title, raw=True):
-            result = cls.get(title)
+        if self.get(title, raw=True):
+            result = self.get(title)
 
             if result:
                 result["mcq_ex"] = True
@@ -99,11 +98,11 @@ class ClassCourses:
         except Exception:
             db.rollback()
 
-            request.state.response["pop_message"] = "Course could not be created."
+            self.request.state.response["pop_message"] = "Course could not be created."
 
             return data
 
-        result = cls.json(course)
+        result = self.json(course)
 
         if result:
             result["mcq_ex"] = True
@@ -112,17 +111,16 @@ class ClassCourses:
 
     # UPDATE
 
-    @classmethod
-    def update(cls, data):
-        if request.state.response["error"]:
+    def update(self, data):
+        if self.request.state.response["error"]:
             return data
 
         item_id = data.get("id")
 
         if not item_id:
-            item_id = get_post_value(request, "item")
+            item_id = get_post_value(self.request, "item")
 
-        course = cls.get(item_id, raw=True)
+        course = self.get(item_id, raw=True)
 
         if course is None:
             return "Not any query found."
@@ -150,7 +148,7 @@ class ClassCourses:
         except Exception:
             db.rollback()
 
-            request.state.response["pop_message"] = "Course could not be updated."
+            self.request.state.response["pop_message"] = "Course could not be updated."
 
             return data
 
@@ -158,14 +156,13 @@ class ClassCourses:
 
     # DELETE
 
-    @classmethod
-    def delete(cls, data):
+    def delete(self, data):
         item_id = data.get("id")
 
         if not item_id:
-            item_id = get_post_value(request, "item")
+            item_id = get_post_value(self.request, "item")
 
-        course = cls.get(item_id, raw=True)
+        course = self.get(item_id, raw=True)
 
         if course is None:
             return "Not any query found."
@@ -177,7 +174,7 @@ class ClassCourses:
         except Exception:
             db.rollback()
 
-            request.state.response["pop_message"] = "Course could not be deleted."
+            self.request.state.response["pop_message"] = "Course could not be deleted."
 
             return data
 
@@ -187,14 +184,13 @@ class ClassCourses:
 
     # INDEX
 
-    @classmethod
-    async def index(cls, roots: Route):
+    async def index(self):
 
         # -----------------------------------------------------
         # API POST
         # -----------------------------------------------------
 
-        if request.method == "POST" and request.query_params("key"):
+        if self.request.method == "POST" and self.request.query_params("key"):
             parameter = getattr(
                 app_context.admin,
                 "parameter",
@@ -205,13 +201,13 @@ class ClassCourses:
                 return [{"error": "Invalid API parameter."}]
 
             bind_function = getattr(
-                cls,
+                self,
                 parameter,
                 None,
             )
 
-            if request.state.response["error"]:
-                return [{"error": request.state.response["error"]}]
+            if self.request.state.response["error"]:
+                return [{"error": self.request.state.response["error"]}]
 
             if callable(bind_function):
                 result = bind_function(app_context.data_querys)
@@ -224,6 +220,6 @@ class ClassCourses:
         # ADMIN
         # -----------------------------------------------------
 
-        request.state.response["data_querys"] = cls.get(True)
+        self.request.state.response["data_querys"] = self.get(True)
 
         return "admin/courses"

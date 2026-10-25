@@ -2,7 +2,7 @@
 
 {% block head %}
 <style>
-    .chart-container{
+    .chart-container {
         display: flex;
         gap: 5px;
     }
@@ -70,9 +70,11 @@
 
 
 
-    var data = {{ trending | safe}};
+    // var data = {{ trending | safe}};
 
-    console.log(data);
+    // console.log(data);
+
+    const response = []
 
     // Process data for chart
     const labels = response.map(item => item.title);

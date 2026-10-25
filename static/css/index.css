@@ -709,16 +709,6 @@ button[disabled] {
   background-position: center;
 }
 
-.site_name {
-  font-size: 140%;
-  text-transform: uppercase;
-  color: #c50008;
-  font-weight: 600;
-}
-
-.site_name span {
-  color: #f4a71d;
-}
 
 /* Home*/
 .IN016 {
@@ -788,7 +778,7 @@ button[disabled] {
   position: relative;
   margin: 80px 0 20px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(286px, 1fr));
   gap: 20px;
   width: 100%;
 }
@@ -812,7 +802,7 @@ button[disabled] {
 }
 
 .IN022 .logo {
-  width: 60px;
+  width: 80px;
   max-height: 60px;
   min-height: 60px;
   height: 80px;

@@ -132,6 +132,16 @@ $.define("dm/action", function Action(ED) {
                 console.log(a, button, list);
             }
         }
+        , sE = (g, t) => {
+            let c = setInterval(() => {
+                if (t <= 0) return clearInterval(c);
+                g.in(new Date(t || null).toISOString().slice(11, 19), true); t -= 1000
+            }, 1000)
+        }
+
+
+
+    sE($("time-left"), SESSION_EXP)
 
     $.DOMContentLoaded(() => {
         const s = $('[jsname="ACSTC"]')
@@ -519,6 +529,80 @@ $.define("dm/action", function Action(ED) {
         ep(function ACTVU(a, b) {
             zd(null, (m, p) => {
                 const d = script_data[a.get("data-content-len")];
+                p = $.popup("Educator Identity Verification");
+
+                const g = p.create("top-group");
+                const f = m.buildFormLayout(g);
+
+                if (d.status === 1)
+                    return teacherRejectIdentity(f, p, a, d);
+
+                console.log(d);
+
+                const o = () => window.open(
+                    d.document_url,
+                    "documentWindow",
+                    "width=600,height=800,resizable=yes,scrollbars=yes"
+                )
+
+
+                f.tableList({
+                    value: {
+                        Name: d.name,
+                        Phone: d.phone,
+                        Email: d.email,
+                        Subject: d.subject,
+                        Experience: d.experience,
+                        Biography: d.biography,
+                        Rejects: String(d.rejects.length),
+                        "Request Time": f.formatZenoTime(d.request_timestamp, "F"),
+                        Document: {
+                            tagName: "a",
+                            href: d.document_url,
+                            class: "DIS00",
+                            inner: d.document_name,
+                            target: "_blank",
+                            icon: "ic_link",
+                            onclick: e => (e.preventDefault(), o())
+                        }
+                    }
+                });
+
+                f.arc();
+                f.container.css({ width: 150, flex: "none" });
+                f.container.create("img-container").create({
+                    tagName: "img",
+                    src: d.img
+                });
+
+                const b = f.container.create("button-container");
+
+                const x = (title, verify) => f.button(
+                    { title, container: b },
+                    () => getx(
+                        { id: d.id, verify, email: d.email },
+                        r => {
+                            if (r.message) $.message(r.message);
+                            if (r.status) p.close();
+                        }
+                    )
+                );
+
+                x("Verify", true);
+                f.button(
+                    { title: "Reject", container: b },
+                    () => teacherRejectIdentity(f, p, a, d)
+                );
+
+                b.css(rcs);
+            });
+        })
+        ep(function ACTVV(a, b) {
+            zd(null, (m, p) => {
+                const d = script_data[a.get("data-content-len")];
+                console.log(d);
+
+                return
                 p = $.popup("Educator Identity Verification", "verification");
 
                 const g = p.create("top-group");
@@ -586,6 +670,7 @@ $.define("dm/action", function Action(ED) {
 
                 b.css(rcs);
             });
+
         })
         ep(function setting(a, b) {
             zd("Setting", (form, popupWindow) => {
@@ -761,9 +846,6 @@ $.define("actionForm", function actionForm(was, extend, modules) {
         position: 'relative'
     }
 
-    modules.add(function teacherVerifyTndentityView(a) {
-        console.log(this);
-    });
     modules.add(function addMedia(a) {
 
         var mediaUplode = function (button) {

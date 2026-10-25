@@ -19,7 +19,7 @@ class StaticRouteHandler:
             return HTMLResponse(content=xml_data, media_type="application/xml")
 
         if file_path == "opensearch.xml":
-            xml_data = Sitemap.opensearch()
+            xml_data = Sitemap.opensearch(request)
             return HTMLResponse(content=xml_data, media_type="application/xml")
 
         if file_path == "robots.txt":

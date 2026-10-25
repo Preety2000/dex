@@ -10,9 +10,9 @@ from PIL import Image, ImageOps, ImageColor, ImageDraw
 # ============================================================
 
 try:
-    import fitz  # PyMuPDF
+    import pymupdf  # PyMuPDF
 except ImportError:
-    fitz = None
+    pymupdf = None
 
 try:
     import cairosvg
@@ -343,7 +343,7 @@ class Thumbnail:
         path: Path,
     ) -> Image.Image:
 
-        if fitz is None:
+        if pymupdf is None:
 
             raise ThumbnailError(
                 "PDF support requires PyMuPDF. " "Install using: pip install PyMuPDF"
@@ -353,7 +353,7 @@ class Thumbnail:
 
         try:
 
-            document = fitz.open(str(path))
+            document = pymupdf.open(str(path))
 
             if document.page_count == 0:
 
@@ -363,7 +363,7 @@ class Thumbnail:
             page = document.load_page(0)
 
             # Render at good quality
-            matrix = fitz.Matrix(
+            matrix = pymupdf.Matrix(
                 2,
                 2,
             )

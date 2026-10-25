@@ -2,7 +2,7 @@ import os
 import math
 from pathlib import Path
 import posixpath
-import fitz
+import pymupdf
 import hashlib
 import mimetypes
 from typing import Any, List
@@ -146,7 +146,7 @@ def get_media_duration(file_path: str, mime_type: str) -> int:
     """PDF / Audio / Video ke liye duration/pages calculate karta hai."""
     try:
         if mime_type in MIME_TYPES["pdf"]:
-            doc = fitz.open(file_path)
+            doc = pymupdf.open(file_path)
             pages = len(doc)
             doc.close()
             return pages  # PDF ke liye total pages store honge
@@ -160,7 +160,7 @@ class MediaManager:
 
     @staticmethod
     def _get_db():
-        return LocalDB("DB_FILESL", MediaAssetBase, "db_media")
+        return LocalDB("DB_FILES", MediaAssetBase, "db_media")
 
     @staticmethod
     def calculate_file_size(file_path: str):

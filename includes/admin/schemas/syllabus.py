@@ -1,9 +1,6 @@
 from includes.admin.modals import checked, emptyMessage
 from includes.core.globals.coreutils import is_empty, slugify
-from includes.core.globals.entry import app_context
-
 from includes.core.globals.route_context import Route
-
 from includes.database.connection import db
 from includes.database.models.primary import Subject
 from includes.database.models.secondary import Syllabus, University
@@ -11,6 +8,8 @@ from includes.utils.utils import get_post_value
 
 
 class AClassSyllabus:
+    def __init__(self, request):
+        self.request = request
 
     # JSON
 
@@ -31,13 +30,12 @@ class AClassSyllabus:
 
     # GET
 
-    @classmethod
-    def get(cls, query=None, raw=False):
+    def get(self, query=None, raw=False):
         db_query = db.query(Syllabus)
 
         # Return all
         if query is True:
-            return [cls.json(item) for item in db_query.all()]
+            return [self.json(item) for item in db_query.all()]
 
         if query is None:
             return None
@@ -50,13 +48,12 @@ class AClassSyllabus:
         if raw:
             return syllabus
 
-        return cls.json(syllabus)
+        return self.json(syllabus)
 
     # INSERT
 
-    @classmethod
-    def insert(cls, data):
-        if request.state.response["error"]:
+    def insert(self, data):
+        if self.request.state.response["error"]:
             return data
 
         slug = data.get("slug") or data.get("title")
@@ -67,8 +64,8 @@ class AClassSyllabus:
         slug = slugify(slug)
 
         # Duplicate slug
-        if cls.get(slug, raw=True):
-            request.state.response["pop_message"] = "This syllabus already exists."
+        if self.get(slug, raw=True):
+            self.request.state.response["pop_message"] = "This syllabus already exists."
             return data
 
         subject = data.get("subject")
@@ -92,17 +89,16 @@ class AClassSyllabus:
 
     # UPDATE
 
-    @classmethod
-    def update(cls, data):
-        if request.state.response["error"]:
+    def update(self, data):
+        if self.request.state.response["error"]:
             return data
 
-        item_id = get_post_value(request, "item")
+        item_id = get_post_value(self.request, "item")
 
-        syllabus = cls.get(item_id, raw=True)
+        syllabus = self.get(item_id, raw=True)
 
         if syllabus is None:
-            request.state.response["pop_message"] = "Syllabus not found."
+            self.request.state.response["pop_message"] = "Syllabus not found."
             return data
 
         slug = data.get("slug") or syllabus.slug
@@ -123,7 +119,9 @@ class AClassSyllabus:
 
         db.commit()
 
-        request.state.response["message"] = "Updated <a href='/admin/syllabus'>Back</a>"
+        self.request.state.response["message"] = (
+            "Updated <a href='/admin/syllabus'>Back</a>"
+        )
 
         data["redirect"] = True
 
@@ -131,17 +129,16 @@ class AClassSyllabus:
 
     # DELETE
 
-    @classmethod
-    def delete(cls, data):
+    def delete(self, data):
         item_id = data.get("id")
 
         if not item_id:
-            item_id = get_post_value(request, "item")
+            item_id = get_post_value(self.request, "item")
 
-        syllabus = cls.get(item_id, raw=True)
+        syllabus = self.get(item_id, raw=True)
 
         if syllabus is None:
-            request.state.response["pop_message"] = "Syllabus not found."
+            self.request.state.response["pop_message"] = "Syllabus not found."
             return data
 
         try:
@@ -151,7 +148,7 @@ class AClassSyllabus:
         except Exception:
             db.rollback()
 
-            request.state.response["pop_message"] = (
+            self.request.state.response["pop_message"] = (
                 "Syllabus could not be deleted. " "Error code Xe742524"
             )
 
@@ -163,8 +160,7 @@ class AClassSyllabus:
 
     # COLLECTION DATA
 
-    @classmethod
-    def addCollection(cls, data):
+    def addCollection(self, data):
         subject_id = data.get("subject") or 0
         university_id = data.get("university") or 0
 
@@ -193,7 +189,7 @@ class AClassSyllabus:
 
             subjects.append(item)
 
-        request.state.response["subjects"] = subjects
+        self.request.state.response["subjects"] = subjects
 
         # Universities
         universities = []
@@ -210,14 +206,13 @@ class AClassSyllabus:
 
             universities.append(item)
 
-        request.state.response["universitys"] = universities
+        self.request.state.response["universitys"] = universities
 
         return data
 
     # VALIDATION
 
-    @classmethod
-    async def _get_form_data(cls):
+    async def _get_form_data(self):
         fields = [
             "title",
             "slug",
@@ -227,7 +222,7 @@ class AClassSyllabus:
         ]
 
         data = await get_post_value(
-            request,
+            self.request,
             fields,
             "",
         )
@@ -244,7 +239,7 @@ class AClassSyllabus:
         # Required fields
         for field, value in data.items():
             if is_empty(value) and field != "content":
-                request.state.response["error"] = request.state.response[
+                self.request.state.response["error"] = self.request.state.response[
                     "error"
                 ] or emptyMessage(field, "")
 
@@ -252,15 +247,14 @@ class AClassSyllabus:
 
     # INDEX
 
-    @classmethod
-    async def index(cls, roots: Route):
-        item_id = get_post_value(request, "item")
-        is_post = request.is_post
+    async def index(self, roots: Route):
+        item_id = get_post_value(self.request, "item")
+        is_post = self.request.is_post
 
         actions = {
-            "insert": cls.insert,
-            "update": cls.update,
-            "delete": cls.delete,
+            "insert": self.insert,
+            "update": self.update,
+            "delete": self.delete,
         }
 
         # -----------------------------------------------------
@@ -275,7 +269,7 @@ class AClassSyllabus:
 
             if roots.scope in ("update", "delete"):
                 data = (
-                    cls.get(
+                    self.get(
                         item_id,
                         raw=False,
                     )
@@ -284,7 +278,7 @@ class AClassSyllabus:
 
             # POST data
             if is_post:
-                data = await cls._get_form_data()
+                data = await self._get_form_data()
 
             # Empty form for GET
             elif not data:
@@ -304,12 +298,12 @@ class AClassSyllabus:
                     result = data
 
                 if result.get("redirect"):
-                    request.state.metadata.redirect_url = "/admin/syllabus"
+                    self.request.state.metadata.redirect_url = "/admin/syllabus"
                     return "redirect"
 
                 data = result
 
-            request.state.response["data_querys"] = cls.addCollection(data)
+            self.request.state.response["data_querys"] = self.addCollection(data)
 
             return "admin/add_syllabus"
 
@@ -317,6 +311,6 @@ class AClassSyllabus:
         # LIST
         # -----------------------------------------------------
 
-        request.state.response["data_querys"] = cls.get(True)
+        self.request.state.response["data_querys"] = self.get(True)
 
         return "admin/syllabus"

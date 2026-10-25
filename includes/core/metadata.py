@@ -42,7 +42,7 @@ class MetaData:
     canonical_url: str | None = None
     redirect_url: str | None = None
     site_url: str | None = None
-    site_name: str | None = "MyApplication"
+    app_name: str | None = "MyApplication"
     site_domain: str | None = None
 
     # --- Media & Visuals ---

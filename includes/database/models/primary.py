@@ -112,7 +112,11 @@ class Members(BaseOwner):
         from includes.database.connection import db
 
         db = await db.configure_main()
-        session = select(MemberSession).where(MemberSession.user_id == self.id)
+        session = (
+            select(MemberSession)
+            .where(MemberSession.user_id == self.id)
+            .order_by(MemberSession.login_time.desc())
+        )
         data["last_login"] = serialize(db.execute(session).scalars().first())
         return data
 

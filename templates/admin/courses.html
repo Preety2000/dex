@@ -55,7 +55,7 @@
 
         <tbody>
             {% for content in data_querys %}
-            <tr {% if content.status=="Draft" %}class="trash-list" {%endif%}>
+            <tr {% if content.status=="draft" %}class="trash-list" {%endif%}>
                 <th class="manage-column check-column">
                     <div class="hidden query-{{content.id}}" style="display: none;">
                         <div id="{{content.id}}" class="quick-editesDIS00width">

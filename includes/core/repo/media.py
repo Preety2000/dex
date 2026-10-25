@@ -2,7 +2,7 @@ from email.mime import image
 import os
 import math
 import posixpath
-import fitz
+import pymupdf
 import aiofiles
 import mimetypes
 from io import BytesIO
@@ -158,11 +158,11 @@ class Media:
 
             if mime_type == "application/pdf":
 
-                pdf_document = fitz.open(file_path)
+                pdf_document = pymupdf.open(file_path)
 
                 page = pdf_document.load_page(0)
 
-                mat = fitz.Matrix(0.3, 0.3)
+                mat = pymupdf.Matrix(0.3, 0.3)
 
                 pix = page.get_pixmap(matrix=mat)
 

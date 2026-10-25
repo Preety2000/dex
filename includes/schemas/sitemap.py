@@ -50,13 +50,13 @@ class Sitemap:
         return xml_data
 
     @staticmethod
-    def opensearch():
+    def opensearch(request):
         root = ET.Element("OpenSearchDescription")
         root.set("xmlns", "http://a9.com/-/spec/opensearch/1.1/")
         root.set("xmlns:moz", "http://www.mozilla.org/2006/browser/search/")
 
         ShortName = ET.SubElement(root, "ShortName")
-        ShortName.text = request.state.metadata.site_name
+        ShortName.text = request.state.metadata.app_name
 
         Description = ET.SubElement(root, "Description")
         Description.text = request.state.metadata.excerpt
@@ -111,7 +111,7 @@ class Sitemap:
         articals = []
         artical_all = db.query(Article).all()
         for artical in artical_all:
-            if artical.status == "Publish":
+            if artical.status == "publish":
                 await get_artical_url(artical)
                 articals.append(artical.url)
 

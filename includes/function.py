@@ -13,6 +13,7 @@ from io import BytesIO
 from urllib.parse import parse_qs
 from datetime import datetime
 from urllib.parse import parse_qs, urlencode
+from zoneinfo import ZoneInfo
 from fastapi.responses import StreamingResponse
 from sqlalchemy import asc, desc
 
@@ -22,6 +23,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 from includes.core.security import _Security
 from includes.core.repo.dir_manager import folder
+from includes.database.models.utils import TimeStamp
 from includes.utils.utils import get_post_value
 
 # Example of using a global variable (not recommended for FastAPI)
@@ -83,3 +85,10 @@ class Functions:
 
     def active_class(self, type, action):
         return "active" if type == action else "deactive"
+
+    def format_tm(self, timestamp):
+        value = TimeStamp.format_ts(timestamp)
+        dt = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S%z")
+
+        dt = dt.astimezone(ZoneInfo("Asia/Kolkata"))
+        return dt.strftime("%Y-%m-%d at %H:%M ")

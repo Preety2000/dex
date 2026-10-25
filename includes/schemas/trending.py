@@ -47,7 +47,7 @@ class ArticleTrendingService:
         query = (
             select(Article, rank_column)
             .join(ArticleView, Article.id == ArticleView.id)
-            .where(Article.status == "Publish", Article.parameter != 0)
+            .where(Article.status == "publish", Article.parameter != 0)
             .order_by(ArticleView.updated_at.desc(), ArticleView.view_count.desc())
         )
 

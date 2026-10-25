@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy import func, select
 
 from includes.core.config import app_context
+from includes.core.metadata import MetaData
 from includes.database.connection import config_secondary_db
 from includes.database.dataclass.dataclass import _Article, _Terms
 from includes.database.models.secondary import Article, ArticleMetadata, Trending
@@ -17,11 +18,11 @@ articalNotFondmessage = "<h2>त्रुटि: फ़ाइल नहीं �
 
 
 def get_excerpt(article, max_length=180):
-    content = article.content.replace(
-        "{{appname}}", app_context.config.get("site_name", "")
-    ).replace("{{appmail}}", app_context.config.get("app_mail", ""))
-    text = BeautifulSoup(content, "html.parser").get_text(" ", strip=True)
+    metadata = MetaData()
+    content = article.content.replace("{{appname}}", metadata.app_name)
+    content = content.replace("{{appmail}}", metadata.app_mail)
 
+    text = BeautifulSoup(content, "html.parser").get_text(" ", strip=True)
     if not text:
         return ""
 

@@ -353,11 +353,17 @@ async def execute_request(request: Request = None):
             response.pop("mdata", None)
             types = response.get("type")
             response["reseant_parameter"] = await ArticleService.get_filtered_articles(
-                request=request, parameter=resource_query.id, limit=10, desc="id",
+                request=request,
+                parameter=resource_query.id,
+                limit=10,
+                desc="id",
             )
             if isinstance(types, dict) and types.get("Id"):
                 response["reseant_type"] = await ArticleService.get_filtered_articles(
-                    request=request, type=types["Id"], limit=10, desc="id",
+                    request=request,
+                    type=types["Id"],
+                    limit=10,
+                    desc="id",
                 )
 
             await request.state.metadata.update(response)
@@ -370,21 +376,22 @@ async def execute_request(request: Request = None):
             return response
 
     # Fallback Article Lookup
-    data = await ArticleService.find_article(
-        slug=request.state.roote.section, parameter=0
-    )
-    if data:
-        page_list = await ArticleService.get_page_lists(
-            desc="id", limit=6, request=request
+    if not request.state.roote.scope:
+        data = await ArticleService.find_article(
+            slug=request.state.roote.section, parameter=0
         )
-        configure_page(
-            request.state.metadata, template="query/page", title=data.get("title")
-        )
-        return {
-            "page_type": "article",
-            "data_querys": data,
-            "page_list": page_list,
-        }
+        if data:
+            page_list = await ArticleService.get_page_lists(
+                desc="id", limit=6, request=request
+            )
+            configure_page(
+                request.state.metadata, template="query/page", title=data.get("title")
+            )
+            return {
+                "page_type": "article",
+                "data_querys": data,
+                "page_list": page_list,
+            }
 
     return {}
 

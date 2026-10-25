@@ -3,12 +3,14 @@ from uuid import UUID, uuid4
 from typing import Any, List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
+
 # Helper function for default UUID string generation
 def generate_uuid_str() -> str:
     return str(uuid4())
 
 
 # 1. TeacherProfile Schemas
+
 
 class TeacherProfileBase(BaseModel):
     name: Optional[str] = Field(None, max_length=255)
@@ -22,8 +24,10 @@ class TeacherProfileBase(BaseModel):
     exam_category: List[Any] = Field(default_factory=list)
     student_limit: int = 250
 
+
 class TeacherProfileCreate(TeacherProfileBase):
     pass
+
 
 class TeacherProfileUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=255)
@@ -37,6 +41,7 @@ class TeacherProfileUpdate(BaseModel):
     exam_category: Optional[List[Any]] = None
     student_limit: Optional[int] = None
 
+
 class TeacherProfileResponse(TeacherProfileBase):
     id: int
     timestamp: datetime
@@ -44,6 +49,7 @@ class TeacherProfileResponse(TeacherProfileBase):
 
 
 # 2. ExamDetails Schemas
+
 
 class ExamDetailsBase(BaseModel):
     teacher_id: int
@@ -60,8 +66,10 @@ class ExamDetailsBase(BaseModel):
     start_timestamp: Optional[datetime] = None
     publish_timestamp: Optional[datetime] = None
 
+
 class ExamDetailsCreate(ExamDetailsBase):
     keys: str = Field(default_factory=generate_uuid_str)
+
 
 class ExamDetailsUpdate(BaseModel):
     exam_name: Optional[str] = None
@@ -77,6 +85,7 @@ class ExamDetailsUpdate(BaseModel):
     start_timestamp: Optional[datetime] = None
     publish_timestamp: Optional[datetime] = None
 
+
 class ExamDetailsResponse(ExamDetailsBase):
     id: int
     keys: UUID
@@ -86,6 +95,7 @@ class ExamDetailsResponse(ExamDetailsBase):
 
 
 # 3. ExamRequestSession Schemas
+
 
 class ExamRequestSessionBase(BaseModel):
     roll_no: int
@@ -107,8 +117,10 @@ class ExamRequestSessionBase(BaseModel):
     leave_timestamps: List[Any] = Field(default_factory=list)
     removed_timestamps: List[Any] = Field(default_factory=list)
 
+
 class ExamRequestSessionCreate(ExamRequestSessionBase):
     pass
+
 
 class ExamRequestSessionUpdate(BaseModel):
     student_name: Optional[str] = None
@@ -123,6 +135,7 @@ class ExamRequestSessionUpdate(BaseModel):
     leave_timestamps: Optional[List[Any]] = None
     removed_timestamps: Optional[List[Any]] = None
 
+
 class ExamRequestSessionResponse(ExamRequestSessionBase):
     id: int
     started_at: datetime
@@ -131,6 +144,7 @@ class ExamRequestSessionResponse(ExamRequestSessionBase):
 
 
 # 4. ExamRecord Schemas
+
 
 class ExamRecordBase(BaseModel):
     roll_no: int
@@ -143,8 +157,10 @@ class ExamRecordBase(BaseModel):
     is_submitted: bool = False
     submitted_on: Optional[datetime] = None
 
+
 class ExamRecordCreate(ExamRecordBase):
     key: str = Field(default_factory=generate_uuid_str)
+
 
 class ExamRecordUpdate(BaseModel):
     pe_point: Optional[str] = Field(None, max_length=255)
@@ -155,6 +171,7 @@ class ExamRecordUpdate(BaseModel):
     is_submitted: Optional[bool] = None
     submitted_on: Optional[datetime] = None
 
+
 class ExamRecordResponse(ExamRecordBase):
     id: int
     key: UUID
@@ -164,6 +181,7 @@ class ExamRecordResponse(ExamRecordBase):
 
 
 # 5. PracticeExamRecord Schemas
+
 
 class PracticeExamRecordBase(BaseModel):
     roll_no: int
@@ -176,8 +194,10 @@ class PracticeExamRecordBase(BaseModel):
     is_submitted: bool = False
     submitted_on: Optional[datetime] = None
 
+
 class PracticeExamRecordCreate(PracticeExamRecordBase):
     key: str = Field(default_factory=generate_uuid_str)
+
 
 class PracticeExamRecordUpdate(BaseModel):
     pe_point: Optional[str] = Field(None, max_length=255)
@@ -187,6 +207,7 @@ class PracticeExamRecordUpdate(BaseModel):
     allmarks: Optional[float] = None
     is_submitted: Optional[bool] = None
     submitted_on: Optional[datetime] = None
+
 
 class PracticeExamRecordResponse(PracticeExamRecordBase):
     id: int
@@ -198,18 +219,22 @@ class PracticeExamRecordResponse(PracticeExamRecordBase):
 
 # 6. StudentTeacherAssociation Schemas
 
+
 class StudentTeacherAssociationBase(BaseModel):
     st_roll_no: int
     teacher_id: int
     exam_category: List[Any] = Field(default_factory=list)
     link_status: int = 1
 
+
 class StudentTeacherAssociationCreate(StudentTeacherAssociationBase):
     pass
+
 
 class StudentTeacherAssociationUpdate(BaseModel):
     exam_category: Optional[List[Any]] = None
     link_status: Optional[int] = None
+
 
 class StudentTeacherAssociationResponse(StudentTeacherAssociationBase):
     timestamp: datetime

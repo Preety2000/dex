@@ -22,7 +22,7 @@ class PageContext:
     keywords: list[str] = field(default_factory=list)
 
     # SEO
-    site_name: str = "MyApplication"
+    app_name: str = "MyApplication"
     site_url: str = ""
     site_domain: str = ""
     canonical_url: str = ""

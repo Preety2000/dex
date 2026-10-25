@@ -1,5 +1,5 @@
 from includes.src.request import Request
-from sqlalchemy import case, delete, func, or_, select
+from sqlalchemy import case, delete, func, or_, select, update
 
 from includes.admin.api.schemas.practice import AdminApiMCQ
 from includes.admin.modals import checked, emptyMessage
@@ -32,8 +32,8 @@ class AdminClassObjective:
 
         stmt = select(
             func.count(QuizQuestion.id).label("total"),
-            func.count(case((QuizQuestion.status == "Draft", 1))).label("draft"),
-            func.count(case((QuizQuestion.status == "Publish", 1))).label("publish"),
+            func.count(case((QuizQuestion.status == "draft", 1))).label("draft"),
+            func.count(case((QuizQuestion.status == "publish", 1))).label("publish"),
         )
 
         result = db.execute(stmt).one()
@@ -41,6 +41,11 @@ class AdminClassObjective:
         set_response(self.request, "total", result.total)
         set_response(self.request, "draft", result.draft)
         set_response(self.request, "publish", result.publish)
+
+        # 1. Update query banayein (Jahan status False ho, unhein update karna hai)
+        stmt = update(QuizQuestion).values(status="publish")
+        db.execute(stmt)
+
 
         data = await NewQueryPaginator.paginate(
             db=db,
@@ -341,11 +346,8 @@ class AdminClassObjective:
         db = await config_secondary_db()
 
         # Status Toggle
-        if action_type in [
-            "trash",
-            "publish",
-        ]:
-            question_record.status = "Draft" if action_type == "trash" else "Publish"
+        if action_type in ["trash", "publish"]:
+            question_record.status = "draft" if action_type == "trash" else "publish"
 
             db.commit()
 

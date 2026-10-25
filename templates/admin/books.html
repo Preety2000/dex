@@ -21,9 +21,12 @@
             <th class="manage-column column-name">
                 <div class="query-title">{{item.name}}</div>
                 <div class="row-actions">
-                    <span class="edit"><a href="/admin/books/update?item={{item.id}}&qas={{item.slug}}">Edit</a> | </span>
-                    <span class="inline"><a type="button" class="button-link editinline" aria_data="{{item.id}}"  aria-expanded="false" href="javascript:void(0)">Quick Edit</a> | </span>
-                    <span class="trash"><a href="/admin/books/delete?item={{item.id}}&action=delete&qas={{item.slug}}" class="submitdelete" >Bin</a> | </span>
+                    <span class="edit"><a href="/admin/books/update?item={{item.id}}&qas={{item.slug}}">Edit</a> |
+                    </span>
+                    <span class="inline"><a type="button" class="button-link editinline" aria_data="{{item.id}}"
+                            aria-expanded="false" href="javascript:void(0)">Quick Edit</a> | </span>
+                    <span class="trash"><a href="/admin/books/delete?item={{item.id}}&action=delete&qas={{item.slug}}"
+                            class="submitdelete">Bin</a> | </span>
                     <span class="view"><a href="/{{item.uri}}" rel="bookmark" target="_blank">View</a></span>
                 </div>
             </th>

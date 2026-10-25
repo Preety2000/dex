@@ -1,7 +1,12 @@
 {% extends "admin/base.html" %}
 
 {% block head %}
-<style>.column-category, .column-date{width: 20%;}</style>
+<style>
+    .column-category,
+    .column-date {
+        width: 20%;
+    }
+</style>
 
 {% endblock %}
 
@@ -33,7 +38,7 @@
         </thead>
         <tbody>
             {% for content in params.data_querys %}
-            <tr {% if content.status == "Draft" %}class="trash-list"{%endif%}>
+            <tr {% if content.status=="draft" %}class="trash-list" {%endif%}>
                 <th class="manage-column check-column">
                     <div class="hidden query-{{content.id}}" style="display: none;">
                         <div id="{{content.id}}" class="quick-editesDIS00width">
@@ -47,13 +52,17 @@
                     <label class="screen-F0019" for="cb-select-{{content.id}}">Select</label>
                     <input class="cb-select" id="cb-select-{{content.id}}" type="checkbox">
                 </th>
-                <th class="manage-column column-image"><img width="40" height="40" style="width: 40px;height:40px;" src="{{content.image_src}}" alt="{{content.name }}"></th>
+                <th class="manage-column column-image"><img width="40" height="40" style="width: 40px;height:40px;"
+                        src="{{content.image_src}}" alt="{{content.name }}"></th>
                 <th class="manage-column column-name">
-                    <strong><a href="/admin/category/update?item={{content.id}}&action=edit" class="query-title action-category">{{content.name}}</a></strong>
+                    <strong><a href="/admin/category/update?item={{content.id}}&action=edit"
+                            class="query-title action-category">{{content.name}}</a></strong>
                     <div class="row-actions">
                         <span class="edit"><a href="javascript:void(0)">Edit</a> | </span>
-                        <span class="inline"><a type="button" class="button-link editinline" aria_data="{{content.id}}"  aria-expanded="false" href="javascript:void(0)">Quick Edit</a> | </span>
-                        <span class="trash"><a href="/admin/category/delete?item={{content.id}}&action=trash" class="submitdelete" >Bin</a> | </span>
+                        <span class="inline"><a type="button" class="button-link editinline" aria_data="{{content.id}}"
+                                aria-expanded="false" href="javascript:void(0)">Quick Edit</a> | </span>
+                        <span class="trash"><a href="/admin/category/delete?item={{content.id}}&action=trash"
+                                class="submitdelete">Bin</a> | </span>
                     </div>
                 </th>
 
@@ -76,9 +85,12 @@
             <div class="inside">
                 <div id="taxonomy-category" class="categorydiv">
                     <ul id="category-tabs" class="category-tabs">
-                        <li class="tabs"><a class="category-type-button" aria-label="category-all" href="javascript:void(0)">All Categories</a></li>
-                        <li><a class="category-type-button" aria-label="category-pop" href="javascript:void(0)">Selector Categories</a></li>
-                        <li><a id="category-add-toggle" href="javascript:void(0)" class="add-new-category">+ Add New Category </a></li>
+                        <li class="tabs"><a class="category-type-button" aria-label="category-all"
+                                href="javascript:void(0)">All Categories</a></li>
+                        <li><a class="category-type-button" aria-label="category-pop" href="javascript:void(0)">Selector
+                                Categories</a></li>
+                        <li><a id="category-add-toggle" href="javascript:void(0)" class="add-new-category">+ Add New
+                                Category </a></li>
                     </ul>
 
                     <div id="category-all" class="tabs-panel category-all">

@@ -1,3 +1,4 @@
+from includes.admin.login import AdminLogin
 from includes.src.request import Request
 
 from includes.core.globals.initialize import initialize_database
@@ -23,8 +24,9 @@ class ADMIN_API:
     async def index(self, request: Request = None, roots: Route = None):
 
         await initialize_database(request)
-
-        if await self.admin.user_verifaction(request.state.roote.entity):
+        
+        login_sesion = AdminLogin(request=request)
+        if await login_sesion.user_verification(request.state.roote.entity):
             return json_response("Session End! 😒")
 
         if "insert" == request.state.roote.entity:

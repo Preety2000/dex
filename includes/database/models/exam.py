@@ -30,9 +30,6 @@ def generate_connect_key():
     return os.urandom(5).hex()
 
 
-
-
-
 # TEACHER PROFILE
 @dataclass
 class _TeacherProfile:

@@ -21,8 +21,6 @@ class TermsCache:
         TermsCacheData.BySlug[record.slug] = record.id
         TermsCacheData.ByName[record.name] = record.id
 
-        print("TermsCache update with id =>", record)
-
         return record
 
     @staticmethod

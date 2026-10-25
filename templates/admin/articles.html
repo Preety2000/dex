@@ -33,7 +33,7 @@
         </thead>
         <tbody>
             {% for content in data_querys %}
-            <tr class="{{'_isfalse' if content.status == 'Draft' else '_istrue' }}">
+            <tr class="{{'_isfalse' if content.status == 'draft' else '_istrue' }}">
                 <th class="manage-column check-column">
                     <div class="hidden query-{{content.id}}" style="display: none;">
                         <div id="{{content.id}}" class="quick-editesDIS00width">
@@ -59,17 +59,18 @@
                                 href="/admin/content/update?item={{content.id}}&qas={{content.slug}}">Edit</a> | </span>
                         <span class="inline"><a type="button" class="button-link editinline" aria_data="{{content.id}}"
                                 aria-expanded="false" href="javascript:void(0)">Quick Edit</a> | </span>
-                        {%if content.status == 'Draft' %}<span class="publish"><a
+                        {%if content.status == 'draft' %}<span class="publish"><a
                                 href="/admin/content/delete?item={{content.id}}&action=publish&qas={{content.slug}}"
                                 class="submitdelete">Publish</a> | </span>{%endif%}
                         <span class="trash"><a
-                                href="/admin/content/delete?item={{content.id}}&action={{'delete' if content.status == 'Draft' else 'trash' }}&qas={{content.slug}}"
-                                class="submitdelete">{{'Delete' if content.status == 'Draft' else 'Bin' }}</a> | </span>
+                                href="/admin/content/delete?item={{content.id}}&action={{'delete' if content.status == 'draft' else 'trash' }}&qas={{content.slug}}"
+                                class="submitdelete">{{'Delete' if content.status == 'draft' else 'Bin' }}</a> | </span>
                         <span class="view"><a href="{{content.uri}}" rel="bookmark" target="_blank">View</a></span>
                     </div>
                 </th>
                 <th class="manage-column column-parameter">{{content.parameters.name}}</th>
-                <th class="manage-column column-subject"> {{ content.subject.name if content.subject else "Default" }}</th>
+                <th class="manage-column column-subject"> {{ content.subject.name if content.subject else "Default" }}
+                </th>
                 <th class="manage-column column-category">
                     <a href="javascript:void(0)" class="sowing-data" title="category" jsname="shodetails"
                         aria-label="{{ content.category | map(attribute='name') | join(',') }}">{{ content.category |
@@ -82,7 +83,7 @@
                 </th>
                 <th class="manage-column column-comment">{{content.comment}}</th>
                 <th class="manage-column column-views">{{content.views}}</th>
-                <th class="manage-column column-date">{{content.update_timestamp}}</th>
+                <th class="manage-column column-date">{{function.format_tm(content.update_timestamp)}}</th>
             </tr>
             {% endfor %}
         </tbody>

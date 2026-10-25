@@ -10,7 +10,7 @@
     <!-- Lenk Session  -->
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
-    <link rel="search" type="application/opensearchdescription+xml" title="{{response.site_name  | safe}}"
+    <link rel="search" type="application/opensearchdescription+xml" title="{{response.app_name  | safe}}"
         href="/opensearch.xml">
 
     <!-- Twitter meta session  -->
@@ -138,7 +138,7 @@
                         jsname="subMenu">{{svg.menu_nine | safe}}</a>{%if auth_session %}
                     <a href="#accountWindow" js-name="button" role='button' class='member button icon'
                         jsname="accountWindow"
-                        aria-label="{{response.site_name  | safe}} खाता: {{auth_session.name}}  {{auth_session.email}}">
+                        aria-label="{{response.app_name  | safe}} खाता: {{auth_session.name}}  {{auth_session.email}}">
                         <img loading='eager' height="34" width="34"
                             src="{{auth_session.img or 'icon/member.png'}}?size=50x50" alt="User Profile Image">
                     </a>{% else %}
@@ -246,7 +246,7 @@
         {%else%}
         <div class="IN053">
             <p class="copyright">Copyright © 2021-2025 | <a href="/"
-                    title="{{response.site_name  | safe}}">{{response.site_name | safe}}</a> | All Right Reserved</p>
+                    title="{{response.app_name  | safe}}">{{response.app_name | safe}}</a> | All Right Reserved</p>
         </div>
         {%endif%}
     </div>

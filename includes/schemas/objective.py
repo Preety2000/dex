@@ -123,7 +123,7 @@ async def get_mcq_by_terms_id(
         )
         .where(
             QuizRelationships.terms_id == terms_id,
-            QuizQuestion.status == "Publish",
+            QuizQuestion.status == "publish",
         )
         .distinct()
     )
@@ -172,7 +172,7 @@ class ClassObjective:
                 QuizRelationships.quiz_id == QuizQuestion.id,
             ).where(QuizRelationships.terms_id == terms_id)
 
-        query = query.where(QuizQuestion.status == "Publish")
+        query = query.where(QuizQuestion.status == "publish")
 
         for key, value in more.items():
             column = getattr(QuizQuestion, key, None)
@@ -212,7 +212,7 @@ class ClassObjective:
         # Default questions
         if not term_slug or term_slug == "default":
 
-            query = select(QuizQuestion).where(QuizQuestion.status == "Publish")
+            query = select(QuizQuestion).where(QuizQuestion.status == "publish")
 
             data = await NewQueryPaginator.paginate(
                 types="query",
@@ -247,7 +247,7 @@ class ClassObjective:
             )
             .where(
                 QuizRelationships.terms_id == term_id,
-                QuizQuestion.status == "Publish",
+                QuizQuestion.status == "publish",
             )
             .distinct()
         )
@@ -345,7 +345,7 @@ class ClassObjective:
         # Status
         # ----------------------------------
 
-        query = query.where(QuizQuestion.status == "Publish").distinct()
+        query = query.where(QuizQuestion.status == "publish").distinct()
 
         # ----------------------------------
         # Ordering

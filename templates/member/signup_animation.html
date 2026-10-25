@@ -130,7 +130,7 @@
                     jsname="subMenu">{{svg.menu_nine | safe}}</a>{%if auth_session %}
                 <a href="#accountWindow" js-name="button" role='button' class='member button icon'
                     jsname="accountWindow"
-                    aria-label="{{response.site_name  | safe}} खाता: {{auth_session.name}}  {{auth_session.email}}">
+                    aria-label="{{response.app_name  | safe}} खाता: {{auth_session.name}}  {{auth_session.email}}">
                     <img loading='eager' height="34" width="34"
                         src="{{auth_session.img or 'icon/member.png'}}?size=50x50" alt="User Profile Image">
                 </a>{% else %}
@@ -176,7 +176,7 @@
                 <div class="logo-container">
                     {{svg.ic_logo | safe}}
                     <p>
-                        {{site_name}} is an education and online examination platform designed to connect students and
+                        {{app_name}} is an education and online examination platform designed to connect students and
                         teachers in one place. Students can learn, practice and take exams, while teachers can create,
                         manage and conduct examinations easily.
                     </p>

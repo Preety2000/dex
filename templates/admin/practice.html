@@ -31,7 +31,7 @@
         </thead>
         <tbody>
             {% for content in data_querys %}
-            <tr {% if content.status=="Draft" %}class="trash-list" {%endif%}>
+            <tr {% if content.status=="draft" %}class="trash-list" {%endif%}>
                 <th class="manage-column check-column">
                     <div class="hidden query-{{content.id}}" style="display: none;">
                         <div id="{{content.id}}" class="quick-editesDIS00width">
@@ -53,12 +53,12 @@
                                 href="/admin/practice/update?{{getallsearch}}&item={{content.id}}">Edit</a> | </span>
                         <span class="inline"><a type="button" class="button-link editinline" aria_data="{{content.id}}"
                                 aria-expanded="false" href="javascript:void(0)">Quick Edit</a> | </span>
-                        {%if content.status == 'Draft' %}<span class="publish"><a
+                        {%if content.status == 'draft' %}<span class="publish"><a
                                 href="/admin/practice/delete?{{getallsearch}}&item={{content.id}}&action=publish"
                                 class="submitdelete">Publish</a> | </span>{%endif%}
                         <span class="trash"><a
-                                href="/admin/practice/delete?{{getallsearch}}&item={{content.id}}&action={{'delete' if content.status == 'Draft' else 'trash' }}"
-                                class="submitdelete">{{'Delete' if content.status == 'Draft' else 'Bin' }}</a> | </span>
+                                href="/admin/practice/delete?{{getallsearch}}&item={{content.id}}&action={{'delete' if content.status == 'draft' else 'trash' }}"
+                                class="submitdelete">{{'Delete' if content.status == 'draft' else 'Bin' }}</a> | </span>
                         <span class="view"><a href="{{content.url}}" rel="bookmark" target="_blank">View</a></span>
                     </div>
                 </th>
@@ -68,7 +68,7 @@
                         aria-label="{{content.category}}">{{content.category | length}}</a>
                 </th>
                 <th class="manage-column column-views">{{content.views}}</th>
-                <th class="manage-column column-date">{{content.timestamp}}</th>
+                <th class="manage-column column-date">{{function.format_tm(content.timestamp)}}</th>
             </tr>
             {% endfor %}
         </tbody>

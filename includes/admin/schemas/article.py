@@ -94,7 +94,7 @@ async def json(query: Article) -> Optional[dict[str, Any]]:
         }
 
     metadata_dict = await _fetch_metadata(article.mdata)
-    # views_count = await MetricsManager.get_article_view(article.id)
+    views_count = await MetricsManager.get_article_view(article.id)
 
     metadata_dict.update(
         {
@@ -113,6 +113,7 @@ async def json(query: Article) -> Optional[dict[str, Any]]:
             "parameter": query.parameter,
             "timestamp": str(query.timestamp),
             "thumbnail": query.thumbnail,
+            "views": views_count,
             "comment_status": query.comment_status,
             "update_timestamp": str(query.update_timestamp),
         }
@@ -134,8 +135,8 @@ class AdminArticleService:
         db = await config_secondary_db()
         stmt = select(
             func.count(Article.id).label("total"),
-            func.count(case((Article.status == "Draft", 1))).label("draft"),
-            func.count(case((Article.status == "Publish", 1))).label("publish"),
+            func.count(case((Article.status == "draft", 1))).label("draft"),
+            func.count(case((Article.status == "publish", 1))).label("publish"),
         )
 
         # Single query execution
@@ -145,6 +146,11 @@ class AdminArticleService:
         set_response(self.request, "total", result.total)
         set_response(self.request, "draft", result.draft)
         set_response(self.request, "publish", result.publish)
+
+
+        # Update query banayein (Jahan status False ho, unhein update karna hai)
+        # stmt = (update(Article).values(status="publish"))
+        # db.execute(stmt)
 
         data = await NewQueryPaginator.paginate(
             db=db,
@@ -260,6 +266,10 @@ class AdminArticleService:
         ]
 
     async def insert(self, data_querys: dict[str, Any]):
+        print(
+            "self.request.state.response.get error",
+            self.request.state.response.get("error"),
+        )
         if self.request.state.response.get("error"):
             return data_querys
 
@@ -387,7 +397,7 @@ class AdminArticleService:
         query = (
             select(Article, rank_column)
             .join(ArticleView, Article.id == ArticleView.id)
-            .where(Article.status == "Publish", Article.parameter != 0)
+            .where(Article.status == "publish", Article.parameter != 0)
             .order_by(ArticleView.updated_at.desc(), ArticleView.view_count.desc())
             .limit(limit)
         )
@@ -545,7 +555,7 @@ class AdminArticleService:
         article = db.execute(stmt).scalar_one_or_none()
 
         if article and action_type in ["trash", "publish"]:
-            article.status = "Draft" if action_type == "trash" else "Publish"
+            article.status = "draft" if action_type == "trash" else "publish"
             db.commit()
             return True
 
@@ -651,6 +661,13 @@ class AdminArticleService:
 
             for field in integer_fields:
                 article_data[field] = int(article_data.get(field) or 0)
+
+            parameter = article_data["parameter"]
+            page_record = await TermsCache.get_by_slug("p")
+            if parameter == 0 or (
+                isinstance(page_record, _Terms) and page_record.id == parameter
+            ):
+                optional_fields.update({"type", "tags", "excerpt", "category"})
 
             for key, value in article_data.items():
                 if is_empty(value) and key not in optional_fields:

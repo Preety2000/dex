@@ -304,7 +304,7 @@ class Exam:
 
         total = db.execute(count_stmt).scalar_one()
 
-        pagination = Pagination(request=request, request_type= "referer")
+        pagination = Pagination(request=request, request_type="referer")
         await pagination.load(limit=limit)
 
         offset = pagination.get_offset()

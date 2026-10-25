@@ -1,6 +1,7 @@
 import inspect
 from typing import Optional
 from bs4 import BeautifulSoup
+from includes.core.metadata import MetaData
 from includes.src.request import Request
 from sqlalchemy import desc, func, select
 from includes.core.config import app_context
@@ -25,23 +26,6 @@ articalNotFondmessage = "<h2>Error: Can't read file, or Article cannot be opened
 articalNotFondmessage = "<h2>त्रुटि: फ़ाइल नहीं पढ़ी जा सकती, या लेख नहीं खोला जा सकता</h2><p>ऐसा लगता है कि आप एक त्रुटि संदेश से निपट रहे हैं जो यह दर्शाता है कि फ़ाइल पढ़ी नहीं जा सकती या लेख नहीं खोला जा सकता। इस समस्या के कुछ संभावित कारण और समस्या निवारण के तरीके यहां दिए गए हैं:</p><ol><li><p><strong>फ़ाइल पथ समस्याएँ</strong>:</p><ul><li><strong>फ़ाइल पथ जाँचें</strong>: सुनिश्चित करें कि आप जिस फ़ाइल पथ का उपयोग कर रहे हैं वह सही है। सत्यापित करें कि फ़ाइल निर्दिष्ट स्थान पर मौजूद है।</li><li><strong>सापेक्ष बनाम निरपेक्ष पथ</strong>: यदि आप सापेक्ष पथ का उपयोग कर रहे हैं, तो अस्पष्टता से बचने के लिए निरपेक्ष पथ का उपयोग करने का प्रयास करें।</li></ul></li><li><p><strong>फ़ाइल अनुमतियाँ</strong>:</p><ul><li><strong>अनुमतिएँ</strong>: सुनिश्चित करें कि आपके पास फ़ाइल तक पहुँचने के लिए आवश्यक अनुमतियाँ हैं। आपको फ़ाइल अनुमतियों को समायोजित करने या अपने एप्लिकेशन को उच्च विशेषाधिकारों के साथ चलाने की आवश्यकता हो सकती है।</li></ul></li><li><p><strong>फ़ाइल भ्रष्टाचार</strong>:</p><ul><li><strong>फ़ाइल अखंडता की जाँच करें</strong>: फ़ाइल दूषित या क्षतिग्रस्त हो सकती है। यह देखने के लिए कि क्या यह काम करता है, इसे किसी अन्य एप्लिकेशन या टूल के साथ खोलने का प्रयास करें।</li></ul></li><li><p><strong>फ़ाइल प्रारूप</strong>:</p><ul><li><strong>समर्थित प्रारूप</strong>: सत्यापित करें कि फ़ाइल प्रारूप आपके एप्लिकेशन द्वारा समर्थित है। यदि नहीं, तो आपको फ़ाइल को संगत प्रारूप में परिवर्तित करने की आवश्यकता हो सकती है।</li></ul></li><li><p><strong>एप्लिकेशन त्रुटियाँ</strong>:</p><ul><li><strong>त्रुटि प्रबंधन</strong>: सुनिश्चित करें कि फ़ाइल-संबंधी समस्याओं से निपटने के लिए आपके एप्लिकेशन में उचित त्रुटि प्रबंधन है।</li><li><strong>लॉग और डिबगिंग</strong>: अधिक विशिष्ट त्रुटि संदेशों के लिए एप्लिकेशन लॉग या डिबग आउटपुट की जाँच करें।</li></ul></li></ol>"
 
 
-def get_excerpt(article, max_length=180):
-    content = article.content.replace(
-        "{{appname}}", app_context.config.get("site_name", "")
-    ).replace("{{appmail}}", app_context.config.get("app_mail", ""))
-    text = BeautifulSoup(content, "html.parser").get_text(" ", strip=True)
-
-    if not text:
-        return ""
-
-    first, *rest = [p.strip() for p in text.split("।") if p.strip()]
-
-    if len(first) < max_length and rest:
-        return f"{first}। {rest[0]}।"
-
-    return f"{first}।"
-
-
 class ArticleService:
 
     @staticmethod
@@ -54,13 +38,11 @@ class ArticleService:
         await get_artical_url(article)
         await enrich_article(article, excerpt=True, suggestion=True)
 
+        metadata = MetaData()
+
         # Replace placeholders in content
-        article.content = article.content.replace(
-            "{{appname}}", app_context.config.get("site_name", "")
-        )
-        article.content = article.content.replace(
-            "{{appmail}}", app_context.config.get("app_mail", "")
-        )
+        article.content = article.content.replace("{{appname}}", metadata.app_name)
+        article.content = article.content.replace("{{appmail}}", metadata.app_mail)
 
         dictionary = to_dict(article)
         dictionary.update(
@@ -100,7 +82,7 @@ class ArticleService:
 
             article_query = article_query.filter(column == value)
 
-        article = article_query.filter(Article.status == "Publish").first()
+        article = article_query.filter(Article.status == "publish").first()
         return (
             await ArticleService.serialize_article(
                 await article.to_dataclass(category=True, like=True, tags=True)
@@ -126,7 +108,7 @@ class ArticleService:
                 remaining_kwargs[key] = value
 
         # Always ensure Published status filter
-        local_conditions.append(Article.status == "Publish")
+        local_conditions.append(Article.status == "publish")
 
         # Fix Modern SQLAlchemy 2.0 select() Query Construction
         query = select(Article).where(*local_conditions).group_by(Article.id)
@@ -206,7 +188,7 @@ class ArticleService:
             .join(TermsRelationship, TermsRelationship.article_id == Article.id)
             .where(
                 TermsRelationship.terms_id == terms_id,
-                Article.status == "Publish",
+                Article.status == "publish",
             )
             .distinct()
         )
@@ -254,7 +236,7 @@ class ArticleService:
             .join(UserRelationships, UserRelationships.article_id == Article.id)
             .where(
                 UserRelationships.users_id == member_id,
-                Article.status == "Publish",
+                Article.status == "publish",
             )
         )
 

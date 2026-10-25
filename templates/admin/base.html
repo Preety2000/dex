@@ -12,12 +12,20 @@
     <link rel="stylesheet" href="/static/css/admin/article.css">
     {% block head %}{% endblock %}
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <script>const None = null, Geolobal = eval(`{{response.Geolobal | safe}}`), GeolobalData = {
-            subjects: eval(`{{response.subjects | safe}}`),
-
-        }</script>
+    <script>
+        const None = null, SESSION_EXP = eval(`{{session_exp}}`), Geolobal = eval(`{{response.Geolobal | safe}}`), GeolobalData = {
+            subjects: eval(`{{response.subjects | safe}}`)
+        }
+    </script>
     <script src="/script/index.js"></script>
-
+    <style>
+        .time-left {
+            background: var(--danger);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--danger-bg);
+        }
+    </style>
 </head>
 
 
@@ -35,7 +43,7 @@
     {% if publish %}
     <span class="separator">|</span>
     <div class="publish">
-        <a href="?where=/status=publish/&order=/asc=id">Published <span class="count">({{ publish }})</span></a>
+        <a href="?where=/status=publish/&order=/asc=id">Published<span class="count">({{ publish }})</span></a>
     </div>
     {% endif %}
 
@@ -76,7 +84,7 @@
             <div class="nv-header DIS01">
                 <div class="icon menu-button"><i class="fa-classic fa-bars"></i></div>
                 <div class="logo DIS01">
-                    <div class="siteName">{{app_context.site_name | safe}}</div>
+                    <div class="siteName">{{app_context.app_name | safe}}</div>
                 </div>
             </div>
             <form action="" class="form">
@@ -100,6 +108,7 @@
                 <div jsname="userInfo" class="icon">
                     <i class="fa-classic fa-member"></i>
                 </div>
+                <div class="time-left">00:00:00</div>
             </div>
         </header>
         <div class="DIS00 container">

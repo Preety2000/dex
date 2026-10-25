@@ -50,21 +50,18 @@ def timestamp_to_int(timestamp):
 
 class IsMember:
 
-    @staticmethod
-    async def teacher_indentity(request: Request = None):
+    def __init__(self, request: Request):
+        self.request = request
+
+    async def teacher_indentity(self):
         verify = {}
         error = {}
         verify["status"] = 0
         verify["error"] = error
 
-        request.state.response["formView"] = True
-        request.state.response["verify"] = verify
+        self.request.state.response["formView"] = True
+        self.request.state.response["verify"] = verify
         data_querys = []
-
-        # for i in db.query(VerifyIdentity).all():
-        #     db.delete(i)
-
-        # db.commit()
 
         for item in db.query(VerifyIdentity).order_by(desc(VerifyIdentity.id)).all():
             uid = get_folder_key(int(item.user_id))
@@ -95,17 +92,16 @@ class IsMember:
                 }
             )
 
-        request.state.response["rejection_reasons"] = rejection_reasons
-        request.state.response["data_querys"] = data_querys
+        self.request.state.response["rejection_reasons"] = rejection_reasons
+        self.request.state.response["data_querys"] = data_querys
 
         return
 
-    @classmethod
-    async def _get_member(cls, request):
-        item = request.query_params.get("item")
+    async def _get_member(self):
+        item = self.request.query_params.get("item")
 
         if not item:
-            request.state.response["error"] = "Member ID is required."
+            self.request.state.response["error"] = "Member ID is required."
             return None
 
         msb = await db.configure_main()
@@ -113,25 +109,26 @@ class IsMember:
         member = msb.query(Members).filter(Members.id == item).first()
 
         if member is None:
-            request.state.response["error"] = "Member not found."
+            self.request.state.response["error"] = "Member not found."
             return None
 
         return member
 
-    @classmethod
-    async def block(cls, request):
-        force = int(request.query_params.get("force", 0))
-        member = await cls._get_member(request)
+    async def block(self):
+        force = int(self.request.query_params.get("force", 0))
+        member = await self._get_member(self.request)
 
         if member is None:
             return False
 
         if member.status == MemberRole.BLOCKED:
-            request.state.response["error"] = "Member is already blocked."
+            self.request.state.response["error"] = "Member is already blocked."
             return False
 
         if member.status == MemberRole.TEACHER and force != 1:
-            request.state.response["error"] = request.state.response["error"] = (
+            self.request.state.response["error"] = self.request.state.response[
+                "error"
+            ] = (
                 "Teacher members cannot be blocked. "
                 "If you still want to block this member, <a href='/members/block?item={member.id}&action=block&force=1'>click here</a> to continue."
             )
@@ -143,15 +140,14 @@ class IsMember:
 
         return True
 
-    @classmethod
-    async def unblock(cls, request):
-        member = await cls._get_member(request)
+    async def unblock(self):
+        member = await self._get_member(self.request)
 
         if member is None:
             return False
 
         if member.status != MemberRole.BLOCKED:
-            request.state.response["error"] = "Member is not blocked."
+            self.request.state.response["error"] = "Member is not blocked."
             return False
 
         member.status = MemberRole.PENDING
@@ -159,8 +155,7 @@ class IsMember:
 
         return True
 
-    @classmethod
-    async def get_member_list(cls, request: Request = None):
+    async def get_member_list(self):
 
         async def transform(record):
             data = await MemberCache._cache(record)
@@ -175,23 +170,22 @@ class IsMember:
             limit=10,
             types="query",
             model=Members,
-            request=request,
+            request=self.request,
             transform=transform,
             query=(select(Members).options(selectinload(Members.identity))),
         )
         return data.records
 
-    @classmethod
-    async def index(cls, roots: Route, request):
+    async def index(self, roots: Route):
         if roots.scope == "block":
-            await cls.block(request)
-            redirect_back(request, "admin/member")
+            await self.block(self.request)
+            redirect_back(self.request, "admin/member")
 
         if roots.scope == "unblock":
-            await cls.unblock(request)
-            redirect_back(request, "admin/member")
+            await self.unblock(self.request)
+            redirect_back(self.request, "admin/member")
 
-        data = await cls.get_member_list(request)
+        data = await self.get_member_list()
 
-        request.state.response["data_querys"] = data
+        self.request.state.response["data_querys"] = data
         return "admin/member"

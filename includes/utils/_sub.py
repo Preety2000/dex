@@ -17,7 +17,7 @@ def configure_page(
         metadata.template = template
 
     if title:
-        suffix_text = metadata.site_name if suffix is True else suffix
+        suffix_text = metadata.app_name if suffix is True else suffix
         metadata.title = f"{title} • {suffix_text}" if suffix_text else title
 
 

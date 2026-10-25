@@ -6,7 +6,7 @@ import mimetypes
 import posixpath
 import re
 import time
-import fitz
+import pymupdf
 from PIL import Image
 from rembg import new_session, remove
 from io import BytesIO
@@ -313,14 +313,14 @@ class FileUpload:
         global folder
 
         def pdf_to_icon(path, output):
-            doc = fitz.open(path)
+            doc = pymupdf.open(path)
 
             try:
                 if not doc.page_count:
                     return None
 
-                pix = doc[0].get_pixmap(matrix=fitz.Matrix(1, 1), alpha=False)
-                # pix = doc[0].get_pixmap(matrix=fitz.Matrix(2, 2), alpha=False)
+                pix = doc[0].get_pixmap(matrix=pymupdf.Matrix(1, 1), alpha=False)
+                # pix = doc[0].get_pixmap(matrix=pymupdf.Matrix(2, 2), alpha=False)
 
                 pix.save(output)
                 return output
