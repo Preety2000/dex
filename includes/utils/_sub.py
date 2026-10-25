@@ -1,4 +1,5 @@
 from includes.core.cache import AppCache
+from includes.core.metadata import MetaData
 from includes.core.config import main_database
 
 from includes.database.models.primary import Subject
